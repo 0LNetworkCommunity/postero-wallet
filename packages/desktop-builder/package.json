@@ -1,0 +1,26 @@
+{
+  "name": "@postero/desktop-builder",
+  "description": "Open Libra Wallet",
+  "version": "0.0.1",
+  "main": "src/index.js",
+  "author": {
+    "name": "Postero",
+    "email": "contact@postero.app"
+  },
+  "homepage": "https://postero.app/",
+  "scripts": {
+    "start": "electron .",
+    "compile": "node ./compile.js",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@electron/rebuild": "3.6.0",
+    "electron": "28.2.0",
+    "electron-builder": "24.9.1"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.1",
+    "electron-squirrel-startup": "^1.0.0"
+  }
+}

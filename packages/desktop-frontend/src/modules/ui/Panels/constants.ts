@@ -1,0 +1,12 @@
+
+export const SIDE_PANEL_INITIAL_WIDTH = 300;
+
+export const PANEL_RESIZE_HANDLE_WIDTH = 5;
+
+export const LEFT_PANEL_MIN_WIDTH = 200;
+export const LEFT_PANEL_MAX_WIDTH = 400;
+export const LEFT_PANEL_HIDE_THRESHOLD = 150;
+
+export const RIGHT_PANEL_MIN_WIDTH = 200;
+export const RIGHT_PANEL_MAX_WIDTH = 0.66;
+export const RIGHT_PANEL_HIDE_THRESHOLD = 150;

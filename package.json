@@ -1,0 +1,17 @@
+{
+  "name": "postero",
+  "version": "0.0.1",
+  "description": "Open Libra Wallet",
+  "repository": "git@github.com:wiri-ol/postero.git",
+  "author": "wiri <157544279+wiri-ol@users.noreply.github.com>",
+  "license": "UNLICENSED",
+  "private": true,
+  "workspaces": [
+    "packages/desktop-backend",
+    "packages/desktop-frontend",
+    "packages/desktop-builder",
+    "packages/mobile-frontend",
+    "packages/mobile-backend"
+  ],
+  "packageManager": "yarn@4.1.0"
+}
