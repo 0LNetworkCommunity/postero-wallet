@@ -66,7 +66,6 @@ class WalletService implements IWalletService {
   }
 
   public async syncWallet(id: string) {
-    console.log('sync', id);
     const wallet = await this.walletRepository.getWallet(id);
     if (wallet) {
       console.log('sync addre', wallet.accountAddress);

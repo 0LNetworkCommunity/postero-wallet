@@ -69,7 +69,7 @@ class WalletsResolver {
     return true;
   }
 
-  @ResolveField("balances", returns => [Balance])
+  @ResolveField((returns) => [Balance])
   public async balances(@Parent() wallet: GraphQLWallet) {
     try {
       await this.walletService.syncWallet(wallet.id);

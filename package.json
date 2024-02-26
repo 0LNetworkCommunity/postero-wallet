@@ -8,8 +8,7 @@
   "private": true,
   "workspaces": [
     "packages/mobile-frontend",
-    "packages/mobile-backend",
-    "packages/backend-test"
+    "packages/mobile-backend"
   ],
   "packageManager": "yarn@4.1.0"
 }
