@@ -5,7 +5,7 @@ import { IDbService } from "../db/interfaces";
 import { IBalanceFactory, IBalanceRepository } from "./interfaces";
 import Bluebird from "bluebird";
 import { ICoinFactory } from "../coin/interfaces";
-import Balance from "./Balance";
+import { Balance } from "./Balance";
 
 @Injectable()
 class BalanceRepository implements IBalanceRepository {
@@ -32,7 +32,7 @@ class BalanceRepository implements IBalanceRepository {
       })
       .where("walletId", walletId)
       .leftJoin("coins", "balances.coinId", "coins.id");
-    
+
     return Bluebird.map(rows, async (row) => {
       const coin = await this.coinFactory.createCoin(
         row.coinId,

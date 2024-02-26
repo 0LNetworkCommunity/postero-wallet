@@ -5,7 +5,7 @@ import { IDbService } from "../db/interfaces";
 import { CryptoWallet } from "../crypto/interfaces";
 import { PlatformTypes } from "../platform/platform-types";
 import Wallet from "../crypto/Wallet";
-import { PlatformEncryptedStoreService, EncryptedStoreRule, PlatformCryptoService } from "../platform/interfaces";
+import { PlatformEncryptedStoreService, PlatformCryptoService } from "../platform/interfaces";
 
 @Injectable()
 class WalletRepository implements IWalletRepository {

@@ -32,7 +32,7 @@ export class GraphQLService implements IGraphQLService {
     query: DocumentNode;
   }): Promise<any> {
     const res = await this.graphqlServer!.instance.executeOperation(operation, {
-      contextValue: window,
+      // contextValue: window,
     });
     return res.body;
   }

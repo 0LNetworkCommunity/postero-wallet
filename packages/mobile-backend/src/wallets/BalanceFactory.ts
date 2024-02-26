@@ -3,7 +3,7 @@ import { Inject, Injectable } from "@nestjs/common";
 
 import { IBalance, IBalanceFactory } from "./interfaces";
 import { Types } from "../types";
-import Balance from "./Balance";
+import { Balance } from "./Balance";
 import { ICoin } from "../coin/interfaces";
 
 @Injectable()

@@ -1,10 +1,11 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { v4 as uuid } from "uuid";
 
 import { ICoin, ICoinFactory, ICoinRepository } from "./interfaces";
 import { IOpenLibraService } from "../open-libra/interfaces";
 import { IDbService } from "../db/interfaces";
 import { Types } from "../types";
+import { PlatformTypes } from "../platform/platform-types";
+import { PlatformCryptoService } from "../platform/interfaces";
 
 @Injectable()
 class CoinRepository implements ICoinRepository {
@@ -16,6 +17,9 @@ class CoinRepository implements ICoinRepository {
 
   @Inject(Types.ICoinFactory)
   private readonly coinFactory: ICoinFactory;
+
+  @Inject(PlatformTypes.CryptoService)
+  private readonly platformCryptoService: PlatformCryptoService;
 
   public async getOrCreateCoin(coinType: string): Promise<ICoin> {
     const coin = await this.dbService
@@ -49,6 +53,7 @@ class CoinRepository implements ICoinRepository {
       symbol: string;
     };
 
+    const id = this.platformCryptoService.randomUUID();
     const [newCoin] = await this.dbService
       .db<{
         id: string;
@@ -58,7 +63,7 @@ class CoinRepository implements ICoinRepository {
         symbol: string;
       }>("coins")
       .insert({
-        id: uuid(),
+        id,
         type: coinType,
         name: data.name,
         decimals: data.decimals,

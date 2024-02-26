@@ -1,11 +1,12 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import Coin from '../coin/Coin';
 import { ICoin } from '../coin/interfaces';
+import { IBalance } from './interfaces';
 
 @ObjectType("Balance")
-class Balance {
+export class Balance implements IBalance {
   @Field()
-  public amount: string;
+  public amount: string
 
   @Field(() => Coin)
   public coin: ICoin;
@@ -15,5 +16,3 @@ class Balance {
     this.coin = coin;
   }
 }
-
-export default Balance;

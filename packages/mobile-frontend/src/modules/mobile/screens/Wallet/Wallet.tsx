@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { View, Text, ActivityIndicator, Button } from "react-native";
+import { View, Text, ActivityIndicator, Button, Pressable, TouchableOpacity } from "react-native";
 import {
   gql,
   useApolloClient,
@@ -18,18 +18,17 @@ const GET_WALLET = gql`
       publicKey
       authenticationKey
       accountAddress
+      balances {
+        amount
+        coin {
+          id
+          symbol
+          decimals
+        }
+      }
     }
   }
 `;
-
-//      balances {
-//        amount
-//        coin {
-//          id
-//          symbol
-//          decimals
-//        }
-//      }
 
 const WalletScreen: FC<StackScreenProps<ModalStackParams, "Wallet">> = ({
   route,
@@ -37,13 +36,21 @@ const WalletScreen: FC<StackScreenProps<ModalStackParams, "Wallet">> = ({
 }) => {
   const { walletId } = route.params;
 
-  const { data, loading } = useQuery<{
+  const { data, error, loading } = useQuery<{
     wallet: {
       id: string;
       label: string;
       publicKey: string;
       accountAddress: string;
       authenticationKey: string;
+      balances: {
+        amount: string;
+        coin: {
+          id: string;
+          symbol: string;
+          decimals: 6;
+        };
+      }[];
     };
   }>(GET_WALLET, {
     variables: {
@@ -52,21 +59,69 @@ const WalletScreen: FC<StackScreenProps<ModalStackParams, "Wallet">> = ({
   });
 
   const unlocked = 8_778_733.183009;
-  const balance = 23_817_187.679843;
+  let balanceLabel = "---";
+
+  if (data?.wallet?.balances?.length) {
+    const balance = data.wallet.balances[0];
+    let amount = parseInt(balance.amount, 10);
+    amount = amount / Math.pow(10, balance.coin.decimals);
+    balanceLabel = amount.toLocaleString();
+  }
 
   if (data) {
     return (
-      <View style={tw.style("flex-1 p-2")}>
-        <Text>{`balance = Ƚ ${balance.toLocaleString()}`}</Text>
+      <View style={tw.style("flex-1 px-3 py-4")}>
+        <Text style={tw.style("font-semibold text-gray-900 text-xl")}>
+          {`${data.wallet.label}`}
+        </Text>
+
+        <View style={tw.style("bg-white p-2 rounded my-2")}>
+          <Text style={tw.style("font-semibold text-gray-400")}>
+            Current Balance
+          </Text>
+          <Text style={tw.style("font-semibold text-gray-900 text-xl")}>
+            {`Ƚ ${balanceLabel}`}
+          </Text>
+        </View>
+
+        <View
+          style={tw.style({
+            flexDirection: "row",
+          })}
+        >
+          <View style={tw.style("basis-1/2 justify-center items-center")}>
+            <TouchableOpacity
+              style={tw.style(
+                "w-full justify-center items-center p-2 rounded mr-2",
+                "bg-white"
+              )}
+              onPress={() => {
+                navigation.navigate("NewTransfer", { walletId });
+              }}
+            >
+              <Text style={tw.style("font-semibold text-slate-900 text-base")}>
+                Send
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={tw.style("basis-1/2 justify-center items-center")}>
+            <TouchableOpacity
+              style={tw.style(
+                "w-full justify-center items-center p-2 rounded ml-2",
+                "bg-slate-950"
+              )}
+              onPress={() => {}}
+            >
+              <Text style={tw.style("font-semibold text-white text-base")}>
+                Receive
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <Text>{`unlocked = Ƚ ${unlocked.toLocaleString()}`}</Text>
-        <Text>{`label = ${data.wallet.label}`}</Text>
         <Text>{`address = ${data.wallet.accountAddress}`}</Text>
-        <Button
-          title="New Transfer"
-          onPress={() => {
-            navigation.navigate("NewTransfer", { walletId });
-          }}
-        />
       </View>
     );
   }

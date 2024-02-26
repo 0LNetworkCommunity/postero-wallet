@@ -2,7 +2,7 @@ import { UnsubscribeFn } from "emittery";
 
 import Wallet from "../crypto/Wallet";
 import { CryptoWallet } from "../crypto/interfaces";
-import Balance from "./Balance";
+import { Balance } from "./Balance";
 import Coin from "../coin/Coin";
 import { ICoin } from "../coin/interfaces";
 

@@ -7,11 +7,9 @@
   "license": "UNLICENSED",
   "private": true,
   "workspaces": [
-    "packages/desktop-backend",
-    "packages/desktop-frontend",
-    "packages/desktop-builder",
     "packages/mobile-frontend",
-    "packages/mobile-backend"
+    "packages/mobile-backend",
+    "packages/backend-test"
   ],
   "packageManager": "yarn@4.1.0"
 }

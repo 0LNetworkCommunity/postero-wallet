@@ -1,7 +1,5 @@
 import { Module, Scope } from "@nestjs/common";
 
-import WalletsResolver from "./WalletsResolver";
-import GraphQLWallet from "./GraphQLWallet";
 import { Types } from "../types";
 import WalletService from "./WalletService";
 import CryptoModule from "../crypto/CryptoModule";
@@ -12,7 +10,9 @@ import WalletRepository from "./WalletRepository";
 import GraphQLWalletFactory from "./GraphQLWalletFactory";
 import BalanceRepository from "./BalanceRepository";
 import BalanceFactory from "./BalanceFactory";
-import Balance from "./Balance";
+import WalletsResolver from "./WalletsResolver";
+import { GraphQLWallet } from "./GraphQLWallet";
+import { Balance } from "./Balance";
 
 @Module({
   imports: [

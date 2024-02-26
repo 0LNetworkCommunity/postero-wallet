@@ -21,6 +21,7 @@ import WalletsModule from './wallets/WalletsModule';
 import { GraphQLModule } from './graphql/graphql.module';
 import { PlatformModule } from './platform/PlatformModule';
 import TransfersModule from './transfers/TransfersModule';
+import { DocumentNode } from "graphql";
 
 export * from './platform/platform-types';
 export * from './platform/interfaces';
@@ -73,18 +74,18 @@ export class Backend {
     graphqlService.registerGraphQLServer(apolloServer);
     this.graphqlService = graphqlService;
 
-    apolloServer.generateSchema({}).then((schema) => {
-      console.log('schema', schema);
-    }).catch((error) => {
-      console.error(error);
-    });
-
     this.graphqlService.on(GraphQLServiceEvent.SubscriptionData, (data) => {
       this.eventEmitter.emit(BackendEvent.SubscriptionData, data);
     });
   }
 
-  public execute(operation: any): Promise<any> {
+  public execute(operation: {
+    operationName: string;
+    variables?: {
+      readonly [variable: string]: unknown;
+    };
+    query: DocumentNode;
+  }): Promise<any> {
     return this.graphqlService.execute(operation);
   }
 
@@ -96,7 +97,8 @@ export class Backend {
     return this.graphqlService.unsubscribe(subscriptionId);
   }
 
-  public on(event: BackendEvent.SubscriptionData,
+  public on(
+    event: BackendEvent.SubscriptionData,
     listener: (eventData: SubscriptionEvent) => void | Promise<void>,
   ): UnsubscribeFn {
     return this.eventEmitter.on(event, listener);

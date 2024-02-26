@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { GraphQLModule as NestJsGraphQLModule } from "@nestjs/graphql";
+import { GraphQLModule as NestGraphQLModule } from "@nestjs/graphql";
 import { ApolloDriverConfig } from "@nestjs/apollo";
 import ApolloDriver from "./apollo.driver";
 import { GraphQLService } from "./graphql.service";
@@ -13,7 +13,7 @@ import { Types } from "../types";
     DateScalar,
     BytesScalar,
 
-    NestJsGraphQLModule.forRoot<ApolloDriverConfig>({
+    NestGraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
     }),

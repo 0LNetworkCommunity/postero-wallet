@@ -1,25 +1,40 @@
-import { Inject } from "@nestjs/common";
-import { Query, Resolver, Mutation, Subscription, ID, Args } from "@nestjs/graphql";
-import { Repeater } from "@repeaterjs/repeater";
+import { Inject } from '@nestjs/common';
+import {
+  Query,
+  Resolver,
+  Mutation,
+  Subscription,
+  ID,
+  Args,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
+import { Repeater } from '@repeaterjs/repeater';
 
-import { Types } from "../types";
-import GraphQLWallet from "./GraphQLWallet";
-import { IGraphQLWallet, IWalletRepository, IWalletService,
+import { Types } from '../types';
+import {
+  IGraphQLWallet,
+  IWalletRepository,
+  IWalletService,
   IGraphQLWalletFactory,
   WalletServiceEvent,
- } from "./interfaces";
-import Wallet from "../crypto/Wallet";
+} from './interfaces';
+import Wallet from '../crypto/Wallet';
+import { GraphQLWallet } from './GraphQLWallet';
+import { Balance } from './Balance';
 
-@Resolver(() => GraphQLWallet)
+@Resolver(GraphQLWallet)
 class WalletsResolver {
-  @Inject(Types.IWalletService)
-  private readonly walletService: IWalletService;
+  public constructor(
+    @Inject(Types.IWalletService)
+    private readonly walletService: IWalletService,
 
-  @Inject(Types.IWalletRepository)
-  private readonly walletRepository!: IWalletRepository;
+    @Inject(Types.IWalletRepository)
+    private readonly walletRepository: IWalletRepository,
 
-  @Inject(Types.IGraphQLWalletFactory)
-  private readonly graphQLWalletFactory!: IGraphQLWalletFactory;
+    @Inject(Types.IGraphQLWalletFactory)
+    private readonly graphQLWalletFactory: IGraphQLWalletFactory,
+  ) {}
 
   @Mutation((returns) => GraphQLWallet)
   public async newWallet() {
@@ -29,7 +44,7 @@ class WalletsResolver {
 
   @Query((returns) => GraphQLWallet)
   public async wallet(
-    @Args("id", { type: () => ID })
+    @Args('id', { type: () => ID })
     id: string,
   ): Promise<IGraphQLWallet | null> {
     const wallet = await this.walletRepository.getWallet(id);
@@ -47,11 +62,21 @@ class WalletsResolver {
 
   @Mutation((returns) => Boolean)
   public async deleteWallet(
-    @Args("id", { type: () => ID })
+    @Args('id', { type: () => ID })
     id: string,
   ) {
     await this.walletService.deleteWallet(id);
     return true;
+  }
+
+  @ResolveField("balances", returns => [Balance])
+  public async balances(@Parent() wallet: GraphQLWallet) {
+    try {
+      await this.walletService.syncWallet(wallet.id);
+    } catch (error) {
+      console.error(error);
+    }
+    return wallet.balances();
   }
 
   @Subscription((returns) => GraphQLWallet)

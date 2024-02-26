@@ -1,8 +1,11 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "target": "es2016",
+    "esModuleInterop": true,
     "strict": true,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "strictNullChecks": false
   }
 }

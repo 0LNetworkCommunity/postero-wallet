@@ -16,11 +16,11 @@
   "license": "UNLICENSED",
   "devDependencies": {
     "@electron/rebuild": "3.6.0",
-    "electron": "28.2.0",
-    "electron-builder": "24.9.1"
+    "electron": "29.0.1",
+    "electron-builder": "24.12.0"
   },
   "dependencies": {
-    "better-sqlite3": "^9.4.1",
+    "better-sqlite3": "^9.4.3",
     "electron-squirrel-startup": "^1.0.0"
   }
 }

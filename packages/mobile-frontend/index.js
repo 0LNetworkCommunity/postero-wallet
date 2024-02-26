@@ -1,9 +1,10 @@
+import "reflect-metadata";
+
 import 'react-native-gesture-handler';
 
 global.Buffer = require('buffer').Buffer;
 
 import "@azure/core-asynciterator-polyfill";
-import "reflect-metadata";
 
 import { registerRootComponent } from "expo";
 

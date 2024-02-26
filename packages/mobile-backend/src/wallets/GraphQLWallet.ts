@@ -1,11 +1,11 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql";
 
-import { IGraphQLWallet, IWalletService } from "./interfaces";
+import { IBalance, IGraphQLWallet, IWalletService } from "./interfaces";
 import { Inject } from "@nestjs/common";
 import { Types } from "../types";
 
 @ObjectType("Wallet")
-class GraphQLWallet implements IGraphQLWallet {
+export class GraphQLWallet implements IGraphQLWallet {
   @Field((type) => ID)
   public id!: string;
 
@@ -37,6 +37,8 @@ class GraphQLWallet implements IGraphQLWallet {
     this.authenticationKey = authenticationKey;
     this.accountAddress = accountAddress;
   }
-}
 
-export default GraphQLWallet;
+  public async balances(): Promise<IBalance[]> {
+    return this.walletSerivce.getWalletBalances(this.id);
+  }
+}
