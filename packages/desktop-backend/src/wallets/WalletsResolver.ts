@@ -25,7 +25,7 @@ import { IWindowManagerSerivce } from "../window-manager/interfaces";
 import { WindowType } from "../window-manager/types";
 import Balance from "./Balance";
 
-@Resolver((of) => GraphQLWallet)
+@Resolver(GraphQLWallet)
 class WalletsResolver {
   @Inject(Types.IWalletRepository)
   private readonly walletRepository!: IWalletRepository;

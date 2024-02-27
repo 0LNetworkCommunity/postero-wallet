@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql";
 
-import { IBalance, IGraphQLWallet, IWalletService } from "./interfaces";
+import { IBalance, IGraphQLWallet, ISlowWallet, IWalletService } from "./interfaces";
 import { Inject } from "@nestjs/common";
 import { Types } from "../types";
 
@@ -22,7 +22,7 @@ export class GraphQLWallet implements IGraphQLWallet {
   public accountAddress: Buffer;
 
   @Inject(Types.IWalletService)
-  private readonly walletSerivce: IWalletService;
+  private readonly walletService: IWalletService;
 
   public init(
     id: string,
@@ -39,6 +39,10 @@ export class GraphQLWallet implements IGraphQLWallet {
   }
 
   public async balances(): Promise<IBalance[]> {
-    return this.walletSerivce.getWalletBalances(this.id);
+    return this.walletService.getWalletBalances(this.id);
+  }
+
+  public async slowWallet(): Promise<ISlowWallet | undefined> {
+    return this.walletService.getSlowWallet(this.id);
   }
 }

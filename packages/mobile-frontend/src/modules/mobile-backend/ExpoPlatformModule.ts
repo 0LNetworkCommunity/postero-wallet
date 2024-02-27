@@ -2,6 +2,7 @@ import { PlatformTypes } from "@postero/mobile-backend";
 import ExpoCryptoService from "./ExpoCryptoService";
 import ExpoSqliteService from "./ExpoSqliteService";
 import ExpoEncryptedStoreService from "./ExpoEncryptedStoreService";
+import ExpoLocalAuthenticationService from "./ExpoLocalAuthenticationService";
 
 const ExpoPlatformModule = {
   providers: [
@@ -17,11 +18,16 @@ const ExpoPlatformModule = {
       provide: PlatformTypes.EncryptedStoreService,
       useClass: ExpoEncryptedStoreService,
     },
+    {
+      provide: PlatformTypes.LocalAuthenticationService,
+      useClass: ExpoLocalAuthenticationService,
+    },
   ],
   exports: [
     PlatformTypes.SqliteService,
     PlatformTypes.CryptoService,
     PlatformTypes.EncryptedStoreService,
+    PlatformTypes.LocalAuthenticationService,
   ],
 };
 

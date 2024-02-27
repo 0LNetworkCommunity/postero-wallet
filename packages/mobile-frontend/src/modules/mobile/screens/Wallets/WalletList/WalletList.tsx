@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { StyleSheet, Text, View, I18nManager } from 'react-native';
 import { FlatList, RectButton } from 'react-native-gesture-handler';
+import tw from "twrnc";
 
 import SwipeableRow from './SwipeableRow';
 import { Wallet } from '../hook';
@@ -9,9 +10,50 @@ import { Wallet } from '../hook';
 I18nManager.allowRTL(false);
 
 const Row: FC<{ wallet: Wallet; onPress: () => void }> = ({ wallet, onPress }) => {
+  const slowWallet = wallet.slowWallet;
+  const libraBalance = wallet.balances.find((balance) => balance.coin.symbol === 'LIBRA');
+  let libraAmount = libraBalance ? parseInt(libraBalance.amount, 10) : undefined;
+
+  if (libraAmount !== undefined) {
+    if (slowWallet) {
+      libraAmount = Math.min(libraAmount, parseInt(slowWallet.unlocked, 10));
+    }
+    libraAmount /= 1e6;
+  }
+
   return (
     <RectButton style={styles.rectButton} onPress={onPress}>
-      <Text style={styles.fromText}>{wallet.label}</Text>
+      <View style={tw.style("flex-row justify-between")}>
+        <Text style={styles.fromText}>{wallet.label}</Text>
+
+        <View style={tw.style("flex-row")}>
+          {wallet.slowWallet && (
+            <View
+              style={tw.style(
+                "items-center rounded-md bg-gray-100 px-1.5 py-0.5",
+                "ml-1"
+              )}
+            >
+              <Text style={tw.style("text-xs font-medium text-gray-600")}>
+                Slow
+              </Text>
+            </View>
+          )}
+
+          {libraAmount !== undefined && (
+            <View
+              style={tw.style(
+                "items-center rounded-md bg-gray-100 px-1.5 py-0.5",
+                "ml-1"
+              )}
+            >
+              <Text style={tw.style("text-xs font-medium text-gray-600")}>
+                {`Ƚ ${libraAmount.toLocaleString()}`}
+              </Text>
+            </View>
+          )}
+        </View>
+      </View>
       <Text numberOfLines={2} style={styles.messageText}>
         {wallet.accountAddress}
       </Text>

@@ -5,7 +5,7 @@ import { IDbService } from "../db/interfaces";
 import { CryptoWallet } from "../crypto/interfaces";
 import { PlatformTypes } from "../platform/platform-types";
 import Wallet from "../crypto/Wallet";
-import { PlatformEncryptedStoreService, PlatformCryptoService } from "../platform/interfaces";
+import { PlatformEncryptedStoreService, PlatformCryptoService, EncryptedStoreRule } from "../platform/interfaces";
 
 @Injectable()
 class WalletRepository implements IWalletRepository {
@@ -34,31 +34,27 @@ class WalletRepository implements IWalletRepository {
     const address = Buffer.from(wallet.accountAddress.address).toString("hex").toUpperCase();
     const privateKey = Buffer.from(wallet.privateKey).toString("hex").toUpperCase();
 
-    // await this.platformEncryptedStoreService.setItem(
-    //   address,
-    //   privateKey,
-    //   EncryptedStoreRule.WhenUnlockedThisDeviceOnly,
-    // );
-
-    // const privateKey = safeStorage.encryptString(
-    //   Buffer.from(wallet.privateKey).toString("base64"),
-    // );
+    await this.platformEncryptedStoreService.setItem(
+      address,
+      privateKey,
+      EncryptedStoreRule.WhenUnlockedThisDeviceOnly,
+    );
 
     const [{ total }] = await this.dbService
       .db("wallets")
       .count("*", { as: "total" });
 
-    const query = this.dbService
-      .db("wallets")
-      .insert({
-        id: this.platformCryptoService.randomUUID(),
-        label: `Wallet #${(total as number) + 1}`,
-        publicKey: Buffer.from(wallet.publicKey),
-        authenticationKey: Buffer.from(wallet.authenticationKey.bytes),
-        address: Buffer.from(wallet.accountAddress.address),
-      })
-      .returning("*")
-      .toSQL();
+    // const query = this.dbService
+    //   .db("wallets")
+    //   .insert({
+    //     id: this.platformCryptoService.randomUUID(),
+    //     label: `Wallet #${(total as number) + 1}`,
+    //     publicKey: Buffer.from(wallet.publicKey),
+    //     authenticationKey: Buffer.from(wallet.authenticationKey.bytes),
+    //     address: Buffer.from(wallet.accountAddress.address),
+    //   })
+    //   .returning("*")
+    //   .toSQL();
 
     const rows = await this.dbService.db.raw(`
       insert into wallets (

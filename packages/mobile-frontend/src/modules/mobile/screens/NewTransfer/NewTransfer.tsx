@@ -21,12 +21,12 @@ const NEW_TRANSFER = gql`
 
 const NewTransfer: FC<StackScreenProps<ModalStackParams, "NewTransfer">> = ({ route, navigation }) => {
   const apolloClient = useApolloClient();
-  const [ recipient, setRecipient ] = useState("");
-  const [ amount, setAmount ] = useState("");
+  const [recipient, setRecipient] = useState("");
+  const [amount, setAmount] = useState("");
 
   const onConfirm = async () => {
     try {
-      await apolloClient.mutate({
+      const res = await apolloClient.mutate({
         mutation: NEW_TRANSFER,
         variables: {
           recipient,

@@ -45,6 +45,14 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
     `);
 
     await this.db.raw(`
+      CREATE TABLE IF NOT EXISTS "slow_wallets" (
+        "walletId" TEXT PRIMARY KEY REFERENCES wallets(id) ON DELETE CASCADE,
+        "transferred" TEXT NOT NULL,
+        "unlocked" TEXT NOT NULL
+      )
+    `);
+
+    await this.db.raw(`
       CREATE TABLE IF NOT EXISTS "balances" (
         "coinId" TEXT NOT NULL REFERENCES coins(id),
         "walletId" TEXT NOT NULL REFERENCES wallets(id) ON DELETE CASCADE,

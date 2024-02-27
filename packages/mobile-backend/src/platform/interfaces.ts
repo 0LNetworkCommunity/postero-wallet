@@ -24,3 +24,7 @@ export interface PlatformEncryptedStoreService {
   getItem(key: string): Promise<string | null>;
   deleteItem(key: string): Promise<void>;
 }
+
+export interface LocalAuthenticationService {
+  authenticate(): Promise<boolean>;
+}

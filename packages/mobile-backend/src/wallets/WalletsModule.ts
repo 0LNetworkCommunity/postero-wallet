@@ -13,6 +13,8 @@ import BalanceFactory from "./BalanceFactory";
 import WalletsResolver from "./WalletsResolver";
 import { GraphQLWallet } from "./GraphQLWallet";
 import { Balance } from "./Balance";
+import SlowWalletFactory from "./SlowWalletFactory";
+import { SlowWallet } from "./SlowWallet";
 
 @Module({
   imports: [
@@ -30,6 +32,15 @@ import { Balance } from "./Balance";
     {
       provide: Types.IGraphQLWallet,
       useClass: GraphQLWallet,
+      scope: Scope.TRANSIENT,
+    },
+    {
+      provide: Types.ISlowWalletFactory,
+      useClass: SlowWalletFactory,
+    },
+    {
+      provide: Types.ISlowWallet,
+      useClass: SlowWallet,
       scope: Scope.TRANSIENT,
     },
     {

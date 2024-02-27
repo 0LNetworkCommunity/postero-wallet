@@ -8,6 +8,16 @@ export interface Wallet {
   publicKey: string;
   authenticationKey: string;
   accountAddress: string;
+  slowWallet?: {
+    unlocked: string;
+  };
+  balances: {
+    amount: string;
+    coin: {
+      decimals: number;
+      symbol: string;
+    };
+  }[];
 }
 
 const GET_WALLETS = gql`
@@ -18,6 +28,16 @@ const GET_WALLETS = gql`
       publicKey
       authenticationKey
       accountAddress
+      slowWallet {
+        unlocked
+      }
+      balances {
+        amount
+        coin {
+          decimals
+          symbol
+        }
+      }
     }
   }
 `;
@@ -30,6 +50,16 @@ const NEW_WALLET_SUBSCRIPTION = gql`
       publicKey
       authenticationKey
       accountAddress
+      slowWallet {
+        unlocked
+      }
+      balances {
+        amount
+        coin {
+          decimals
+          symbol
+        }
+      }
     }
   }
 `;
@@ -48,6 +78,9 @@ const WALLET_UPDATED = gql`
       publicKey
       authenticationKey
       accountAddress
+      slowWallet {
+        unlocked
+      }
     }
   }
 `;
@@ -110,6 +143,7 @@ export const useWallets = () => {
       const res = await apolloClient.query<{ wallets: Wallet[] }>({
         query: GET_WALLETS,
       });
+      console.log(res.data.wallets);
       setWallets(res.data.wallets);
     };
 

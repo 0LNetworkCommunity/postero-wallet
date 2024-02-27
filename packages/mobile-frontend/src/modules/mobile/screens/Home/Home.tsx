@@ -1,11 +1,79 @@
 import { FC } from "react";
-import { View, Text } from "react-native";
+import { View, Text, SafeAreaView } from "react-native";
+import tw from "twrnc";
+
+import { useWallets } from "../Wallets/hook";
 
 const Home: FC = () => {
+  const wallets = useWallets();
+
+  let totalLocked = 0;
+  let totalUnlocked = 0;
+
+  for (const wallet of wallets) {
+    const libraBalance = wallet.balances.find(
+      (it) => it.coin.symbol === "LIBRA"
+    );
+    if (libraBalance === undefined) {
+      continue;
+    }
+
+    const libraAmount = parseInt(libraBalance.amount, 10);
+    const slowWallet = wallet.slowWallet;
+
+    if (slowWallet) {
+      const unlocked = parseInt(slowWallet.unlocked, 10);
+      const locked = libraAmount - unlocked;
+      totalUnlocked += unlocked;
+      totalLocked += locked;
+    } else {
+      totalLocked += libraAmount;
+    }
+  }
+
+  if (totalLocked) {
+    totalLocked /= 1e6;
+  }
+  if (totalUnlocked) {
+    totalUnlocked /= 1e6;
+  }
+
+  const rate = 0.0089;
+
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text>Home Screen</Text>
-    </View>
+    <SafeAreaView>
+      <View style={tw.style("p-2")}>
+        <View style={tw.style("flex-row mb-2")}>
+
+          <View style={tw.style("basis-1/2 pr-2")}>
+            <View style={tw.style("p-2 rounded-md bg-white")}>
+              <Text style={tw.style("text-gray-500 text-base leading-6")}>
+                Balance
+              </Text>
+              <Text style={tw.style("text-black text-xl leading-6 font-semibold")}>
+                {`Ƚ ${totalUnlocked.toLocaleString()}`}
+              </Text>
+              <Text style={tw.style("text-gray-600 text-base leading-6")}>
+                {`$ ${(rate * totalUnlocked).toLocaleString()}`}
+              </Text>
+            </View>
+          </View>
+
+          <View style={tw.style("basis-1/2", "p-2 rounded-md bg-white mb-2")}>
+            <Text style={tw.style("text-gray-500 text-base leading-6")}>
+              Locked
+            </Text>
+            <Text style={tw.style("text-black text-xl leading-6 font-semibold")}>
+              {`Ƚ ${totalLocked.toLocaleString()}`}
+            </Text>
+            <Text style={tw.style("text-gray-600 text-base leading-6")}>
+              {`$ ${(rate * totalLocked).toLocaleString()}`}
+            </Text>
+          </View>
+        </View>
+
+      </View>
+    </SafeAreaView>
   );
 };
 

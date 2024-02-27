@@ -60,6 +60,9 @@ export enum Types {
   IGraphQLWalletFactory = "IGraphQLWalletFactory",
   IGraphQLWallet = "IGraphQLWallet",
 
+  ISlowWalletFactory = "ISlowWalletFactory",
+  ISlowWallet = "ISlowWallet",
+
   IRecipeService = "IRecipeService",
   IRecipeResolver = "IRecipeResolver",
 

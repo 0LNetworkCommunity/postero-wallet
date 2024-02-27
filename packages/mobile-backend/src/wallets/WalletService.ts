@@ -4,6 +4,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   IBalance,
   IBalanceRepository,
+  ISlowWallet,
+  ISlowWalletFactory,
   IWalletRepository,
   IWalletService,
   WalletServiceEvent,
@@ -21,20 +23,16 @@ class WalletService implements IWalletService {
   @Inject(Types.IBalanceRepository)
   private readonly balanceRepository: IBalanceRepository;
 
-  importWallet(mnemonic: string): Promise<Wallet> {
-    throw new Error("Method not implemented.");
-  }
-
   setWalletLabel(walletId: string, label: string): Promise<void> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   getWallet(walletId: string): Promise<Wallet> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   getWalletPrivateKey(walletId: string): Promise<Uint8Array> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   @Inject(Types.IDbService)
@@ -52,6 +50,9 @@ class WalletService implements IWalletService {
   @Inject(Types.IWalletRepository)
   private readonly walletRepository: IWalletRepository;
 
+  @Inject(Types.ISlowWalletFactory)
+  private readonly slowWalletFactory: ISlowWalletFactory;
+
   private eventEmitter = new Emittery();
 
   public async newWallet(): Promise<Wallet> {
@@ -68,15 +69,14 @@ class WalletService implements IWalletService {
   public async syncWallet(id: string) {
     const wallet = await this.walletRepository.getWallet(id);
     if (wallet) {
-      console.log('sync addre', wallet.accountAddress);
       const resources = await this.openLibraService.getAccountResources(
         wallet.accountAddress,
       );
 
       for (const resource of resources) {
-        if (resource.type.startsWith("0x1::coin::CoinStore<")) {
+        if (resource.type.startsWith('0x1::coin::CoinStore<')) {
           const coinType = resource.type.substring(
-            "0x1::coin::CoinStore<".length,
+            '0x1::coin::CoinStore<'.length,
             resource.type.length - 1,
           );
 
@@ -87,21 +87,36 @@ class WalletService implements IWalletService {
           const coin = await this.coinRepository.getOrCreateCoin(coinType);
 
           await this.dbService
-            .db("balances")
+            .db('balances')
             .insert({
               coinId: coin.id,
               walletId: wallet.id,
               amount: data.coin.value,
             })
-            .onConflict(["coinId", "walletId"])
-            .merge(["amount"]);
+            .onConflict(['coinId', 'walletId'])
+            .merge(['amount']);
+        } else if (resource.type === '0x1::slow_wallet::SlowWallet') {
+          const slowWallet = resource.data as {
+            transferred: string;
+            unlocked: string;
+          };
+
+          await this.dbService
+            .db('slow_wallets')
+            .insert({
+              walletId: wallet.id,
+              transferred: slowWallet.transferred,
+              unlocked: slowWallet.unlocked,
+            })
+            .onConflict(['walletId'])
+            .merge(['transferred', 'unlocked']);
         }
       }
     }
   }
 
   public async deleteWallet(id: string) {
-    await this.dbService.db("wallets").where("id", id).del();
+    await this.dbService.db('wallets').where('id', id).del();
     this.eventEmitter.emit(WalletServiceEvent.WalletRemoved, id);
   }
 
@@ -114,6 +129,36 @@ class WalletService implements IWalletService {
 
   public async getWalletBalances(walletId: string): Promise<IBalance[]> {
     return this.balanceRepository.getBalances(walletId);
+  }
+
+  public async importWallet(mnemonic: string): Promise<Wallet> {
+    const cryptoWallet = await this.cryptoService.walletFromMnemonic(mnemonic);
+    const address = await this.openLibraService.getOriginatingAddress(
+      cryptoWallet.authenticationKey.bytes,
+    );
+    cryptoWallet.accountAddress = new AccountAddress(address);
+    const wallet = await this.walletRepository!.saveWallet(cryptoWallet);
+    await this.syncWallet(wallet.id);
+
+    this.eventEmitter.emit(WalletServiceEvent.NewWallet, wallet);
+
+    return wallet;
+  }
+
+  public async getSlowWallet(
+    walletId: string,
+  ): Promise<ISlowWallet | undefined> {
+    const res = await this.dbService
+      .db('slow_wallets')
+      .where('walletId', walletId)
+      .first();
+    if (res) {
+      return this.slowWalletFactory.getSlowWallet(
+        res.transferred,
+        res.unlocked,
+      );
+    }
+    return undefined;
   }
 }
 

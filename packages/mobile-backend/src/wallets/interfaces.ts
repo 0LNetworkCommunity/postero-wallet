@@ -30,6 +30,7 @@ export interface IWalletService {
   getWallet(walletId: string): Promise<Wallet | null>;
   getWalletPrivateKey(walletId: string): Promise<Uint8Array | null>;
   getWalletBalances(walletId: string): Promise<Balance[]>;
+  getSlowWallet(walletId: string): Promise<ISlowWallet | undefined>;
 
   on(
     eventName: WalletServiceEvent,
@@ -63,6 +64,10 @@ export interface IGraphQLWalletFactory {
   ): Promise<IGraphQLWallet>;
 }
 
+export interface ISlowWalletFactory {
+  getSlowWallet(transferred: string, unlocked: string): Promise<ISlowWallet>;
+}
+
 export interface IBalanceFactory {
   createBalance(amount: string, coin: Coin): Promise<Balance>;
 }
@@ -75,4 +80,10 @@ export interface IBalance {
   amount: string;
   coin: ICoin;
   init(amount: string, coin: ICoin): void;
+}
+
+export interface ISlowWallet {
+  transferred: string;
+  unlocked: string;
+  init(transferred: string, unlocked: string): void;
 }

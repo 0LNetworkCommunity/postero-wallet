@@ -1,7 +1,12 @@
+import { Inject } from "@nestjs/common";
 import { Args, ID, Int, Mutation, Resolver } from "@nestjs/graphql";
 import { sha3_256 as sha3Hash } from "@noble/hashes/sha3";
 import { AptosAccount, AptosClient, BCS, TxnBuilderTypes } from "aptos";
 import axios from "axios";
+import { PlatformTypes } from "../platform/platform-types";
+import { PlatformEncryptedStoreService } from "../platform/interfaces";
+import { Types } from "../types";
+import { IWalletRepository } from "../wallets/interfaces";
 
 const {
   AccountAddress,
@@ -21,8 +26,13 @@ const {
 
 @Resolver()
 class TransfersResolver {
-  // private aptosClient = new AptosClient("http://104.248.94.195:8080");
   private aptosClient = new AptosClient("https://rpc.0l.fyi");
+
+  @Inject(PlatformTypes.EncryptedStoreService)
+  private readonly platformEncryptedStoreService: PlatformEncryptedStoreService;
+
+  @Inject(Types.IWalletRepository)
+  private readonly walletRepository: IWalletRepository;
 
   @Mutation((returns) => Boolean)
   public async newTransfer(
@@ -35,11 +45,20 @@ class TransfersResolver {
     @Args("amount", { type: () => Int })
     amount: number,
   ) {
-    console.log("newTransfer", { walletId, recipient, amount });
+    const wallet = await this.walletRepository.getWallet(walletId);
+    if (!wallet) {
+      return false;
+    }
 
-    const walletAddress = "D0383924341821F9E43A6CFF46F0A74E"
+    const walletAddress = Buffer.from(wallet.accountAddress).toString('hex').toUpperCase();
+
+    const pk = await this.platformEncryptedStoreService.getItem(walletAddress);
+    if (!pk) {
+      return false;
+    }
+
     const privateKey = Buffer.from(
-      '60B9B1BCC7F9AF9011D7FB26466CB00FD35A21DB22F373F085B3BC0604ACA78C',
+      pk,
       'hex',
     );
 
@@ -49,19 +68,16 @@ class TransfersResolver {
         new Identifier('transfer'),
         [],
         [
-          Buffer.from('C19E0958797D9BC29F9D55177616F1BF44FCDD558E434AF41D19BD327FAB361C', 'hex'),
-          BCS.bcsSerializeUint64(10000000),
+          Buffer.from(recipient, 'hex'),
+          BCS.bcsSerializeUint64(amount),
         ],
       ),
     );
-
-    console.log("entryFunctionPayload", entryFunctionPayload);
 
     const maxGasUnit = 2000000;
     const gasPrice = 200;
 
     const chainId = 1; // await this.aptosClient.getChainId();
-    console.log("chainId", chainId);
 
     const timeout = 10;
 
@@ -107,6 +123,7 @@ class TransfersResolver {
     const bcsTxn = BCS.bcsToBytes(signedTx);
 
     console.log('sending...');
+
     try {
       const res = await axios<{
         hash: string;
@@ -127,7 +144,6 @@ class TransfersResolver {
     } catch (error) {
       console.error(error);
     }
-
 
     return true;
   }

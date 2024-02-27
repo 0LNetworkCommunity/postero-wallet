@@ -18,28 +18,42 @@ import {
   IWalletService,
   IGraphQLWalletFactory,
   WalletServiceEvent,
+  ISlowWallet,
 } from './interfaces';
 import Wallet from '../crypto/Wallet';
 import { GraphQLWallet } from './GraphQLWallet';
 import { Balance } from './Balance';
+import { PlatformTypes } from '../platform/platform-types';
+import { LocalAuthenticationService } from '../platform/interfaces';
+import { SlowWallet } from './SlowWallet';
 
 @Resolver(GraphQLWallet)
 class WalletsResolver {
-  public constructor(
-    @Inject(Types.IWalletService)
-    private readonly walletService: IWalletService,
+  @Inject(Types.IWalletService)
+  private readonly walletService!: IWalletService;
 
-    @Inject(Types.IWalletRepository)
-    private readonly walletRepository: IWalletRepository,
+  @Inject(Types.IWalletRepository)
+  private readonly walletRepository!: IWalletRepository;
 
-    @Inject(Types.IGraphQLWalletFactory)
-    private readonly graphQLWalletFactory: IGraphQLWalletFactory,
-  ) {}
+  @Inject(Types.IGraphQLWalletFactory)
+  private readonly graphQLWalletFactory!: IGraphQLWalletFactory;
+
+  @Inject(PlatformTypes.LocalAuthenticationService)
+  private readonly localAuthenticationService!: LocalAuthenticationService;
 
   @Mutation((returns) => GraphQLWallet)
   public async newWallet() {
     const wallet = await this.walletService.newWallet();
     return wallet;
+  }
+
+  @Mutation((returns) => Boolean)
+  public async importWallet(
+    @Args('mnemonic', { type: () => String })
+    mnemonic: string,
+  ) {
+    await this.walletService.importWallet(mnemonic);
+    return true;
   }
 
   @Query((returns) => GraphQLWallet)
@@ -61,12 +75,25 @@ class WalletsResolver {
   }
 
   @Mutation((returns) => Boolean)
+  public async syncWallet(
+    @Args('id', { type: () => ID })
+    id: string,
+  ) {
+    await this.walletService.syncWallet(id);
+    return true;
+  }
+
+  @Mutation((returns) => Boolean)
   public async deleteWallet(
     @Args('id', { type: () => ID })
     id: string,
   ) {
-    await this.walletService.deleteWallet(id);
-    return true;
+    const success = await this.localAuthenticationService.authenticate();
+    if (success) {
+      await this.walletService.deleteWallet(id);
+      return true;
+    }
+    return false;
   }
 
   @ResolveField((returns) => [Balance])
@@ -77,6 +104,13 @@ class WalletsResolver {
       console.error(error);
     }
     return wallet.balances();
+  }
+
+  @ResolveField((returns) => SlowWallet, { nullable: true })
+  public async slowWallet(
+    @Parent() wallet: GraphQLWallet,
+  ): Promise<ISlowWallet | undefined> {
+    return wallet.slowWallet();
   }
 
   @Subscription((returns) => GraphQLWallet)
