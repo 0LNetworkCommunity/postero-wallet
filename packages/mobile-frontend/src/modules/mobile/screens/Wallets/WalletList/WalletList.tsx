@@ -22,7 +22,13 @@ const Row: FC<{ wallet: Wallet; onPress: () => void }> = ({ wallet, onPress }) =
   }
 
   return (
-    <RectButton style={styles.rectButton} onPress={onPress}>
+    <RectButton
+      style={tw.style(
+        "p-3 bg-white justify-between flex-col",
+        styles.rectButton
+      )}
+      onPress={onPress}
+    >
       <View style={tw.style("flex-row justify-between")}>
         <Text style={styles.fromText}>{wallet.label}</Text>
 
@@ -84,13 +90,7 @@ const WalletList: FC<Props> = ({ wallets, onWalletPress, onWalletDelete }) => {
 
 const styles = StyleSheet.create({
   rectButton: {
-    flex: 1,
     height: 80,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    justifyContent: 'space-between',
-    flexDirection: 'column',
-    backgroundColor: 'white',
   },
   separator: {
     backgroundColor: 'rgb(200, 199, 204)',

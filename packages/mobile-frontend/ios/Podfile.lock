@@ -9,6 +9,10 @@ PODS:
     - ExpoModulesCore
   - ExpoBlur (12.9.2):
     - ExpoModulesCore
+  - ExpoCamera (14.0.5):
+    - ExpoModulesCore
+    - ZXingObjC/OneD
+    - ZXingObjC/PDF417
   - ExpoCrypto (12.8.1):
     - ExpoModulesCore
   - ExpoDevice (5.9.3):
@@ -1114,6 +1118,11 @@ PODS:
     - sqlite3/common (= 3.42.0)
   - sqlite3/common (3.42.0)
   - Yoga (1.14.0)
+  - ZXingObjC/Core (3.6.9)
+  - ZXingObjC/OneD (3.6.9):
+    - ZXingObjC/Core
+  - ZXingObjC/PDF417 (3.6.9):
+    - ZXingObjC/Core
 
 DEPENDENCIES:
   - boost (from `../../../node_modules/react-native/third-party-podspecs/boost.podspec`)
@@ -1122,6 +1131,7 @@ DEPENDENCIES:
   - EXFont (from `../../../node_modules/expo-font/ios`)
   - Expo (from `../../../node_modules/expo`)
   - ExpoBlur (from `../../../node_modules/expo-blur/ios`)
+  - ExpoCamera (from `../../../node_modules/expo-camera/ios`)
   - ExpoCrypto (from `../../../node_modules/expo-crypto/ios`)
   - ExpoDevice (from `../../../node_modules/expo-device/ios`)
   - ExpoFileSystem (from `../../../node_modules/expo-file-system/ios`)
@@ -1194,6 +1204,7 @@ SPEC REPOS:
     - libevent
     - SocketRocket
     - sqlite3
+    - ZXingObjC
 
 EXTERNAL SOURCES:
   boost:
@@ -1208,6 +1219,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/expo"
   ExpoBlur:
     :path: "../../../node_modules/expo-blur/ios"
+  ExpoCamera:
+    :path: "../../../node_modules/expo-camera/ios"
   ExpoCrypto:
     :path: "../../../node_modules/expo-crypto/ios"
   ExpoDevice:
@@ -1341,6 +1354,7 @@ SPEC CHECKSUMS:
   EXFont: f20669cb266ef48b004f1eb1f2b20db96cd1df9f
   Expo: c2d3edc1b1e833e26d837b03aa46d9137ca63302
   ExpoBlur: e832d874bd94afc0645daddbd3162ec1ce172080
+  ExpoCamera: 9eb966748a7897e84986567e3eef71836c219823
   ExpoCrypto: b6428f48599c007676dc81a9b5f72c07e62fdccc
   ExpoDevice: d204395e17fffdcefa7470bdef33b07719ac41b1
   ExpoFileSystem: a9273932e69a9a1e1a8d01b6ba895bb8294bbea2
@@ -1407,6 +1421,7 @@ SPEC CHECKSUMS:
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   sqlite3: f163dbbb7aa3339ad8fc622782c2d9d7b72f7e9c
   Yoga: 1b901a6d6eeba4e8a2e8f308f708691cdb5db312
+  ZXingObjC: 8898711ab495761b2dbbdec76d90164a6d7e14c5
 
 PODFILE CHECKSUM: 3f9cf4f179224d35382c6c81a80bf27c4912fa8a
 

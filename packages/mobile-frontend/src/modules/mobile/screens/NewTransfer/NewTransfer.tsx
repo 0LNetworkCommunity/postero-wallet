@@ -63,6 +63,16 @@ const NewTransfer: FC<StackScreenProps<ModalStackParams, "NewTransfer">> = ({ ro
 
       <Button onPress={onConfirm} title="Send" />
       <Button onPress={onCancel} title="Cancel" />
+      <Button
+        onPress={() => {
+          navigation.navigate("BarCodeScanner", {
+            onScan: (data) => {
+              setRecipient(data);
+            },
+          });
+        }}
+        title="Scan"
+      />
     </View>
   );
 };

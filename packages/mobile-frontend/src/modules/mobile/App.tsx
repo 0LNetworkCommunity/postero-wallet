@@ -16,6 +16,8 @@ import bootstrap from "../mobile-backend";
 import { getApolloClient } from "../backend/apollo-client";
 import { ModalStackParams } from "./screens/params";
 import NewTransfer from "./screens/NewTransfer";
+import WalletDetails from "./screens/WalletDetails";
+import BarCodeScanner from "./screens/BarCodeScanner";
 
 const Stack = createNativeStackNavigator<ModalStackParams>();
 
@@ -69,6 +71,22 @@ const App: FC = () => {
             <Stack.Screen
               name="NewTransfer"
               component={NewTransfer}
+              options={{
+                headerShown: false,
+                presentation: "modal",
+              }}
+            />
+            <Stack.Screen
+              name="WalletDetails"
+              component={WalletDetails}
+              options={{
+                headerShown: false,
+                presentation: "modal",
+              }}
+            />
+            <Stack.Screen
+              name="BarCodeScanner"
+              component={BarCodeScanner}
               options={{
                 headerShown: false,
                 presentation: "modal",

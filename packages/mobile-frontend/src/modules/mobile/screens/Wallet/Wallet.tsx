@@ -171,7 +171,11 @@ const WalletScreen: FC<StackScreenProps<ModalStackParams, "Wallet">> = ({
                 "w-full justify-center items-center p-2 rounded-md ml-2",
                 "bg-slate-950"
               )}
-              onPress={() => {}}
+              onPress={() => {
+                navigation.navigate("WalletDetails", {
+                  walletAddress: data.wallet.accountAddress,
+                });
+              }}
             >
               <Text style={tw.style("font-semibold text-white text-base")}>
                 Receive
@@ -179,8 +183,6 @@ const WalletScreen: FC<StackScreenProps<ModalStackParams, "Wallet">> = ({
             </TouchableOpacity>
           </View>
         </View>
-
-        <Text>{`address = ${data.wallet.accountAddress}`}</Text>
       </View>
     );
   }
