@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "454556822929",
+    "project_id": "postero-d8b0f",
+    "storage_bucket": "postero-d8b0f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:454556822929:android:c2e2ae7dc96f6f46513e30",
+        "android_client_info": {
+          "package_name": "app.postero.postero"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIQUcM8qO4E16u7krGEZZsB84-2MXg-_8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -50,5 +50,8 @@
         }
       ]
     ]
+  },
+  "android": {
+    "googleServicesFile": "./android/app/google-services.json"
   }
 }

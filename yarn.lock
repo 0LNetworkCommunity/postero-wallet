@@ -2782,6 +2782,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ide/backoff@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@ide/backoff@npm:1.0.0"
+  checksum: 10c0/e0c176e1894cf0a8f2d4056030d70c52f7e83db15bc0d1422a94f69e8b4c4a73c352791123f1ec647d66232a267353156fcc9e5eec02833e00189a60f057b331
+  languageName: node
+  linkType: hard
+
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
   resolution: "@isaacs/cliui@npm:8.0.2"
@@ -3585,6 +3592,7 @@ __metadata:
     expo-font: "npm:~11.10.3"
     expo-linear-gradient: "npm:~12.7.2"
     expo-local-authentication: "npm:~13.8.0"
+    expo-notifications: "npm:~0.27.6"
     expo-secure-store: "npm:~12.8.1"
     expo-splash-screen: "npm:~0.26.4"
     expo-sqlite: "npm:~13.2.2"
@@ -5518,7 +5526,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"assert@npm:^2.1.0":
+"assert@npm:^2.0.0, assert@npm:^2.1.0":
   version: 2.1.0
   resolution: "assert@npm:2.1.0"
   dependencies:
@@ -5812,6 +5820,13 @@ __metadata:
   version: 1.0.2
   resolution: "backo2@npm:1.0.2"
   checksum: 10c0/a9e825a6a38a6d1c4a94476eabc13d6127dfaafb0967baf104affbb67806ae26abbb58dab8d572d2cd21ef06634ff57c3ad48dff14b904e18de1474cc2f22bf3
+  languageName: node
+  linkType: hard
+
+"badgin@npm:^1.1.5":
+  version: 1.2.3
+  resolution: "badgin@npm:1.2.3"
+  checksum: 10c0/f8ba1090240a8602a8d174214e3426b1a7ec3ecb820ec7e4561fd6181c07df572f02ad0e7ec9250e19dd9594d05a57719a5717a126d769f91fc0cc5d233119cf
   languageName: node
   linkType: hard
 
@@ -8091,6 +8106,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-application@npm:~5.8.0":
+  version: 5.8.3
+  resolution: "expo-application@npm:5.8.3"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/540e3bf319c399e5bcdaf98b6d5ae43e8b04fc1a89b8beb74b2b7fc9c2d2fb502738e0787358cbb197201e49a5e4d43b260e1de3683cbffd535f341731a1aed8
+  languageName: node
+  linkType: hard
+
 "expo-asset@npm:~9.0.2":
   version: 9.0.2
   resolution: "expo-asset@npm:9.0.2"
@@ -8238,6 +8262,24 @@ __metadata:
   dependencies:
     invariant: "npm:^2.2.4"
   checksum: 10c0/4a4c4f7e267a5ff86aa0beb31c4f9935b06244947eb5c91a08b914648042071d346ce9281b7a61ca7bdde867c565fa24459ef70781da04aee956edd66dbe7682
+  languageName: node
+  linkType: hard
+
+"expo-notifications@npm:~0.27.6":
+  version: 0.27.6
+  resolution: "expo-notifications@npm:0.27.6"
+  dependencies:
+    "@expo/image-utils": "npm:^0.4.0"
+    "@ide/backoff": "npm:^1.0.0"
+    abort-controller: "npm:^3.0.0"
+    assert: "npm:^2.0.0"
+    badgin: "npm:^1.1.5"
+    expo-application: "npm:~5.8.0"
+    expo-constants: "npm:~15.4.0"
+    fs-extra: "npm:^9.1.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/19dc040e487b0f50e85278187e16949ed7acab9ee94c0f0c1bc365ea44117d3fd681d21524821be422e66e51f0f55d8ad4f562ac7fd7aaea56a3566ecd6df446
   languageName: node
   linkType: hard
 

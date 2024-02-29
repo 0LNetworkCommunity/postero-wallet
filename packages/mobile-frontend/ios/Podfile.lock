@@ -1,9 +1,13 @@
 PODS:
   - boost (1.83.0)
   - DoubleConversion (1.1.6)
+  - EXApplication (5.8.3):
+    - ExpoModulesCore
   - EXConstants (15.4.5):
     - ExpoModulesCore
   - EXFont (11.10.3):
+    - ExpoModulesCore
+  - EXNotifications (0.27.6):
     - ExpoModulesCore
   - Expo (50.0.8):
     - ExpoModulesCore
@@ -1127,8 +1131,10 @@ PODS:
 DEPENDENCIES:
   - boost (from `../../../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
+  - EXApplication (from `../../../node_modules/expo-application/ios`)
   - EXConstants (from `../../../node_modules/expo-constants/ios`)
   - EXFont (from `../../../node_modules/expo-font/ios`)
+  - EXNotifications (from `../../../node_modules/expo-notifications/ios`)
   - Expo (from `../../../node_modules/expo`)
   - ExpoBlur (from `../../../node_modules/expo-blur/ios`)
   - ExpoCamera (from `../../../node_modules/expo-camera/ios`)
@@ -1211,10 +1217,14 @@ EXTERNAL SOURCES:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
+  EXApplication:
+    :path: "../../../node_modules/expo-application/ios"
   EXConstants:
     :path: "../../../node_modules/expo-constants/ios"
   EXFont:
     :path: "../../../node_modules/expo-font/ios"
+  EXNotifications:
+    :path: "../../../node_modules/expo-notifications/ios"
   Expo:
     :path: "../../../node_modules/expo"
   ExpoBlur:
@@ -1350,8 +1360,10 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
   DoubleConversion: fea03f2699887d960129cc54bba7e52542b6f953
+  EXApplication: 137189a3f149b4e8e546884629392c3efc94cbd3
   EXConstants: 988aa430ca0f76b43cd46b66e7fae3287f9cc2fc
   EXFont: f20669cb266ef48b004f1eb1f2b20db96cd1df9f
+  EXNotifications: e11f0e9a5b657c064a481a5d522f3bc5a07bf7cd
   Expo: c2d3edc1b1e833e26d837b03aa46d9137ca63302
   ExpoBlur: e832d874bd94afc0645daddbd3162ec1ce172080
   ExpoCamera: 9eb966748a7897e84986567e3eef71836c219823
