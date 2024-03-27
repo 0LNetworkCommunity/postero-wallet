@@ -80,4 +80,9 @@ export enum Types {
   IBalance = "IBalance",
   IBalanceFactory = "IBalanceFactory",
   IBalanceRepository = "IBalanceRepository",
+
+  IMovementsService = "IMovementsService",
+  IMovement = "IMovement",
+  IMovementFactory = "IMovementFactory",
+  IMovementsRepository = "IMovementsRepository",
 }

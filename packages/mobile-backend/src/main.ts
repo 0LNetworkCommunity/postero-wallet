@@ -22,6 +22,7 @@ import { GraphQLModule } from './graphql/graphql.module';
 import { PlatformModule } from './platform/PlatformModule';
 import TransfersModule from './transfers/TransfersModule';
 import { DocumentNode } from "graphql";
+import MovementsModule from "./movements/MovementsModule";
 
 export * from './platform/platform-types';
 export * from './platform/interfaces';
@@ -46,6 +47,7 @@ export class Backend {
         GraphQLModule,
         WalletsModule,
         TransfersModule,
+        MovementsModule,
       ],
       providers: [],
     })

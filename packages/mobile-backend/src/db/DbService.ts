@@ -62,6 +62,18 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
     `);
 
     await this.db.raw(`
+      CREATE TABLE IF NOT EXISTS "movements" (
+        "version" TEXT NOT NULL,
+        "walletId" TEXT NOT NULL REFERENCES wallets(id) ON DELETE CASCADE,
+        "lockedBalance" TEXT NOT NULL,
+        "balance" TEXT NOT NULL,
+        "lockedAmount" TEXT NOT NULL,
+        "unlockedAmount" TEXT NOT NULL,
+        PRIMARY KEY("version", "walletId")
+      )
+    `);
+
+    await this.db.raw(`
       CREATE TABLE IF NOT EXISTS "dApps" (
         "id" TEXT PRIMARY KEY,
         "host" TEXT NOT NULL UNIQUE,
@@ -78,6 +90,42 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
         "type" TEXT NOT NULL,
         "payload" BLOB NOT NULL,
         "createdAt" TEXT NOT NULL
+      )
+    `);
+
+    await this.db.raw(`
+      CREATE TABLE IF NOT EXISTS "blockMetadataTransaction" (
+        "version" TEXT PRIMARY KEY,
+        "epoch" TEXT NOT NULL,
+        "timestamp" INTEGER NOT NULL
+      )
+    `);
+
+    await this.db.raw(`
+      CREATE TABLE IF NOT EXISTS "genesisTransaction" (
+        "version" TEXT PRIMARY KEY
+      )
+    `);
+
+    await this.db.raw(`
+      CREATE TABLE IF NOT EXISTS "userTransaction" (
+        "version" TEXT PRIMARY KEY,
+        "success" INTEGER,
+        "sender" TEXT NOT NULL,
+        "moduleAddress" TEXT NOT NULL,
+        "moduleName" TEXT NOT NULL,
+        "functionName" TEXT NOT NULL,
+        "arguments" TEXT NOT NULL,
+        "timestamp" INTEGER NOT NULL
+      )
+    `);
+
+    await this.db.raw(`
+      CREATE TABLE IF NOT EXISTS "scriptUserTransaction" (
+        "version" TEXT PRIMARY KEY,
+        "success" INTEGER,
+        "sender" TEXT NOT NULL,
+        "timestamp" INTEGER NOT NULL
       )
     `);
   }

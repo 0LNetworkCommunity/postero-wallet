@@ -1,15 +1,25 @@
-import { FC } from "react";
-import { View, Text, ActivityIndicator, Button, Pressable, TouchableOpacity } from "react-native";
+import { FC, useMemo } from "react";
+import { View, Text, ActivityIndicator, TouchableOpacity, SafeAreaView } from "react-native";
 import {
   gql,
   useApolloClient,
   useQuery,
-  useSubscription,
 } from "@apollo/client";
 import { StackScreenProps } from "@react-navigation/stack";
 import tw from "twrnc";
+import BN from "bn.js"
+
 import { ModalStackParams } from "../params";
 import RefreshIcon from "../../icons/RefreshIcon";
+import Movements from "./Movements";
+import {
+  BlockMetadataTransaction,
+  ScriptUserTransaction,
+  TransactionType,
+  UserTransaction,
+  useMovements,
+} from "../../../movements";
+import Chart from "./Chart";
 
 const GET_WALLET = gql`
   query GetWallet($id: ID!) {
@@ -46,6 +56,37 @@ const WalletScreen: FC<StackScreenProps<ModalStackParams, "Wallet">> = ({
 }) => {
   const { walletId } = route.params;
   const apolloClient = useApolloClient();
+  const { movements } = useMovements(walletId);
+
+  const histData = useMemo(() => {
+    const histBalance: { value: number; date: Date }[] = [];
+
+    if (movements) {
+      for (const movement of movements) {
+        const { transaction, balance } = movement;
+
+        if (transaction.type !== TransactionType.Genesis) {
+          const date = new Date(
+            (
+              transaction as
+                | UserTransaction
+                | ScriptUserTransaction
+                | BlockMetadataTransaction
+            ).timestamp
+              .div(new BN(1e3))
+              .toNumber()
+          );
+
+          histBalance.push({
+            date,
+            value: balance.toNumber()
+          });
+        }
+      }
+    }
+
+    return histBalance;
+  }, [movements]);
 
   const { data, error, loading } = useQuery<{
     wallet: {
@@ -115,75 +156,90 @@ const WalletScreen: FC<StackScreenProps<ModalStackParams, "Wallet">> = ({
 
   if (data) {
     return (
-      <View style={tw.style("flex-1 px-3 py-2")}>
-        <View style={tw.style("flex-row items-center justify-between")}>
-          <Text style={tw.style("font-semibold text-gray-900 text-xl")}>
-            {`${data.wallet.label}`}
-          </Text>
-          <TouchableOpacity
-            style={tw.style('p-2 pr-0')}
-            onPress={onRefresh}
-          >
-            <RefreshIcon color="#000000" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={tw.style("bg-white p-2 rounded-md my-2")}>
-          <Text style={tw.style("font-medium text-gray-400 leading-6")}>
-            Current Balance
-          </Text>
-          <Text>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={tw.style("px-3 pt-2")}>
+          <View style={tw.style("flex-row items-center justify-between")}>
             <Text style={tw.style("font-semibold text-gray-900 text-xl")}>
-              {unlockedAmountLabel}
+              {`${data.wallet.label}`}
             </Text>
-            {lockedAmountLabel !== undefined && (
-              <Text style={tw.style("font-medium text-gray-500 text-sm")}>
-                {` / ${lockedAmountLabel}`}
-              </Text>
+            <TouchableOpacity style={tw.style("p-2 pr-0")} onPress={onRefresh}>
+              <RefreshIcon color="#000000" />
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={tw.style(
+              { height: 250 },
+              "bg-white rounded-md my-2 overflow-hidden"
             )}
-          </Text>
-        </View>
-
-        <View
-          style={tw.style({
-            flexDirection: "row",
-          })}
-        >
-          <View style={tw.style("basis-1/2 justify-center items-center")}>
-            <TouchableOpacity
-              style={tw.style(
-                "w-full justify-center items-center p-2 rounded-md mr-2",
-                "bg-white"
-              )}
-              onPress={() => {
-                navigation.navigate("NewTransfer", { walletId });
-              }}
-            >
-              <Text style={tw.style("font-semibold text-slate-900 text-base")}>
-                Send
-              </Text>
-            </TouchableOpacity>
+          >
+            {histData.length > 0 && (
+              <Chart data={histData} />
+            )}
+            {/* <HistoricalBalance /> */}
           </View>
 
-          <View style={tw.style("basis-1/2 justify-center items-center")}>
-            <TouchableOpacity
-              style={tw.style(
-                "w-full justify-center items-center p-2 rounded-md ml-2",
-                "bg-slate-950"
-              )}
-              onPress={() => {
-                navigation.navigate("WalletDetails", {
-                  walletAddress: data.wallet.accountAddress,
-                });
-              }}
-            >
-              <Text style={tw.style("font-semibold text-white text-base")}>
-                Receive
+          <View style={tw.style("bg-white p-2 rounded-md my-2")}>
+            <Text style={tw.style("font-medium text-gray-400 leading-6")}>
+              Current Balance
+            </Text>
+            <Text>
+              <Text style={tw.style("font-semibold text-gray-900 text-xl")}>
+                {unlockedAmountLabel}
               </Text>
-            </TouchableOpacity>
+              {lockedAmountLabel !== undefined && (
+                <Text style={tw.style("font-medium text-gray-500 text-sm")}>
+                  {` / ${lockedAmountLabel}`}
+                </Text>
+              )}
+            </Text>
+          </View>
+
+          <View
+            style={tw.style({
+              flexDirection: "row",
+            })}
+          >
+            <View style={tw.style("basis-1/2 justify-center items-center")}>
+              <TouchableOpacity
+                style={tw.style(
+                  "w-full justify-center items-center p-2 rounded-md mr-2",
+                  "bg-white"
+                )}
+                onPress={() => {
+                  navigation.navigate("NewTransfer", { walletId });
+                }}
+              >
+                <Text
+                  style={tw.style("font-semibold text-slate-900 text-base")}
+                >
+                  Send
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={tw.style("basis-1/2 justify-center items-center")}>
+              <TouchableOpacity
+                style={tw.style(
+                  "w-full justify-center items-center p-2 rounded-md ml-2",
+                  "bg-slate-950"
+                )}
+                onPress={() => {
+                  navigation.navigate("WalletDetails", {
+                    walletAddress: data.wallet.accountAddress,
+                  });
+                }}
+              >
+                <Text style={tw.style("font-semibold text-white text-base")}>
+                  Receive
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
+
+        <Movements movements={movements ?? []} />
+      </SafeAreaView>
     );
   }
 

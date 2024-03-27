@@ -27,7 +27,7 @@ const Home: FC = () => {
       totalUnlocked += unlocked;
       totalLocked += locked;
     } else {
-      totalLocked += libraAmount;
+      totalUnlocked += libraAmount;
     }
   }
 
@@ -38,7 +38,7 @@ const Home: FC = () => {
     totalUnlocked /= 1e6;
   }
 
-  const rate = 0.0089;
+  const rate = 0.01159;
 
   return (
     <SafeAreaView>

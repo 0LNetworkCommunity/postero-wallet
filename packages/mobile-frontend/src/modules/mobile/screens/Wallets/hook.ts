@@ -143,7 +143,6 @@ export const useWallets = () => {
       const res = await apolloClient.query<{ wallets: Wallet[] }>({
         query: GET_WALLETS,
       });
-      console.log(res.data.wallets);
       setWallets(res.data.wallets);
     };
 

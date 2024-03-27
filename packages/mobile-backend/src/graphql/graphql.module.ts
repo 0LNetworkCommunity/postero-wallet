@@ -7,11 +7,14 @@ import { DateScalar } from "../common/scalars/date.scalar";
 import { BytesScalar } from "../common/scalars/bytes.scalar";
 
 import { Types } from "../types";
+import { BigIntScalar } from "./bigint.scalar";
+import { DecimalScalar } from "./decimal.scalar";
 
 @Module({
   imports: [
     DateScalar,
     BytesScalar,
+    DecimalScalar,
 
     NestGraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -23,6 +26,7 @@ import { Types } from "../types";
       provide: Types.IGraphQLService,
       useClass: GraphQLService,
     },
+    BigIntScalar,
   ],
   exports: [Types.IGraphQLService],
 })
