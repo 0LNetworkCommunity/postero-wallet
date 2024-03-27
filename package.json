@@ -6,9 +6,20 @@
   "author": "wiri <157544279+wiri-ol@users.noreply.github.com>",
   "license": "UNLICENSED",
   "private": true,
+  "scripts": {
+    "postinstall": "patch-package"
+  },
   "workspaces": [
     "packages/mobile-frontend",
-    "packages/mobile-backend"
+    "packages/mobile-backend",
+    "packages/desktop-backend",
+    "packages/desktop-frontend"
   ],
-  "packageManager": "yarn@4.1.0"
+  "packageManager": "yarn@4.1.1",
+  "dependencies": {
+    "@yarnpkg/types": "^4.0.0"
+  },
+  "devDependencies": {
+    "patch-package": "8.0.0"
+  }
 }
