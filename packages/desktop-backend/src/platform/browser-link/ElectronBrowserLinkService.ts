@@ -4,7 +4,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { WebSocketServer, WebSocket } from 'ws';
 import { ModuleRef } from "@nestjs/core";
 
-import { Types, IBrowserBridge } from "@postero/mobile-backend";
+import { Types, IBrowserBridge } from "@postero/core";
 import ElectronBrowserBridge from './ElectronBrowserBridge';
 
 @Injectable()

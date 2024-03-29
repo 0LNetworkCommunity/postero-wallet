@@ -5,7 +5,7 @@ const path = require('path');
 
 const projectRoot = __dirname;
 const monorepoRoot = path.resolve(projectRoot, '../..');
-const backendNodeModules = path.resolve(monorepoRoot, 'packages/mobile-backend/node_modules');
+const coreNodeModules = path.resolve(monorepoRoot, 'packages/core/node_modules');
 const rootNodeModules = path.resolve(monorepoRoot, 'node_modules');
 
 const config = getDefaultConfig(projectRoot);
@@ -16,7 +16,7 @@ config.resolver.disableHierarchicalLookup = true;
 
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
-  backendNodeModules,
+  coreNodeModules,
   rootNodeModules,
 ];
 

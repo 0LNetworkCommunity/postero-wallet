@@ -7,7 +7,7 @@
 // import { GraphQLModule } from "@nestjs/graphql";
 // import { ApolloDriver } from "@nestjs/apollo";
 
-import bootstrapBackend, { IWindowManagerSerivce, WindowType, Types } from "@postero/mobile-backend";
+import bootstrapBackend, { IWindowManagerSerivce, WindowType, Types } from "@postero/core";
 
 import ElectronPlatformModule from './platform/ElectronPlatformModule';
 

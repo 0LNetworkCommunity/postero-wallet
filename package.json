@@ -11,7 +11,7 @@
   },
   "workspaces": [
     "packages/mobile-frontend",
-    "packages/mobile-backend",
+    "packages/core",
     "packages/desktop-backend",
     "packages/desktop-frontend"
   ],

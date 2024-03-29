@@ -1,6 +1,6 @@
 import { ApolloClient, InMemoryCache, split } from "@apollo/client";
 import { getMainDefinition } from "@apollo/client/utilities";
-import { Backend } from "@postero/mobile-backend";
+import { Backend } from "@postero/core";
 import LocalLink from "./LocalLink";
 import SubscriptionLink from "./SubscriptionLink";
 

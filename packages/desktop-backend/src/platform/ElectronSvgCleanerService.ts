@@ -1,6 +1,6 @@
 import { JSDOM } from "jsdom";
 
-import { PlatformSvgCleanerService } from "@postero/mobile-backend";
+import { PlatformSvgCleanerService } from "@postero/core";
 
 const SVG_ALLOWED_ATTRIBUTES = [
   "about",

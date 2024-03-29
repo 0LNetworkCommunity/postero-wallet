@@ -1,4 +1,4 @@
-import { WindowManagerService } from '@postero/mobile-backend';
+import { WindowManagerService } from '@postero/core';
 
 class ReactNativeWindowManagerService implements WindowManagerService {
 }

@@ -9,7 +9,7 @@ import {
   JsonRpcIncomingMessage,
   RpcMethod,
   Types,
-} from "@postero/mobile-backend";
+} from "@postero/core";
 
 @Injectable()
 class ElectronBrowserBridge implements IBrowserBridge {

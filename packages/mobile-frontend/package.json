@@ -19,7 +19,7 @@
     "@expo/react-native-action-sheet": "^4.0.1",
     "@heroicons/react": "^2.1.1",
     "@noble/hashes": "^1.4.0",
-    "@postero/mobile-backend": "workspace:^0.0.1",
+    "@postero/core": "workspace:^0.0.1",
     "@react-native-picker/picker": "2.6.1",
     "@react-navigation/bottom-tabs": "^6.5.20",
     "@react-navigation/native": "^6.1.17",

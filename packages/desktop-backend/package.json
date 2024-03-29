@@ -29,7 +29,7 @@
     "@nestjs/graphql": "^12.1.1",
     "@nestjs/platform-express": "^10.3.4",
     "@noble/hashes": "^1.4.0",
-    "@postero/mobile-backend": "workspace:^0.0.1",
+    "@postero/core": "workspace:^0.0.1",
     "@repeaterjs/repeater": "^3.0.5",
     "aptos": "^1.21.0",
     "better-sqlite3": "9.4.3",

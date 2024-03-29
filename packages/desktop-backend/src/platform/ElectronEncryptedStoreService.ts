@@ -1,7 +1,7 @@
 import {
   PlatformEncryptedStoreService,
   EncryptedStoreRule,
-} from "@postero/mobile-backend";
+} from "@postero/core";
 
 class ElectronEncryptedStoreService implements PlatformEncryptedStoreService {
   public async setItem(

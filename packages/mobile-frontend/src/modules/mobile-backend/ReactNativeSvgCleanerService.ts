@@ -1,4 +1,4 @@
-import { PlatformSvgCleanerService } from "@postero/mobile-backend";
+import { PlatformSvgCleanerService } from "@postero/core";
 
 class ReactNativeSvgCleanerService implements PlatformSvgCleanerService {
   public clean(svgImg: string): string {

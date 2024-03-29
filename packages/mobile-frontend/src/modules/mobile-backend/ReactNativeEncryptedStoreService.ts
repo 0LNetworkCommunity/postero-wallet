@@ -1,7 +1,7 @@
 import {
   PlatformEncryptedStoreService,
   EncryptedStoreRule,
-} from "@postero/mobile-backend";
+} from "@postero/core";
 
 import * as SecureStore from "expo-secure-store";
 

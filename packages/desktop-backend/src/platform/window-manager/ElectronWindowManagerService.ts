@@ -20,7 +20,7 @@ import {
   IWindow,
   IpcMethod,
   PlatformTypes,
-} from "@postero/mobile-backend";
+} from "@postero/core";
 import ElectronWindow from "./ElectronWindow";
 
 @Injectable()

@@ -1,5 +1,5 @@
 import * as Crypto from "expo-crypto";
-import { PlatformCryptoService } from "@postero/mobile-backend";
+import { PlatformCryptoService } from "@postero/core";
 
 class ReactNativeCryptoService implements PlatformCryptoService {
   public getRandomBytes(byteCount: number): Uint8Array {

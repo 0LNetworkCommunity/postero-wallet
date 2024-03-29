@@ -6,7 +6,7 @@ import {
   FetchResult,
   RequestHandler,
 } from "@apollo/client";
-import { Backend, BackendEvent } from "@postero/mobile-backend";
+import { Backend, BackendEvent } from "@postero/core";
 
 class SubscriptionLink extends ApolloLink {
   private observers = new Map<string, Observer<FetchResult>>();

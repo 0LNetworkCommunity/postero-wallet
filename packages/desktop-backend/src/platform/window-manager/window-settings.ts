@@ -1,7 +1,7 @@
 import process from "node:process";
 import { BrowserWindowConstructorOptions } from "electron";
 
-import { WindowType } from "@postero/mobile-backend";
+import { WindowType } from "@postero/core";
 
 const isMac = process.platform === "darwin";
 

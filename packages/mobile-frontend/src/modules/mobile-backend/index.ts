@@ -1,4 +1,4 @@
-import bootstrapBackend, { Backend } from "@postero/mobile-backend";
+import bootstrapBackend, { Backend } from "@postero/core";
 import ReactNativePlatformModule from './ReactNativePlatformModule';
 
 const bootstrap = async (): Promise<Backend> => {

@@ -2,7 +2,7 @@ import pathUtil from "node:path";
 import fs from "node:fs";
 import { app } from "electron";
 
-import { PlatformSqliteService } from "@postero/mobile-backend";
+import { PlatformSqliteService } from "@postero/core";
 
 class ExpoSqliteService implements PlatformSqliteService {
   public async getKnexConfig() {

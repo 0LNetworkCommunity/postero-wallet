@@ -26,7 +26,7 @@ import {
   IWalletService,
   IGraphQLService,
   IpcMethod,
-} from "@postero/mobile-backend";
+} from "@postero/core";
 import { windowsSettings } from "./window-settings";
 
 @ObjectType({

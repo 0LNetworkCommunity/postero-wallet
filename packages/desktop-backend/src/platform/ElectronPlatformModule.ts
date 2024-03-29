@@ -1,6 +1,6 @@
 import { Scope } from "@nestjs/common";
 
-import { PlatformTypes } from "@postero/mobile-backend";
+import { PlatformTypes } from "@postero/core";
 
 import ElectronCryptoService from "./ElectronCryptoService";
 import ElectronSqliteService from "./ElectronSqliteService";

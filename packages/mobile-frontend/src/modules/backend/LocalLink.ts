@@ -5,7 +5,7 @@ import {
   Observable,
   FetchResult,
 } from "@apollo/client";
-import { Backend } from "@postero/mobile-backend";
+import { Backend } from "@postero/core";
 
 class LocalLink extends ApolloLink {
   public constructor(private readonly backend: Backend) {

@@ -1,5 +1,5 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { PlatformCryptoService } from "@postero/mobile-backend";
+import { PlatformCryptoService } from "@postero/core";
 
 class ElectronCryptoService implements PlatformCryptoService {
   public getRandomBytes(byteCount: number): Uint8Array {

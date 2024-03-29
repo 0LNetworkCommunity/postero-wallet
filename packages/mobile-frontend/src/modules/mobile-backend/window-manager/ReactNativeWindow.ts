@@ -14,7 +14,7 @@ import {
   IWalletService,
   IGraphQLService,
   IpcMethod,
-} from "@postero/mobile-backend";
+} from "@postero/core";
 
 @ObjectType({
   implements: () => [AbstractWindow],
