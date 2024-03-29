@@ -5,8 +5,6 @@ import RpcService from "./RpcService";
 import BrowserTabService from "./BrowserTabService";
 import BrowserTabFactory from "./BrowserTabFactory";
 import BrowserTab from "./BrowserTab";
-import BrowserBridge from "./BrowserBridge";
-import BrowserBridgeFactory from "./BrowserBridgeFactory";
 import DAppsModule from "../dapps/DAppsModule";
 import TransactionsModule from "../transactions/TransactionsModule";
 
@@ -31,18 +29,8 @@ import TransactionsModule from "../transactions/TransactionsModule";
       useClass: BrowserTab,
       scope: Scope.TRANSIENT,
     },
-
-    {
-      provide: Types.IBrowserBridgeFactory,
-      useClass: BrowserBridgeFactory,
-    },
-    {
-      provide: Types.IBrowserBridge,
-      useClass: BrowserBridge,
-      scope: Scope.TRANSIENT,
-    },
   ],
-  exports: [],
+  exports: [Types.IBrowserTabFactory, Types.IBrowserTabService],
 })
 class RpcModule {}
 

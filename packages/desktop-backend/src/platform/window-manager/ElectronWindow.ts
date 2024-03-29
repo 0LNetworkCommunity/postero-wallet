@@ -13,27 +13,21 @@ import Emittery, { UnsubscribeFn } from "emittery";
 import qs from "qs";
 import { Field, ObjectType } from "@nestjs/graphql";
 
-import { IWindow, IWindowManagerSerivce } from "./interfaces";
-import {
-  ContextMenu,
-  ContextMenuEventData,
-  WindowEvent,
-  WindowState,
-  WindowType,
-} from "./types";
-import { IWalletService } from "../wallets/interfaces";
-import { Types } from "../types";
-import { IGraphQLService } from "../graphql/interfaces";
-import { IpcMethod } from "../ipc/methods";
+import { IWalletService } from "../../wallets/interfaces";
+import { Types } from "../../types";
+import { IGraphQLService } from "../../graphql/interfaces";
+import { IpcMethod } from "../../ipc/methods";
+import { IWindow, IWindowManagerSerivce } from "../../window-manager/interfaces";
+import { ContextMenu, ContextMenuEventData, WindowEvent, WindowState, WindowType } from "../../window-manager/types";
+import windowsSettings from "../../window-manager/window-settings";
+import { AbstractWindow } from "../../window-manager/AbstractWindow";
 
-import windowsSettings from "./window-settings";
-
-@ObjectType("Window")
-class Window implements IWindow {
-  @Field()
+@ObjectType({
+  implements: () => [AbstractWindow],
+})
+class ElectronWindow implements IWindow {
   public frame: boolean;
 
-  @Field(() => WindowState)
   public state: WindowState;
 
   public window?: BrowserWindow;
@@ -96,7 +90,7 @@ class Window implements IWindow {
       // devTools: !app.isPackaged,
       preload: app.isPackaged
         ? path.join(appPath, "src/preload.js")
-        : path.join(__dirname, "../../preload.js"),
+        : path.join(__dirname, "../../../preload.js"),
     };
 
     this.eventEmitter.on;
@@ -127,7 +121,7 @@ class Window implements IWindow {
       });
     } else {
       const queryStr = qs.stringify(query);
-      window.loadURL(`http://localhost:8081/?${queryStr}`);
+      window.loadURL(`http://localhost:8082/?${queryStr}`);
     }
   }
 
@@ -280,4 +274,4 @@ class Window implements IWindow {
   }
 }
 
-export default Window;
+export default ElectronWindow;

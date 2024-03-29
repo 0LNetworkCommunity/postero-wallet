@@ -1,4 +1,4 @@
-import { BrowserWindow, IpcMainInvokeEvent, WebContents } from "electron";
+import { BrowserWindow, IpcMainInvokeEvent } from "electron";
 import { UnsubscribeFn } from "emittery";
 
 import { WindowType, WindowEvent, ContextMenuEventData } from "./types";
@@ -10,7 +10,6 @@ export interface IWindowManagerSerivce {
     params?: any,
     parent?: IWindow,
   ): Promise<IWindow>;
-  getWindowFromWebContents(webContents: WebContents): IWindow | undefined;
 }
 
 export interface IWindow {
@@ -22,11 +21,11 @@ export interface IWindow {
   ): UnsubscribeFn;
   onContextMenu(event: ContextMenuEventData): void;
 
-  handleIpcCall(
-    method: IpcMethod,
-    event: IpcMainInvokeEvent,
-    args: any,
-  ): Promise<any>;
+  // handleIpcCall(
+  //   method: IpcMethod,
+  //   event: IpcMainInvokeEvent,
+  //   args: any,
+  // ): Promise<any>;
 }
 
 export interface IWindowFactory {
@@ -35,4 +34,7 @@ export interface IWindowFactory {
     params?: any,
     parent?: IWindow,
   ): Promise<IWindow>;
+}
+
+export interface IPlatformWindowManagerService {
 }

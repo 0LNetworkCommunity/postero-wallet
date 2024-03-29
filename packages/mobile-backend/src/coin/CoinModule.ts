@@ -8,7 +8,9 @@ import Coin from "./Coin";
 import CoinFactory from "./CoinFactory";
 
 @Module({
-  imports: [DbModule, OpenLibraModule],
+  imports: [
+    DbModule, OpenLibraModule
+  ],
   providers: [
     {
       provide: Types.ICoinRepository,

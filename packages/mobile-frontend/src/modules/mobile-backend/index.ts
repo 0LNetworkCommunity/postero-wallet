@@ -1,5 +1,5 @@
 import bootstrapBackend, { Backend } from "@postero/mobile-backend";
-import ExpoPlatformModule from './ExpoPlatformModule';
+import ReactNativePlatformModule from './ReactNativePlatformModule';
 
 const bootstrap = async (): Promise<Backend> => {
   const proc = process as any;
@@ -22,7 +22,7 @@ const bootstrap = async (): Promise<Backend> => {
     },
   });
 
-  const backend = await bootstrapBackend(ExpoPlatformModule);
+  const backend = await bootstrapBackend(ReactNativePlatformModule);
   return backend;
 };
 

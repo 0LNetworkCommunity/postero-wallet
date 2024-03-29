@@ -1,4 +1,4 @@
-import { Notification } from "electron";
+// import { Notification } from "electron";
 import Emittery, { UnsubscribeFn } from "emittery";
 import { Field, ID, ObjectType } from "@nestjs/graphql";
 
@@ -42,9 +42,9 @@ class ConnectionRequest implements IConnectionRequest {
   }
 
   public notify() {
-    new Notification({
-      title: `Connect ${this.dApp.name}`,
-    }).show();
+    // new Notification({
+    //   title: `Connect ${this.dApp.name}`,
+    // }).show();
   }
 
   public async approve(wallet: Wallet): Promise<void> {

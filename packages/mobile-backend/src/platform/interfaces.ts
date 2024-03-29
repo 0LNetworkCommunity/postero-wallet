@@ -1,4 +1,7 @@
 import { Knex } from 'knex';
+import { UnsubscribeFn } from 'emittery';
+import { IpcMethod } from '../ipc/methods';
+import { WindowType } from '../types';
 
 export interface PlatformCryptoService {
   getRandomBytes(byteCount: number): Uint8Array;
@@ -27,4 +30,12 @@ export interface PlatformEncryptedStoreService {
 
 export interface LocalAuthenticationService {
   authenticate(): Promise<boolean>;
+}
+
+export interface PlatformWindowManagerService {
+  createWindow(type: WindowType, params?: any, parent?: any): Promise<any>;
+}
+
+export interface PlatformBrowserLinkService {
+
 }

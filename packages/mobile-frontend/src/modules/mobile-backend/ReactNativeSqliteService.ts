@@ -1,7 +1,7 @@
 import { PlatformSqliteService } from '@postero/mobile-backend';
 import ExpoSQLiteDialect from '@expo/knex-expo-sqlite-dialect';
 
-class ExpoSqliteService implements PlatformSqliteService {
+class ReactNativeSqliteService implements PlatformSqliteService {
   public async getKnexConfig() {
     return {
       client: ExpoSQLiteDialect,
@@ -12,4 +12,4 @@ class ExpoSqliteService implements PlatformSqliteService {
   }
 }
 
-export default ExpoSqliteService;
+export default ReactNativeSqliteService;

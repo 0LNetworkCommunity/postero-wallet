@@ -63,4 +63,6 @@ export enum Types {
   IBalance = "IBalance",
   IBalanceFactory = "IBalanceFactory",
   IBalanceRepository = "IBalanceRepository",
+
+  PlatformWindowManager = "PlatformWindowManager",
 }

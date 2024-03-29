@@ -1,6 +1,9 @@
 export enum PlatformTypes {
   CryptoService = "CryptoService",
   SqliteService = "SqliteService",
-  EncryptedStoreService = "PlatformEncryptedStoreService",
+  EncryptedStoreService = "EncryptedStoreService",
   LocalAuthenticationService = "LocalAuthenticationService",
+  PlatformWindowManagerService = "PlatformWindowManagerService",
+  Window = "Window",
+  BrowserLinkService = "BrowserLinkService"
 }

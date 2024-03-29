@@ -14,23 +14,24 @@ class OpenLibraService implements IOpenLibraService {
   public async getOriginatingAddress(
     authenticationKey: Uint8Array,
   ): Promise<Uint8Array> {
-    try {
-      const res = (await this.aptosClient.view({
-        function: "0x1::account::get_originating_address",
-        type_arguments: [],
-        arguments: [`0x${Buffer.from(authenticationKey).toString("hex")}`],
-      })) as [string];
-      return Buffer.from(res[0].substring(2), "hex");
-    } catch (error) {
-      if (error instanceof ApiError) {
-        const err = error as ApiError;
-        if (err.errorCode === "invalid_input") {
-          return authenticationKey;
-        }
-      }
+    return authenticationKey;
+    // try {
+    //   const res = (await this.aptosClient.view({
+    //     function: "0x1::account::get_originating_address",
+    //     type_arguments: [],
+    //     arguments: [`0x${Buffer.from(authenticationKey).toString("hex")}`],
+    //   })) as [string];
+    //   return Buffer.from(res[0].substring(2), "hex");
+    // } catch (error) {
+    //   if (error instanceof ApiError) {
+    //     const err = error as ApiError;
+    //     if (err.errorCode === "invalid_input") {
+    //       return authenticationKey;
+    //     }
+    //   }
 
-      throw error;
-    }
+    //   throw error;
+    // }
   }
 
   public async getAccountResources(

@@ -1,12 +1,18 @@
 global.Buffer = global.Buffer || require('buffer').Buffer;
 
-import "fast-text-encoding";
+import 'fast-text-encoding';
 import { NestFactory } from '@nestjs/core';
 import {
   ExpressAdapter,
   NestExpressApplication,
 } from '@nestjs/platform-express';
-import { Module, DynamicModule, INestApplication } from '@nestjs/common';
+import {
+  Module,
+  DynamicModule,
+  INestApplication,
+  Type,
+  ForwardReference,
+} from '@nestjs/common';
 import { ApolloDriver } from '@nestjs/apollo';
 import { GraphQLModule as NestGraphQLModule } from '@nestjs/graphql';
 import Emittery, { UnsubscribeFn } from 'emittery';
@@ -21,18 +27,20 @@ import WalletsModule from './wallets/WalletsModule';
 import { GraphQLModule } from './graphql/graphql.module';
 import { PlatformModule } from './platform/PlatformModule';
 import TransfersModule from './transfers/TransfersModule';
-import { DocumentNode } from "graphql";
-import MovementsModule from "./movements/MovementsModule";
+import { DocumentNode } from 'graphql';
+import MovementsModule from './movements/MovementsModule';
+import IpcModule from './ipc/ipc.module';
 
 export * from './platform/platform-types';
 export * from './platform/interfaces';
+export * from './ipc/methods';
 
 export enum BackendEvent {
   SubscriptionData = 'SubscriptionData',
 }
 
 export class Backend {
-  private readonly app: INestApplication;
+  public readonly app: INestApplication;
 
   private graphqlService: IGraphQLService;
 
@@ -40,14 +48,20 @@ export class Backend {
 
   public static async create(
     platformServices: Pick<DynamicModule, 'providers' | 'exports'>,
+
+    imports?: Array<
+      Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
+    >,
   ): Promise<Backend> {
     @Module({
       imports: [
         PlatformModule.forRoot(platformServices),
+        IpcModule,
         GraphQLModule,
         WalletsModule,
         TransfersModule,
         MovementsModule,
+        ...(imports ?? []),
       ],
       providers: [],
     })
@@ -109,8 +123,11 @@ export class Backend {
 
 const bootstrap = async (
   platformServices: Pick<DynamicModule, 'providers' | 'exports'>,
+  imports?: Array<
+    Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
+  >,
 ): Promise<Backend> => {
-  return Backend.create(platformServices);
+  return Backend.create(platformServices, imports);
 };
 
 export default bootstrap;

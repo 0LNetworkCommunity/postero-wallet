@@ -1,10 +1,10 @@
 import * as LocalAuthentication from "expo-local-authentication";
 
-class ExpoLocalAuthenticationService {
+class ReactNativeLocalAuthenticationService {
   public async authenticate(): Promise<boolean> {
     const res = await LocalAuthentication.authenticateAsync();
     return res.success;
   }
 }
 
-export default ExpoLocalAuthenticationService;
+export default ReactNativeLocalAuthenticationService;

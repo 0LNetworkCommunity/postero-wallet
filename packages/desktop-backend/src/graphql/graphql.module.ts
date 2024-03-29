@@ -9,11 +9,15 @@ import ApolloDriver from "./apollo.driver";
 import { BytesScalar } from "../common/scalars/bytes.scalar";
 import { GraphQLService } from "./graphql.service";
 import { Types } from "../types";
+import { BigIntScalar } from "./bigint.scalar";
+import { DecimalScalar } from "./decimal.scalar";
 
 @Module({
   imports: [
     DateScalar,
     BytesScalar,
+    DecimalScalar,
+    BigIntScalar,
 
     NestJsGraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

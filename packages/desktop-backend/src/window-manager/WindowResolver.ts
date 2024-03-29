@@ -1,13 +1,14 @@
 import { Mutation, Resolver, Context, Query, Subscription } from "@nestjs/graphql";
 import { dialog } from "electron";
-import Window from "./Window";
+// import Window from "./Window";
 import { IWindow } from "./interfaces";
 import { Repeater } from "@repeaterjs/repeater";
 import { WindowEvent } from "./types";
+import { AbstractWindow } from "./AbstractWindow";
 
 @Resolver()
 class WindowResolver {
-  @Query((returns) => Window)
+  @Query((returns) => AbstractWindow)
   public async window(@Context() window: IWindow) {
     return window;
   }
@@ -27,7 +28,7 @@ class WindowResolver {
     return res.filePath || null;
   }
 
-  @Subscription((returns) => Window)
+  @Subscription((returns) => AbstractWindow)
   public windowUpdated(
     @Context() window: IWindow
   ) {

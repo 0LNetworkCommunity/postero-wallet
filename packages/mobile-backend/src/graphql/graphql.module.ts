@@ -15,6 +15,7 @@ import { DecimalScalar } from "./decimal.scalar";
     DateScalar,
     BytesScalar,
     DecimalScalar,
+    BigIntScalar,
 
     NestGraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -26,7 +27,6 @@ import { DecimalScalar } from "./decimal.scalar";
       provide: Types.IGraphQLService,
       useClass: GraphQLService,
     },
-    BigIntScalar,
   ],
   exports: [Types.IGraphQLService],
 })

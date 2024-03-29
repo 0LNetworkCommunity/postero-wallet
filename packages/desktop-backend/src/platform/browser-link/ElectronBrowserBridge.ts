@@ -1,19 +1,18 @@
 import { Socket } from "node:net";
 import { WebSocket, RawData } from "ws";
 import { Inject, Injectable } from "@nestjs/common";
-
-import { RpcMethod } from "./methods";
 import {
   IBrowserBridge,
   IBrowserTab,
   IBrowserTabFactory,
   IBrowserTabService,
   JsonRpcIncomingMessage,
-} from "./interfaces";
-import { Types } from "../types";
+} from "../../rpc/interfaces";
+import { RpcMethod } from "../../rpc/methods";
+import { Types } from "../../types";
 
 @Injectable()
-class BrowserBridge implements IBrowserBridge {
+class ElectronBrowserBridge implements IBrowserBridge {
   public id!: number;
 
   public socket!: Socket;
@@ -118,4 +117,4 @@ class BrowserBridge implements IBrowserBridge {
   }
 }
 
-export default BrowserBridge;
+export default ElectronBrowserBridge;

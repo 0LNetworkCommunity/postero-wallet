@@ -5,6 +5,8 @@ const path = require('path');
 
 const projectRoot = __dirname;
 const monorepoRoot = path.resolve(projectRoot, '../..');
+const backendNodeModules = path.resolve(monorepoRoot, 'packages/mobile-backend/node_modules');
+const rootNodeModules = path.resolve(monorepoRoot, 'node_modules');
 
 const config = getDefaultConfig(projectRoot);
 
@@ -14,7 +16,8 @@ config.resolver.disableHierarchicalLookup = true;
 
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
-  path.resolve(monorepoRoot, 'node_modules'),
+  backendNodeModules,
+  rootNodeModules,
 ];
 
 const shimsDir = path.join(projectRoot, "shims");
@@ -42,8 +45,8 @@ Object.assign(config.resolver.extraNodeModules, {
   tls: config.resolver.emptyModulePath,
   url: config.resolver.emptyModulePath,
   zlib: config.resolver.emptyModulePath,
+  mkdirp: config.resolver.emptyModulePath,
   querystring: config.resolver.emptyModulePath,
-
 });
 
 const skippedModules = [
@@ -61,9 +64,8 @@ const skippedModules = [
   "class-transformer/storage",
   "@nodelib/fs.scandir",
   "fast-glob",
+  "mkdirp",
 ];
-
-const rootNodeModules = path.resolve(monorepoRoot, 'node_modules');
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (skippedModules.includes(moduleName)) {
