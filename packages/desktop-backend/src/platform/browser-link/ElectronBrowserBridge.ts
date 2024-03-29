@@ -7,9 +7,9 @@ import {
   IBrowserTabFactory,
   IBrowserTabService,
   JsonRpcIncomingMessage,
-} from "../../rpc/interfaces";
-import { RpcMethod } from "../../rpc/methods";
-import { Types } from "../../types";
+  RpcMethod,
+  Types,
+} from "@postero/mobile-backend";
 
 @Injectable()
 class ElectronBrowserBridge implements IBrowserBridge {

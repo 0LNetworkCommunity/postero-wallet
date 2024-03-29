@@ -4,8 +4,8 @@ import { Inject, Injectable } from "@nestjs/common";
 import { WebSocketServer, WebSocket } from 'ws';
 import { ModuleRef } from "@nestjs/core";
 
-import { IBrowserBridge } from "../../rpc/interfaces";
-import { Types } from '../../types';
+import { Types, IBrowserBridge } from "@postero/mobile-backend";
+import ElectronBrowserBridge from './ElectronBrowserBridge';
 
 @Injectable()
 class ElectronBrowserLinkService {
@@ -27,7 +27,7 @@ class ElectronBrowserLinkService {
   private async onConnection(webSocket: WebSocket, req: IncomingMessage) {
     const bridgeId = this.bridgeId++;
 
-    const bridge = await this.moduleRef.resolve<IBrowserBridge>(
+    const bridge = await this.moduleRef.resolve<ElectronBrowserBridge>(
       Types.IBrowserBridge,
     );
     bridge.init(bridgeId, req.socket, webSocket);

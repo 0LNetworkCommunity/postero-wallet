@@ -12,24 +12,21 @@ import {
   IpcMainInvokeEvent,
 } from "electron";
 
-import { PlatformWindowManagerService } from "@postero/mobile-backend";
 import {
+  PlatformWindowManagerService,
   ContextMenuEventData,
   WindowEvent,
   WindowType,
-} from "../../window-manager/types";
-import { IWindow, IWindowFactory } from "../../window-manager/interfaces";
-import { Types } from "../../types";
-import { IpcMethod } from "../../ipc/methods";
+  IWindow,
+  IpcMethod,
+  PlatformTypes,
+} from "@postero/mobile-backend";
 import ElectronWindow from "./ElectronWindow";
 
 @Injectable()
 class ElectronWindowManagerService
   implements PlatformWindowManagerService, OnModuleInit
 {
-  @Inject()
-  private readonly moduleRef: ModuleRef;
-
   // We only allow one instance of the settings window
   private settingsWindow?: ElectronWindow;
 
@@ -53,6 +50,8 @@ class ElectronWindowManagerService
     //     break;
     // }
   };
+
+  public constructor(private readonly moduleRef: ModuleRef) {}
 
   public onModuleInit() {
     this.initIpcHandler();
@@ -97,8 +96,8 @@ class ElectronWindowManagerService
   public async createWindow(
     type: WindowType,
     params?: any,
-    parent?: IWindow,
-  ): Promise<IWindow> {
+    parent?: ElectronWindow,
+  ): Promise<ElectronWindow> {
     // this.getColors();
 
     if (type === WindowType.Settings && this.settingsWindow) {
@@ -108,7 +107,7 @@ class ElectronWindowManagerService
 
     await app.whenReady();
 
-    const window = await this.moduleRef.resolve<ElectronWindow>(Types.IWindow);
+    const window = await this.moduleRef.resolve<ElectronWindow>(PlatformTypes.Window);
     await window.init(type, params, parent);
 
     this.windows.push(window);

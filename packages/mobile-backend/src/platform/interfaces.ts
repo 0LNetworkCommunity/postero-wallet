@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import { UnsubscribeFn } from 'emittery';
 import { IpcMethod } from '../ipc/methods';
-import { WindowType } from '../types';
+import { WindowType } from '../window-manager/types';
 
 export interface PlatformCryptoService {
   getRandomBytes(byteCount: number): Uint8Array;
@@ -38,4 +38,8 @@ export interface PlatformWindowManagerService {
 
 export interface PlatformBrowserLinkService {
 
+}
+
+export interface PlatformSvgCleanerService {
+  clean(svgImg: string): string;
 }

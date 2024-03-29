@@ -8,6 +8,7 @@ import ApolloDriver from './apollo.driver';
 import { GraphQLServiceEvent, IGraphQLService, SubscriptionEvent } from './interfaces';
 import { PlatformTypes } from '../platform/platform-types';
 import { PlatformCryptoService } from '../platform/interfaces';
+import { IWindow } from '../window-manager/interfaces';
 
 @Injectable()
 export class GraphQLService implements IGraphQLService {
@@ -24,26 +25,32 @@ export class GraphQLService implements IGraphQLService {
     this.graphqlServer = graphqlServer;
   }
 
-  public async execute(operation: {
-    operationName: string;
-    variables?: {
-      readonly [variable: string]: unknown;
-    };
-    query: DocumentNode;
-  }): Promise<any> {
+  public async execute(
+    operation: {
+      operationName: string;
+      variables?: {
+        readonly [variable: string]: unknown;
+      };
+      query: DocumentNode;
+    },
+    window: IWindow | undefined,
+  ): Promise<any> {
     const res = await this.graphqlServer!.instance.executeOperation(operation, {
-      // contextValue: window,
+      contextValue: window,
     });
     return res.body;
   }
 
-  public async subscribe(operation: {
-    operationName: string;
-    variables?: {
-      readonly [variable: string]: unknown;
-    };
-    query: DocumentNode;
-  }) {
+  public async subscribe(
+    operation: {
+      operationName: string;
+      variables?: {
+        readonly [variable: string]: unknown;
+      };
+      query: DocumentNode;
+    },
+    window: IWindow | undefined,
+  ) {
     const subscriptionId = this.platformCryptoService.randomUUID();
 
     const sub = (await subscribe({

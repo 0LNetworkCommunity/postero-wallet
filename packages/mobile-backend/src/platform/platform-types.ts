@@ -5,5 +5,7 @@ export enum PlatformTypes {
   LocalAuthenticationService = "LocalAuthenticationService",
   PlatformWindowManagerService = "PlatformWindowManagerService",
   Window = "Window",
-  BrowserLinkService = "BrowserLinkService"
+  BrowserLinkService = "BrowserLinkService",
+  BrowserBridge = "BrowserBridge",
+  SvgCleanerService = "SvgCleanerService"
 }

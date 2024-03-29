@@ -11,16 +11,23 @@ import {
 } from "electron";
 import Emittery, { UnsubscribeFn } from "emittery";
 import qs from "qs";
-import { Field, ObjectType } from "@nestjs/graphql";
+import { ObjectType } from "@nestjs/graphql";
 
-import { IWalletService } from "../../wallets/interfaces";
-import { Types } from "../../types";
-import { IGraphQLService } from "../../graphql/interfaces";
-import { IpcMethod } from "../../ipc/methods";
-import { IWindow, IWindowManagerSerivce } from "../../window-manager/interfaces";
-import { ContextMenu, ContextMenuEventData, WindowEvent, WindowState, WindowType } from "../../window-manager/types";
-import windowsSettings from "../../window-manager/window-settings";
-import { AbstractWindow } from "../../window-manager/AbstractWindow";
+import {
+  IWindow,
+  IWindowManagerSerivce,
+  ContextMenu,
+  ContextMenuEventData,
+  WindowEvent,
+  WindowState,
+  WindowType,
+  AbstractWindow,
+  Types,
+  IWalletService,
+  IGraphQLService,
+  IpcMethod,
+} from "@postero/mobile-backend";
+import { windowsSettings } from "./window-settings";
 
 @ObjectType({
   implements: () => [AbstractWindow],
@@ -76,7 +83,7 @@ class ElectronWindow implements IWindow {
     }
   };
 
-  public async init(type: WindowType, params?: any, parent?: IWindow) {
+  public async init(type: WindowType, params?: any, parent?: ElectronWindow) {
     await app.whenReady();
 
     const appPath = app.getAppPath();
@@ -148,6 +155,10 @@ class ElectronWindow implements IWindow {
     if (handler) {
       handler.call(this, event);
     }
+  }
+
+  public close() {
+    this.window?.close();
   }
 
   private toolbarWalletAction(event: ContextMenuEventData) {

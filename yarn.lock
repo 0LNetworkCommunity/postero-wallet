@@ -234,41 +234,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@apollo/server@npm:^4.10.0":
-  version: 4.10.2
-  resolution: "@apollo/server@npm:4.10.2"
-  dependencies:
-    "@apollo/cache-control-types": "npm:^1.0.3"
-    "@apollo/server-gateway-interface": "npm:^1.1.1"
-    "@apollo/usage-reporting-protobuf": "npm:^4.1.1"
-    "@apollo/utils.createhash": "npm:^2.0.0"
-    "@apollo/utils.fetcher": "npm:^2.0.0"
-    "@apollo/utils.isnodelike": "npm:^2.0.0"
-    "@apollo/utils.keyvaluecache": "npm:^2.1.0"
-    "@apollo/utils.logger": "npm:^2.0.0"
-    "@apollo/utils.usagereporting": "npm:^2.1.0"
-    "@apollo/utils.withrequired": "npm:^2.0.0"
-    "@graphql-tools/schema": "npm:^9.0.0"
-    "@josephg/resolvable": "npm:^1.0.0"
-    "@types/express": "npm:^4.17.13"
-    "@types/express-serve-static-core": "npm:^4.17.30"
-    "@types/node-fetch": "npm:^2.6.1"
-    async-retry: "npm:^1.2.1"
-    cors: "npm:^2.8.5"
-    express: "npm:^4.17.1"
-    loglevel: "npm:^1.6.8"
-    lru-cache: "npm:^7.10.1"
-    negotiator: "npm:^0.6.3"
-    node-abort-controller: "npm:^3.1.1"
-    node-fetch: "npm:^2.6.7"
-    uuid: "npm:^9.0.0"
-    whatwg-mimetype: "npm:^3.0.0"
-  peerDependencies:
-    graphql: ^16.6.0
-  checksum: 10c0/3aaf9e9bdedd7da59578fd7cc75b238bd7f08f8c97365b3423a2b6228c8020e7a88435746481c81237c02c276a0fc1b49304b4c79fadb99ee2c212645f5402a3
-  languageName: node
-  linkType: hard
-
 "@apollo/server@npm:^4.10.1":
   version: 4.10.1
   resolution: "@apollo/server@npm:4.10.1"
@@ -3423,27 +3388,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/common@npm:^10.3.3":
-  version: 10.3.6
-  resolution: "@nestjs/common@npm:10.3.6"
-  dependencies:
-    iterare: "npm:1.2.1"
-    tslib: "npm:2.6.2"
-    uid: "npm:2.0.2"
-  peerDependencies:
-    class-transformer: "*"
-    class-validator: "*"
-    reflect-metadata: ^0.1.12 || ^0.2.0
-    rxjs: ^7.1.0
-  peerDependenciesMeta:
-    class-transformer:
-      optional: true
-    class-validator:
-      optional: true
-  checksum: 10c0/17c2932bc7cc9e04e1df6b69672f5757b5c7f7f29748fce231e46b16e72175d5d45757cea0eae43c6e1d60d1c741e7e33db3b6ceac933427f717e004a1c9e30c
-  languageName: node
-  linkType: hard
-
 "@nestjs/common@npm:^10.3.4":
   version: 10.3.4
   resolution: "@nestjs/common@npm:10.3.4"
@@ -3462,34 +3406,6 @@ __metadata:
     class-validator:
       optional: true
   checksum: 10c0/38ccb4f993bf981522d3675ee9d87fd84924e339f580e5f3426e2fd4047704b35752cdb88e8d4190802e37026949f163e475b58db76bc5bba0541ed8561338df
-  languageName: node
-  linkType: hard
-
-"@nestjs/core@npm:^10.3.3":
-  version: 10.3.6
-  resolution: "@nestjs/core@npm:10.3.6"
-  dependencies:
-    "@nuxtjs/opencollective": "npm:0.3.2"
-    fast-safe-stringify: "npm:2.1.1"
-    iterare: "npm:1.2.1"
-    path-to-regexp: "npm:3.2.0"
-    tslib: "npm:2.6.2"
-    uid: "npm:2.0.2"
-  peerDependencies:
-    "@nestjs/common": ^10.0.0
-    "@nestjs/microservices": ^10.0.0
-    "@nestjs/platform-express": ^10.0.0
-    "@nestjs/websockets": ^10.0.0
-    reflect-metadata: ^0.1.12 || ^0.2.0
-    rxjs: ^7.1.0
-  peerDependenciesMeta:
-    "@nestjs/microservices":
-      optional: true
-    "@nestjs/platform-express":
-      optional: true
-    "@nestjs/websockets":
-      optional: true
-  checksum: 10c0/8aad746cd11eeb2e485b7513bf5dfaea7ef9931ec16de1e3b49524c218904fe5f85f08d285312be4e1da32829fc4d3804ccf35dc3c35907c6383beb6f93471c1
   languageName: node
   linkType: hard
 
@@ -3575,22 +3491,6 @@ __metadata:
     class-validator:
       optional: true
   checksum: 10c0/f92743cb4c0fe3b1eecdf0c7c6a40f0e7478574a9e1a25ebdbd29db29a7319c2ae608c08d07f7b9525bea01a5e20dbd73222100204d3a13500db4f56676446a1
-  languageName: node
-  linkType: hard
-
-"@nestjs/platform-express@npm:^10.3.3":
-  version: 10.3.6
-  resolution: "@nestjs/platform-express@npm:10.3.6"
-  dependencies:
-    body-parser: "npm:1.20.2"
-    cors: "npm:2.8.5"
-    express: "npm:4.19.2"
-    multer: "npm:1.4.4-lts.1"
-    tslib: "npm:2.6.2"
-  peerDependencies:
-    "@nestjs/common": ^10.0.0
-    "@nestjs/core": ^10.0.0
-  checksum: 10c0/8d26b3c8474f95d230bf5e38271a9ca362068202b6a6447900cab9128a315030d0f4368f4ca2564807aa107ba420c44655d4b3eb85f82a2b16104048d997d621
   languageName: node
   linkType: hard
 
@@ -3686,7 +3586,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/hashes@npm:^1.3.3, @noble/hashes@npm:^1.4.0":
+"@noble/hashes@npm:^1.4.0":
   version: 1.4.0
   resolution: "@noble/hashes@npm:1.4.0"
   checksum: 10c0/8c3f005ee72e7b8f9cff756dfae1241485187254e3f743873e22073d63906863df5d4f13d441b7530ea614b7a093f0d889309f28b59850f33b66cb26a779a4a5
@@ -3813,17 +3713,17 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@postero/desktop-backend@workspace:packages/desktop-backend"
   dependencies:
-    "@apollo/server": "npm:^4.10.0"
+    "@apollo/server": "npm:^4.10.1"
     "@electron/rebuild": "npm:3.6.0"
     "@nestjs/apollo": "npm:^12.1.0"
     "@nestjs/cli": "npm:^10.3.2"
-    "@nestjs/common": "npm:^10.3.3"
-    "@nestjs/core": "npm:^10.3.3"
+    "@nestjs/common": "npm:^10.3.4"
+    "@nestjs/core": "npm:^10.3.4"
     "@nestjs/graphql": "npm:^12.1.1"
-    "@nestjs/platform-express": "npm:^10.3.3"
+    "@nestjs/platform-express": "npm:^10.3.4"
     "@nestjs/schematics": "npm:^10.1.1"
     "@nestjs/testing": "npm:^10.3.3"
-    "@noble/hashes": "npm:^1.3.3"
+    "@noble/hashes": "npm:^1.4.0"
     "@postero/mobile-backend": "workspace:^0.0.1"
     "@repeaterjs/repeater": "npm:^3.0.5"
     "@types/bluebird": "npm:^3.5.42"
@@ -3858,7 +3758,7 @@ __metadata:
     ts-loader: "npm:^9.5.1"
     ts-node: "npm:^10.9.2"
     tsconfig-paths: "npm:^4.2.0"
-    typescript: "npm:^5.3.3"
+    typescript: "npm:^5.4.3"
     url-metadata: "npm:^3.5.6"
     uuid: "npm:^9.0.1"
     winreg: "npm:^1.2.5"
@@ -10447,45 +10347,6 @@ __metadata:
     utils-merge: "npm:1.0.1"
     vary: "npm:~1.1.2"
   checksum: 10c0/0b9eeafbac549e3c67d92d083bf1773e358359f41ad142b92121935c6348d29079b75054555b3f62de39263fffc8ba06898b09fdd3e213e28e714c03c5d9f44c
-  languageName: node
-  linkType: hard
-
-"express@npm:4.19.2":
-  version: 4.19.2
-  resolution: "express@npm:4.19.2"
-  dependencies:
-    accepts: "npm:~1.3.8"
-    array-flatten: "npm:1.1.1"
-    body-parser: "npm:1.20.2"
-    content-disposition: "npm:0.5.4"
-    content-type: "npm:~1.0.4"
-    cookie: "npm:0.6.0"
-    cookie-signature: "npm:1.0.6"
-    debug: "npm:2.6.9"
-    depd: "npm:2.0.0"
-    encodeurl: "npm:~1.0.2"
-    escape-html: "npm:~1.0.3"
-    etag: "npm:~1.8.1"
-    finalhandler: "npm:1.2.0"
-    fresh: "npm:0.5.2"
-    http-errors: "npm:2.0.0"
-    merge-descriptors: "npm:1.0.1"
-    methods: "npm:~1.1.2"
-    on-finished: "npm:2.4.1"
-    parseurl: "npm:~1.3.3"
-    path-to-regexp: "npm:0.1.7"
-    proxy-addr: "npm:~2.0.7"
-    qs: "npm:6.11.0"
-    range-parser: "npm:~1.2.1"
-    safe-buffer: "npm:5.2.1"
-    send: "npm:0.18.0"
-    serve-static: "npm:1.15.0"
-    setprototypeof: "npm:1.2.0"
-    statuses: "npm:2.0.1"
-    type-is: "npm:~1.6.18"
-    utils-merge: "npm:1.0.1"
-    vary: "npm:~1.1.2"
-  checksum: 10c0/e82e2662ea9971c1407aea9fc3c16d6b963e55e3830cd0ef5e00b533feda8b770af4e3be630488ef8a752d7c75c4fcefb15892868eeaafe7353cb9e3e269fdcb
   languageName: node
   linkType: hard
 

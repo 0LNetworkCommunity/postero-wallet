@@ -7,8 +7,10 @@ import ReactNativeSqliteService from "./ReactNativeSqliteService";
 import ReactNativeEncryptedStoreService from "./ReactNativeEncryptedStoreService";
 import ReactNativeLocalAuthenticationService from "./ReactNativeLocalAuthenticationService";
 import ReactNativeWindowManagerService from "./ReactNativeWindowManagerService";
-import ReactNativeIpcService from "./ReactNativeIpcService";
 import ReactNativeWindow from "./ReactNativeWindow";
+import ReactNativeBrowserBridge from "./browser-link/ReactNativeBrowserBridge";
+import ReactNativeBrowserLinkService from "./browser-link/ReactNativeBrowserLinkService";
+import ReactNativeSvgCleanerService from "./ReactNativeSvgCleanerService";
 
 const ReactNativePlatformModule = {
   providers: [
@@ -29,17 +31,26 @@ const ReactNativePlatformModule = {
       useClass: ReactNativeLocalAuthenticationService,
     },
     {
-      provide: PlatformTypes.WindowManagerService,
+      provide: PlatformTypes.PlatformWindowManagerService,
       useClass: ReactNativeWindowManagerService,
-    },
-    {
-      provide: PlatformTypes.IpcService,
-      useClass: ReactNativeIpcService,
     },
     {
       provide: PlatformTypes.Window,
       useClass: ReactNativeWindow,
       scope: Scope.TRANSIENT,
+    },
+    {
+      provide: PlatformTypes.BrowserBridge,
+      useClass: ReactNativeBrowserBridge,
+      scope: Scope.TRANSIENT,
+    },
+    {
+      provide: PlatformTypes.BrowserLinkService,
+      useClass: ReactNativeBrowserLinkService,
+    },
+    {
+      provide: PlatformTypes.SvgCleanerService,
+      useClass: ReactNativeSvgCleanerService,
     },
   ],
   exports: [
@@ -47,8 +58,9 @@ const ReactNativePlatformModule = {
     PlatformTypes.CryptoService,
     PlatformTypes.EncryptedStoreService,
     PlatformTypes.LocalAuthenticationService,
-    PlatformTypes.WindowManagerService,
-    PlatformTypes.IpcService,
+    PlatformTypes.PlatformWindowManagerService,
+    PlatformTypes.BrowserLinkService,
+    PlatformTypes.SvgCleanerService,
   ],
 };
 

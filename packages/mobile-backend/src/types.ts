@@ -1,16 +1,3 @@
-export enum WindowType {
-  Main,
-  Settings,
-  ImportWallet,
-  Wallet,
-  NewWallet,
-}
-
-export enum ContextMenu {
-  ToolbarWalletAction,
-  WalletAction,
-}
-
 export enum Types {
   ICryptoService = "ICryptoService",
   ICryptoImplService = "ICryptoImplService",
@@ -39,8 +26,6 @@ export enum Types {
   IBrowserTabFactory = "IBrowserTabFactory",
   IBrowserTabService = "IBrowserTabService",
 
-  IWindowManagerService = "IWindowManagerService",
-
   IApp = "IApp",
 
   IDAppService = "IDAppService",
@@ -66,8 +51,8 @@ export enum Types {
   IRecipeService = "IRecipeService",
   IRecipeResolver = "IRecipeResolver",
 
-  IWindow = "IWindow",
   IWindowFactory = "IWindowFactory",
+  IWindowManagerService = "IWindowManagerService",
 
   ITransaction = "ITransaction",
   ITransactionsService = "ITransactionsService",

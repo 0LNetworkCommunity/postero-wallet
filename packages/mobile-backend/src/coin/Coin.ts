@@ -1,7 +1,7 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { ICoin } from "./interfaces";
 
-@ObjectType("RNCoin")
+@ObjectType("Coin")
 class Coin implements ICoin {
   @Field((type) => ID)
   public id: string;

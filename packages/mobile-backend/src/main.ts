@@ -30,10 +30,24 @@ import TransfersModule from './transfers/TransfersModule';
 import { DocumentNode } from 'graphql';
 import MovementsModule from './movements/MovementsModule';
 import IpcModule from './ipc/ipc.module';
+import { IWindow } from './window-manager/interfaces';
+import DAppsModule from './dapps/DAppsModule';
+import TransactionsModule from './transactions/TransactionsModule';
+import { WindowManagerModule } from './window-manager/WindowManagerModule';
+import RpcModule from './rpc/RpcModule';
+import SettingsModule from './settings/SettingsModule';
 
 export * from './platform/platform-types';
 export * from './platform/interfaces';
 export * from './ipc/methods';
+export * from './types';
+export * from './window-manager/interfaces';
+export * from './window-manager/AbstractWindow';
+export * from './window-manager/types';
+export * from './graphql/interfaces';
+export * from './wallets/interfaces';
+export * from './rpc/methods';
+export * from './rpc/interfaces';
 
 export enum BackendEvent {
   SubscriptionData = 'SubscriptionData',
@@ -58,9 +72,14 @@ export class Backend {
         PlatformModule.forRoot(platformServices),
         IpcModule,
         GraphQLModule,
+        DAppsModule,
         WalletsModule,
         TransfersModule,
         MovementsModule,
+        TransactionsModule,
+        WindowManagerModule,
+        SettingsModule,
+        RpcModule,
         ...(imports ?? []),
       ],
       providers: [],
@@ -95,18 +114,30 @@ export class Backend {
     });
   }
 
-  public execute(operation: {
-    operationName: string;
-    variables?: {
-      readonly [variable: string]: unknown;
-    };
-    query: DocumentNode;
-  }): Promise<any> {
-    return this.graphqlService.execute(operation);
+  public execute(
+    operation: {
+      operationName: string;
+      variables?: {
+        readonly [variable: string]: unknown;
+      };
+      query: DocumentNode;
+    },
+    window: IWindow | undefined,
+  ): Promise<any> {
+    return this.graphqlService.execute(operation, window);
   }
 
-  public subscribe(operation: any): Promise<string> {
-    return this.graphqlService.subscribe(operation);
+  public subscribe(
+    operation: {
+      operationName: string;
+      variables?: {
+        readonly [variable: string]: unknown;
+      };
+      query: DocumentNode;
+    },
+    window: IWindow | undefined,
+  ): Promise<string> {
+    return this.graphqlService.subscribe(operation, window);
   }
 
   public unsubscribe(subscriptionId: string) {
