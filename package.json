@@ -2,8 +2,6 @@
   "name": "postero",
   "version": "0.0.1",
   "description": "Open Libra Wallet",
-  "repository": "git@github.com:wiri-ol/postero.git",
-  "author": "wiri <157544279+wiri-ol@users.noreply.github.com>",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
@@ -13,11 +11,13 @@
     "packages/mobile-frontend",
     "packages/core",
     "packages/desktop-backend",
-    "packages/desktop-frontend"
+    "packages/desktop-frontend",
+    "packages/ui"
   ],
   "packageManager": "yarn@4.1.1",
   "dependencies": {
-    "@yarnpkg/types": "^4.0.0"
+    "@yarnpkg/types": "^4.0.0",
+    "node-gyp": "^10.1.0"
   },
   "devDependencies": {
     "patch-package": "8.0.0"
