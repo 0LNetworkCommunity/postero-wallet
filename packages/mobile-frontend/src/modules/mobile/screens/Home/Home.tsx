@@ -1,10 +1,16 @@
 import { FC } from "react";
 import { View, Text, SafeAreaView } from "react-native";
 import tw from "twrnc";
+import { Button } from "@postero/ui";
+import { WalletScreen } from "@postero/ui";
 
 import { useWallets } from "../Wallets/hook";
 
 const Home: FC = () => {
+  return <WalletScreen />;
+};
+
+const aHome: FC = () => {
   const wallets = useWallets();
 
   let totalLocked = 0;
@@ -71,6 +77,8 @@ const Home: FC = () => {
             </Text>
           </View>
         </View>
+
+        <Button title="bonjour" />
 
       </View>
     </SafeAreaView>

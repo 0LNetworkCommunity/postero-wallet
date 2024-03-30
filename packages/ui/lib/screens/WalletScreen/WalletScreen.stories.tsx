@@ -1,4 +1,4 @@
-import WalletScreen from "./WalletScreen";
+import { WalletScreen } from "./WalletScreen";
 
 function WalletScreenStory() {
   return (

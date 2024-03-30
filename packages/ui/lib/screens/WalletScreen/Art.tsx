@@ -42,14 +42,14 @@ function createShader(
   type: number,
   source: string
 ): WebGLShader | undefined {
-  var shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader!, source);
+  gl.compileShader(shader!);
+  const success = gl.getShaderParameter(shader!, gl.COMPILE_STATUS);
   if (success) {
-    return shader;
+    return shader!;
   }
-  console.log(gl.getShaderInfoLog(shader));
+  console.log(gl.getShaderInfoLog(shader!));
   gl.deleteShader(shader);
 }
 
@@ -57,8 +57,12 @@ function createProgram(
   gl: ExpoWebGLRenderingContext,
   vertexShader: WebGLShader,
   fragmentShader: WebGLShader
-) {
-  var program = gl.createProgram();
+): WebGLProgram | null {
+  const program = gl.createProgram();
+  if (!program) {
+    return null;
+  }
+
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
   gl.linkProgram(program);
@@ -69,14 +73,16 @@ function createProgram(
 
   console.log(gl.getProgramInfoLog(program));
   gl.deleteProgram(program);
+
+  return null;
 }
 
 function onContextCreate(gl: ExpoWebGLRenderingContext) {
   const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
   const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 
-  const program = createProgram(gl, vertexShader, fragmentShader);
-  const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+  const program = createProgram(gl, vertexShader!, fragmentShader!);
+  const positionAttributeLocation = gl.getAttribLocation(program!, "a_position");
 
   console.log("positionAttributeLocation", positionAttributeLocation);
 

@@ -25,7 +25,7 @@ interface Props {
   unlocked: number;
 }
 
-function SlowWalletRatio({ locked, unlocked }: Props) {
+export function SlowWalletRatio({ locked, unlocked }: Props) {
   const total = (locked ?? 0) + unlocked;
 
   return (
@@ -57,5 +57,3 @@ function SlowWalletRatio({ locked, unlocked }: Props) {
     </View>
   );
 }
-
-export default SlowWalletRatio;

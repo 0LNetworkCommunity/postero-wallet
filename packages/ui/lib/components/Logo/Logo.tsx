@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import { View } from "react-native";
-import Svg, { Circle, Rect, Path } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 
-function Logo(): ReactNode {
+export function Logo(): ReactNode {
   return (
     <View>
       <Svg width="48" height="48" viewBox="0 0 48 48" fill="none">
@@ -17,5 +17,3 @@ function Logo(): ReactNode {
   );
 
 }
-
-export default Logo;

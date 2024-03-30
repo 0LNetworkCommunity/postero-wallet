@@ -11,12 +11,13 @@ import EyeIcon from "../../icons/EyeIcon";
 import EyeOffIcon from "../../icons/EyeOffIcon";
 import QrScanIcon from "../../icons/QrScanIcon";
 import SwitchVerticalIcon from "../../icons/SwitchVerticalIcon";
-import Button from "../../components/Button";
+import { Button, ButtonSize, ButtonVariation } from "../../components/Button";
 import WalletsCarousel from "./WalletsCarousel";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#FFFFFF",
   },
   balanceVisibilityContainer: {
     flexDirection: "row",
@@ -67,12 +68,14 @@ const styles = StyleSheet.create({
   },
 });
 
-function WalletScreen() {
+export function WalletScreen() {
   const [balanceVisible, setBalanceVisible] = useState(true);
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{ width: "100%", padding: 20 }}>
+      <View
+        style={{ width: "100%", paddingHorizontal: 20, paddingVertical: 10 }}
+      >
         <View style={styles.topBarContainer}>
           <TouchableOpacity onPress={() => setBalanceVisible(!balanceVisible)}>
             {balanceVisible ? (
@@ -112,21 +115,20 @@ function WalletScreen() {
         </View>
 
         <View style={{ flexDirection: "row", width: "100%" }}>
-          <View style={{ width: "50%", paddingRight: 4 }}>
-            <Button title="Send" />
+          <View style={{ width: "50%", paddingRight: 8 }}>
+            <Button
+              title="Send"
+              size={ButtonSize.XL}
+              variation={ButtonVariation.Secondary}
+            />
           </View>
-          <View style={{ width: "50%", paddingRight: 4 }}>
-            <Button title="Receive" />
+          <View style={{ width: "50%", paddingLeft: 8 }}>
+            <Button title="Receive" size={ButtonSize.XL} />
           </View>
         </View>
       </View>
 
-      <View style={{ flex: 1 }}>
-        <WalletsCarousel />
-      </View>
-
+      <WalletsCarousel />
     </SafeAreaView>
   );
 }
-
-export default WalletScreen;

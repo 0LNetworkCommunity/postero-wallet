@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import DotsHorizontalIcon from "../../icons/DotsHorizontalIcon";
+import { DotsHorizontalIcon } from "../../icons/DotsHorizontalIcon";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Art from "./Art";
 

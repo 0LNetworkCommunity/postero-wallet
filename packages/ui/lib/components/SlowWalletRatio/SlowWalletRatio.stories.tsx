@@ -1,5 +1,5 @@
 import { View, StyleSheet } from "react-native";
-import SlowWalletRatio from "./SlowWalletRatio";
+import { SlowWalletRatio } from "./SlowWalletRatio";
 
 const styles = StyleSheet.create({
   container: {

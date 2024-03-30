@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import Button from './Button';
+import { Button } from './Button';
 
 function ButtonStory() {
   return (

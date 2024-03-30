@@ -1,14 +1,16 @@
 {
   "name": "@postero/ui",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "private": true,
-  "main": "index.js",
+  "main": "dist/main.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "STORYBOOK_ENABLED='true' expo start --ios",
     "web": "expo start --web",
-    "storybook": "STORYBOOK_ENABLED='true' expo start --web"
+    "storybook": "STORYBOOK_ENABLED='true' expo start --web",
+    "build": "tsc --project tsconfig.build.json",
+    "watch": "tsc --watch --project tsconfig.build.json"
   },
   "dependencies": {
     "expo": "50.0.14",

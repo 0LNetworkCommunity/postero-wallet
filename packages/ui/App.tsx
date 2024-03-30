@@ -21,8 +21,6 @@ function App() {
     }
   }, [fontsLoaded, fontError]);
 
-  console.log({ fontsLoaded, fontError });
-
   if (!fontsLoaded && !fontError) {
     return null;
   }

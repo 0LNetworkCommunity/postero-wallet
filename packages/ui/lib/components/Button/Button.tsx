@@ -1,54 +1,131 @@
 import { ReactNode, useState } from "react";
-import { Pressable, View, Text, StyleSheet } from "react-native";
-
-// border-radius: var(--radius-sm, 6px);
-// border: 1px solid var(--Component-colors-Components-Buttons-Secondary-color-button-secondary-color-border, #0F0F0F);
-// background: var(--Component-colors-Components-Buttons-Secondary-color-button-secondary-color-bg, #0F0F0F);
-
-// /* Shadows/shadow-xs */
-// box-shadow: 0px 1px 2px 0px rgba(20, 20, 20, 0.05);
-
-// Component colors/Components/Buttons/Secondary color/button-secondary-color-border
+import { Pressable, Text, StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#0F0F0F",
-    paddingTop: 8,
-    paddingBottom: 8,
-    paddingLeft: 12,
-    paddingRight: 12,
     borderRadius: 6,
     justifyContent: "center",
     flexDirection: "row",
+
+    shadowColor: "#141414",
+    shadowOpacity: 0.05,
+    shadowRadius: 1,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
   },
+
   containerHover: {
     backgroundColor: "#292929",
   },
   text: {
-    color: "#FFFFFF",
-    fontFamily: "SpaceGrotesk-Regular",
+    fontFamily: "SpaceGrotesk-Medium",
     fontSize: 14,
     lineHeight: 20,
   },
+
+  /* VARIATIONS */
+  containerPrimary: {
+    backgroundColor: "#0F0F0F",
+  },
+  containerSecondary: {
+    backgroundColor: "#F5F5F5",
+  },
+  textPrimary: {
+    color: "#FFFFFF",
+  },
+  textSecondary: {
+    color: "#424242",
+  },
+
+  /* SIZES */
+
+  containerMd: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  containerXl: {
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+  },
+
+  textMd: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  textXl: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
 });
+
+export enum ButtonSize {
+  SM,
+  MD,
+  XL,
+  XXL
+}
+
+export enum ButtonVariation {
+  Primary,
+  Secondary,
+}
 
 interface Props {
   title: string;
+  size?: ButtonSize;
+  variation?: ButtonVariation;
 }
 
-function Button({ title }: Props): ReactNode {
+const containerVariationsStyles = new Map([
+  [ButtonVariation.Primary, styles.containerPrimary],
+  [ButtonVariation.Secondary, styles.containerSecondary],
+]);
+
+const containerSizeStyles = new Map([
+  [ButtonSize.MD, styles.containerMd],
+  [ButtonSize.XL, styles.containerXl],
+]);
+
+const textVariationsStyles = new Map([
+  [ButtonVariation.Primary, styles.textPrimary],
+  [ButtonVariation.Secondary, styles.textSecondary],
+]);
+
+const textSizesStyles = new Map([
+  [ButtonSize.MD, styles.textMd],
+  [ButtonSize.XL, styles.textXl],
+]);
+
+export function Button({
+  title,
+  size = ButtonSize.MD,
+  variation = ButtonVariation.Primary,
+}: Props): ReactNode {
   const [hovered, setHovered] = useState(false);
 
   return (
     <Pressable
-      style={[styles.container, hovered && styles.containerHover]}
+      style={[
+        styles.container,
+        containerSizeStyles.get(size),
+        containerVariationsStyles.get(variation),
+        hovered && styles.containerHover,
+      ]}
       onPress={() => console.log("lol")}
       onHoverIn={() => setHovered(true)}
       onHoverOut={() => setHovered(false)}
     >
-      <Text style={styles.text}>{title}</Text>
+      <Text
+        style={[
+          styles.text,
+          textSizesStyles.get(size),
+          textVariationsStyles.get(variation),
+        ]}
+      >
+        {title}
+      </Text>
     </Pressable>
   );
 }
-
-export default Button;

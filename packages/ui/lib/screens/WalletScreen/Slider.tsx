@@ -23,7 +23,7 @@ function Index({ width, height }: Props) {
       <Carousel
         style={{
           width,
-          height: height - 20,
+          height: height - 10,
           justifyContent: "center",
         }}
         width={width - 40}
@@ -77,7 +77,6 @@ function Index({ width, height }: Props) {
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            width: 100,
             alignSelf: "center",
           }}
         >
@@ -133,6 +132,7 @@ const PaginationItem: React.FC<{
           backgroundColor: "#141414",
           height: 10,
           borderRadius: 10,
+          marginHorizontal: 4,
         },
         animStyle,
       ]}
