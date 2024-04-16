@@ -26,7 +26,7 @@ const {
 
 @Resolver()
 class TransfersResolver {
-  private aptosClient = new AptosClient("https://rpc.0l.fyi");
+  private readonly aptosClient = new AptosClient("https://rpc.0l.fyi");
 
   @Inject(PlatformTypes.EncryptedStoreService)
   private readonly platformEncryptedStoreService: PlatformEncryptedStoreService;

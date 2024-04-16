@@ -1,16 +1,23 @@
 import { FC } from "react";
 import { View, Text, SafeAreaView } from "react-native";
 import tw from "twrnc";
+import { StackScreenProps } from "@react-navigation/stack";
 import { Button } from "@postero/ui";
+
 import { WalletScreen } from "@postero/ui";
 
 import { useWallets } from "../Wallets/hook";
+import { ModalStackParams } from "../params";
+import Wallets from "../Wallets";
 
-const Home: FC = () => {
+const aHome: FC = () => {
   return <WalletScreen />;
 };
 
-const aHome: FC = () => {
+const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
+  route,
+  navigation,
+}) => {
   const wallets = useWallets();
 
   let totalLocked = 0;
@@ -78,7 +85,14 @@ const aHome: FC = () => {
           </View>
         </View>
 
-        <Button title="bonjour" />
+        <Button
+          title="New Wallet"
+          onPress={() => {
+            navigation.navigate("NewWallet");
+          }}
+        />
+
+        <Wallets />
 
       </View>
     </SafeAreaView>

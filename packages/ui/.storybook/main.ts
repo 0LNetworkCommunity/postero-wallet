@@ -1,5 +1,6 @@
-/** @type{import("@storybook/react-native").StorybookConfig} */
-module.exports = {
+import { StorybookConfig } from "@storybook/react-native";
+
+const config: StorybookConfig = {
   stories: [
     // "../components/**/*.stories.?(ts|tsx|js|jsx)",
     "../lib/**/*.stories.?(ts|tsx|js|jsx)",
@@ -9,3 +10,5 @@ module.exports = {
     "@storybook/addon-ondevice-actions",
   ],
 };
+
+export default config;

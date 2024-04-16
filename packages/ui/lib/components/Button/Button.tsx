@@ -1,5 +1,11 @@
 import { ReactNode, useState } from "react";
-import { Pressable, Text, StyleSheet } from "react-native";
+import {
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  ViewStyle,
+} from "react-native";
+import Text from "../Text";
 
 const styles = StyleSheet.create({
   container: {
@@ -18,11 +24,6 @@ const styles = StyleSheet.create({
 
   containerHover: {
     backgroundColor: "#292929",
-  },
-  text: {
-    fontFamily: "SpaceGrotesk-Medium",
-    fontSize: 14,
-    lineHeight: 20,
   },
 
   /* VARIATIONS */
@@ -49,6 +50,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 18,
   },
+  containerXxl: {
+    paddingVertical: 16,
+    paddingHorizontal: 22,
+  },
 
   textMd: {
     fontSize: 14,
@@ -64,7 +69,7 @@ export enum ButtonSize {
   SM,
   MD,
   XL,
-  XXL
+  XXL,
 }
 
 export enum ButtonVariation {
@@ -76,6 +81,8 @@ interface Props {
   title: string;
   size?: ButtonSize;
   variation?: ButtonVariation;
+  onPress: () => void;
+  style?: StyleProp<ViewStyle>;
 }
 
 const containerVariationsStyles = new Map([
@@ -86,6 +93,7 @@ const containerVariationsStyles = new Map([
 const containerSizeStyles = new Map([
   [ButtonSize.MD, styles.containerMd],
   [ButtonSize.XL, styles.containerXl],
+  [ButtonSize.XXL, styles.containerXxl],
 ]);
 
 const textVariationsStyles = new Map([
@@ -93,15 +101,12 @@ const textVariationsStyles = new Map([
   [ButtonVariation.Secondary, styles.textSecondary],
 ]);
 
-const textSizesStyles = new Map([
-  [ButtonSize.MD, styles.textMd],
-  [ButtonSize.XL, styles.textXl],
-]);
-
 export function Button({
   title,
   size = ButtonSize.MD,
   variation = ButtonVariation.Primary,
+  style,
+  onPress,
 }: Props): ReactNode {
   const [hovered, setHovered] = useState(false);
 
@@ -112,17 +117,15 @@ export function Button({
         containerSizeStyles.get(size),
         containerVariationsStyles.get(variation),
         hovered && styles.containerHover,
+        style,
       ]}
-      onPress={() => console.log("lol")}
+      onPress={onPress}
       onHoverIn={() => setHovered(true)}
       onHoverOut={() => setHovered(false)}
     >
       <Text
-        style={[
-          styles.text,
-          textSizesStyles.get(size),
-          textVariationsStyles.get(variation),
-        ]}
+        xxl={size === ButtonSize.XXL}
+        style={[textVariationsStyles.get(variation)]}
       >
         {title}
       </Text>

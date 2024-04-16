@@ -1,5 +1,12 @@
 import { FC, useMemo } from "react";
-import { View, Text, ActivityIndicator, TouchableOpacity, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  TouchableOpacity,
+  SafeAreaView,
+  Alert,
+} from "react-native";
 import {
   gql,
   useApolloClient,
@@ -50,6 +57,12 @@ const SYNC_WALLET = gql`
   }
 `;
 
+const SET_SLOW = gql`
+  mutation SetSlow($walletId: ID!) {
+    setSlow(walletId: $walletId)
+  }
+`;
+
 const WalletScreen: FC<StackScreenProps<ModalStackParams, "Wallet">> = ({
   route,
   navigation,
@@ -97,7 +110,7 @@ const WalletScreen: FC<StackScreenProps<ModalStackParams, "Wallet">> = ({
       authenticationKey: string;
       slowWallet: {
         unlocked: string;
-      };
+      } | null;
       balances: {
         amount: string;
         coin: {
@@ -112,6 +125,30 @@ const WalletScreen: FC<StackScreenProps<ModalStackParams, "Wallet">> = ({
       id: walletId,
     },
   });
+
+  const onSetSlow = () => {
+    Alert.alert("Set slow", "Are you sure?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "OK",
+        onPress: async () => {
+          try {
+            const res = await apolloClient.mutate({
+              mutation: SET_SLOW,
+              variables: {
+                walletId,
+              },
+            });
+          } catch (error) {
+            console.error(error);
+          }
+        },
+      },
+    ]);
+  };
 
   const onRefresh = async () => {
     await apolloClient.mutate({
@@ -193,6 +230,46 @@ const WalletScreen: FC<StackScreenProps<ModalStackParams, "Wallet">> = ({
                 </Text>
               )}
             </Text>
+          </View>
+
+          <View
+            style={tw.style({
+              flexDirection: "row",
+            })}
+          >
+            <View style={tw.style("basis-1/2 justify-center items-center")}>
+              <TouchableOpacity
+                style={tw.style(
+                  "w-full justify-center items-center p-2 rounded-md mr-2",
+                  "bg-white"
+                )}
+                onPress={onSetSlow}
+              >
+                <Text
+                  style={tw.style("font-semibold text-slate-900 text-base")}
+                >
+                  Set slow
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={tw.style("basis-1/2 justify-center items-center")}>
+              {/* <TouchableOpacity
+                style={tw.style(
+                  "w-full justify-center items-center p-2 rounded-md ml-2",
+                  "bg-slate-950"
+                )}
+                onPress={() => {
+                  navigation.navigate("WalletDetails", {
+                    walletAddress: data.wallet.accountAddress,
+                  });
+                }}
+              >
+                <Text style={tw.style("font-semibold text-white text-base")}>
+                  Receive
+                </Text>
+              </TouchableOpacity> */}
+            </View>
           </View>
 
           <View

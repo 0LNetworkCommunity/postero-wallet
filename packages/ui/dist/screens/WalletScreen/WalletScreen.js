@@ -101,10 +101,10 @@ function WalletScreen() {
 
         <react_native_1.View style={{ flexDirection: "row", width: "100%" }}>
           <react_native_1.View style={{ width: "50%", paddingRight: 8 }}>
-            <Button_1.Button title="Send" size={Button_1.ButtonSize.XL} variation={Button_1.ButtonVariation.Secondary}/>
+            <Button_1.Button title="Send" size={Button_1.ButtonSize.XL} variation={Button_1.ButtonVariation.Secondary} onPress={() => { }}/>
           </react_native_1.View>
           <react_native_1.View style={{ width: "50%", paddingLeft: 8 }}>
-            <Button_1.Button title="Receive" size={Button_1.ButtonSize.XL}/>
+            <Button_1.Button title="Receive" size={Button_1.ButtonSize.XL} onPress={() => { }}/>
           </react_native_1.View>
         </react_native_1.View>
       </react_native_1.View>

@@ -31,6 +31,7 @@ export interface IWalletService {
   getWalletPrivateKey(walletId: string): Promise<Uint8Array | null>;
   getWalletBalances(walletId: string): Promise<Balance[]>;
   getSlowWallet(walletId: string): Promise<ISlowWallet | undefined>;
+  setSlow(walletId: string): Promise<void>;
 
   on(
     eventName: WalletServiceEvent,

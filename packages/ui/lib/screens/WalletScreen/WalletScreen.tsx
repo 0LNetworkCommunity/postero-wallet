@@ -120,10 +120,11 @@ export function WalletScreen() {
               title="Send"
               size={ButtonSize.XL}
               variation={ButtonVariation.Secondary}
+              onPress={() => {}}
             />
           </View>
           <View style={{ width: "50%", paddingLeft: 8 }}>
-            <Button title="Receive" size={ButtonSize.XL} />
+            <Button title="Receive" size={ButtonSize.XL} onPress={() => {}} />
           </View>
         </View>
       </View>

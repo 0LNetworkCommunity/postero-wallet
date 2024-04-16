@@ -57,6 +57,7 @@ const BaseChart: FC<{ width: number; height: number } & Props> = ({
   const xx = d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0);
 
   return (
+    <>
     <View style={{ width, height }}>
       {rows.map((row) => (
         <View
@@ -128,6 +129,8 @@ const BaseChart: FC<{ width: number; height: number } & Props> = ({
       /> */}
       </Svg>
     </View>
+
+    </>
   );
 };
 

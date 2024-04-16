@@ -1,7 +1,21 @@
+import React from "react";
 import { View } from "react-native";
+import { ThemeProvider } from "@emotion/react";
+import { Preview } from "@storybook/react";
+import { lightTheme, darkTheme } from "../lib/theme";
 
-/** @type{import("@storybook/react").Preview} */
-const preview = {
+const preview: Preview = {
+  args: { theme: "light" },
+
+  argTypes: {
+    theme: {
+      options: ["light", "dark"],
+      control: {
+        type: "select",
+      },
+    },
+  },
+
   parameters: {
     controls: {
       matchers: {
@@ -12,18 +26,24 @@ const preview = {
   },
 
   decorators: [
-    (Story, { parameters }) => (
-      <View
-        style={{
-          flex: 1,
-          // backgroundColor:
-          //   parameters.noBackground === true ? undefined : "#26c6da",
-          padding: 8,
-        }}
-      >
-        <Story />
-      </View>
-    ),
+    (Story, context) => {
+      return (
+        <ThemeProvider
+          theme={context.args.theme === "light" ? lightTheme : darkTheme}
+        >
+          <View
+            style={{
+              flex: 1,
+              // backgroundColor:
+              //   parameters.noBackground === true ? undefined : "#26c6da",
+              padding: 8,
+            }}
+          >
+            <Story />
+          </View>
+        </ThemeProvider>
+      );
+    },
   ],
 };
 

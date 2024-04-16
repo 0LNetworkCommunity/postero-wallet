@@ -4,7 +4,7 @@ import { IBalance, IGraphQLWallet, ISlowWallet, IWalletService } from "./interfa
 import { Inject } from "@nestjs/common";
 import { Types } from "../types";
 
-@ObjectType("Wallet")
+@ObjectType('Wallet')
 export class GraphQLWallet implements IGraphQLWallet {
   @Field((type) => ID)
   public id!: string;
@@ -20,6 +20,11 @@ export class GraphQLWallet implements IGraphQLWallet {
 
   @Field()
   public accountAddress: Buffer;
+
+  @Field({
+    nullable: true,
+  })
+  public mnemonic?: String;
 
   @Inject(Types.IWalletService)
   private readonly walletService: IWalletService;

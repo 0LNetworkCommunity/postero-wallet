@@ -13,6 +13,9 @@
     "watch": "tsc --watch --project tsconfig.build.json"
   },
   "dependencies": {
+    "@emotion/native": "^11.11.0",
+    "@emotion/react": "^11.11.4",
+    "d3": "^7.9.0",
     "expo": "50.0.14",
     "expo-font": "11.10.3",
     "expo-gl": "13.6.0",
@@ -33,6 +36,7 @@
     "@storybook/addon-ondevice-actions": "^7.6.17",
     "@storybook/addon-ondevice-controls": "^7.6.17",
     "@storybook/react-native": "^7.6.17",
+    "@types/d3": "^7.4.3",
     "@types/react": "~18.2.73",
     "@types/react-native": "~0.72.8",
     "typescript": "^5.4.3"

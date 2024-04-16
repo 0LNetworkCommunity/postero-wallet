@@ -1,37 +1,45 @@
-import { View } from 'react-native';
-import { Button } from './Button';
+import type { Meta, StoryObj } from '@storybook/react';
+import { Button, ButtonSize, ButtonVariation } from './Button';
 
-function ButtonStory() {
-  return (
-    <View>
-      <Button title="Hello" />
-    </View>
-  );
-}
-
-export default {
-  title: 'Button',
-  component: ButtonStory,
+const meta: Meta<typeof Button> = {
+  // title: 'Button',
+  component: Button,
   argTypes: {
-    onPinTask: { action: 'onPinTask' },
-    onArchiveTask: { action: 'onArchiveTask' },
-  },
-};
-
-export const Default = {
-  args: {
-    task: {
-      id: '1',
-      title: 'Test Task',
-      state: 'TASK_INBOX',
+    title: {
+      control: "text",
+    },
+    size: {
+      options: [ButtonSize.SM, ButtonSize.MD, ButtonSize.XL, ButtonSize.XXL],
+      control: {
+        type: "select",
+        labels: {
+          [ButtonSize.SM]: "SM",
+          [ButtonSize.MD]: "MD",
+          [ButtonSize.XL]: "XL",
+          [ButtonSize.XXL]: "XXL",
+        },
+      },
+    },
+    variation: {
+      options: [ButtonVariation.Primary, ButtonVariation.Secondary],
+      control: {
+        type: "select",
+        labels: {
+          [ButtonVariation.Primary]: "Primary",
+          [ButtonVariation.Secondary]: "Secondary",
+        },
+      },
     },
   },
+  args: {
+    title: "Title",
+    variation: ButtonVariation.Secondary,
+    size: ButtonSize.MD,
+  },
 };
 
-export const Pinned = {
-  args: { task: { ...Default.args.task, state: 'TASK_PINNED' } },
-};
+export default meta;
 
-export const Archived = {
-  args: { task: { ...Default.args.task, state: 'TASK_ARCHIVED' } },
-};
+type Story = StoryObj<typeof Button>;
+
+export const Basic: Story = {};

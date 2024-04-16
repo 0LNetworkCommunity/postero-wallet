@@ -56,6 +56,15 @@ class WalletsResolver {
     return true;
   }
 
+  @Mutation((returns) => Boolean)
+  public async setSlow(
+    @Args('walletId', { type: () => ID })
+    walletId: string,
+  ) {
+    await this.walletService.setSlow(walletId);
+    return true;
+  }
+
   @Query((returns) => GraphQLWallet)
   public async wallet(
     @Args('id', { type: () => ID })

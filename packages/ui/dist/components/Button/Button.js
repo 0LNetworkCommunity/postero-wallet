@@ -1,8 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Button = exports.ButtonVariation = exports.ButtonSize = void 0;
 const react_1 = require("react");
 const react_native_1 = require("react-native");
+const Text_1 = __importDefault(require("../Text"));
 const styles = react_native_1.StyleSheet.create({
     container: {
         borderRadius: 6,
@@ -18,11 +22,6 @@ const styles = react_native_1.StyleSheet.create({
     },
     containerHover: {
         backgroundColor: "#292929",
-    },
-    text: {
-        fontFamily: "SpaceGrotesk-Medium",
-        fontSize: 14,
-        lineHeight: 20,
     },
     containerPrimary: {
         backgroundColor: "#0F0F0F",
@@ -43,6 +42,10 @@ const styles = react_native_1.StyleSheet.create({
     containerXl: {
         paddingVertical: 12,
         paddingHorizontal: 18,
+    },
+    containerXxl: {
+        paddingVertical: 16,
+        paddingHorizontal: 22,
     },
     textMd: {
         fontSize: 14,
@@ -72,30 +75,24 @@ const containerVariationsStyles = new Map([
 const containerSizeStyles = new Map([
     [ButtonSize.MD, styles.containerMd],
     [ButtonSize.XL, styles.containerXl],
+    [ButtonSize.XXL, styles.containerXxl],
 ]);
 const textVariationsStyles = new Map([
     [ButtonVariation.Primary, styles.textPrimary],
     [ButtonVariation.Secondary, styles.textSecondary],
 ]);
-const textSizesStyles = new Map([
-    [ButtonSize.MD, styles.textMd],
-    [ButtonSize.XL, styles.textXl],
-]);
-function Button({ title, size = ButtonSize.MD, variation = ButtonVariation.Primary, }) {
+function Button({ title, size = ButtonSize.MD, variation = ButtonVariation.Primary, style, onPress, }) {
     const [hovered, setHovered] = (0, react_1.useState)(false);
     return (<react_native_1.Pressable style={[
             styles.container,
             containerSizeStyles.get(size),
             containerVariationsStyles.get(variation),
             hovered && styles.containerHover,
-        ]} onPress={() => console.log("lol")} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}>
-      <react_native_1.Text style={[
-            styles.text,
-            textSizesStyles.get(size),
-            textVariationsStyles.get(variation),
-        ]}>
+            style,
+        ]} onPress={onPress} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}>
+      <Text_1.default xxl={size === ButtonSize.XXL} style={[textVariationsStyles.get(variation)]}>
         {title}
-      </react_native_1.Text>
+      </Text_1.default>
     </react_native_1.Pressable>);
 }
 exports.Button = Button;

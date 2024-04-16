@@ -2,6 +2,8 @@ import Emittery, { UnsubscribeFn } from "emittery";
 import { Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import _ from 'lodash';
+import { AptosAccount, AptosClient, BCS, TxnBuilderTypes } from "aptos";
+import { sha3_256 as sha3Hash } from "@noble/hashes/sha3";
 
 import {
   IBalance,
@@ -20,6 +22,23 @@ import { IOpenLibraService } from "../open-libra/interfaces";
 import { ICoinRepository } from "../coin/interfaces";
 import AccountAddress from "../crypto/AccountAddress";
 import { GetAccountMovementsRes } from "./gql-types";
+import { PlatformTypes } from "../platform/platform-types";
+import { PlatformEncryptedStoreService } from "../platform/interfaces";
+
+const {
+  EntryFunction,
+  TransactionPayloadEntryFunction,
+  RawTransaction,
+  ChainId,
+  TransactionAuthenticatorEd25519,
+  Ed25519PublicKey,
+  Ed25519Signature,
+  SignedTransaction,
+  ModuleId,
+  Identifier,
+  StructTag,
+  TypeTagStruct,
+} = TxnBuilderTypes;
 
 export const GET_MOVEMENTS = `
   query GetAccountMovements(
@@ -80,6 +99,8 @@ export const GET_MOVEMENTS = `
 
 @Injectable()
 class WalletService implements IWalletService {
+  private readonly aptosClient = new AptosClient('https://rpc.0l.fyi');
+
   @Inject(Types.IBalanceRepository)
   private readonly balanceRepository: IBalanceRepository;
 
@@ -113,6 +134,9 @@ class WalletService implements IWalletService {
   @Inject(Types.ISlowWalletFactory)
   private readonly slowWalletFactory: ISlowWalletFactory;
 
+  @Inject(PlatformTypes.EncryptedStoreService)
+  private readonly platformEncryptedStoreService: PlatformEncryptedStoreService;
+
   private eventEmitter = new Emittery();
 
   public async newWallet(): Promise<Wallet> {
@@ -121,15 +145,17 @@ class WalletService implements IWalletService {
       cryptoWallet.authenticationKey.bytes,
     );
     cryptoWallet.accountAddress = new AccountAddress(address);
+
     const wallet = await this.walletRepository.saveWallet(cryptoWallet);
     this.eventEmitter.emit(WalletServiceEvent.NewWallet, wallet);
+    wallet.mnemonic = cryptoWallet.mnemonic;
+
     return wallet;
   }
 
   public async syncWallet(id: string) {
     const wallet = await this.walletRepository.getWallet(id);
     if (wallet) {
-
       {
         const res = await axios<{ data: GetAccountMovementsRes }>({
           url: 'https://api.0l.fyi/graphql',
@@ -378,6 +404,104 @@ class WalletService implements IWalletService {
       );
     }
     return undefined;
+  }
+
+  public async setSlow(walletId: string): Promise<void> {
+    const wallet = await this.walletRepository.getWallet(walletId);
+    if (!wallet) {
+      throw new Error('invalid wallet id');
+    }
+
+    const walletAddress = Buffer.from(wallet.accountAddress)
+      .toString('hex')
+      .toUpperCase();
+
+    const pk = await this.platformEncryptedStoreService.getItem(walletAddress);
+    if (!pk) {
+      throw new Error("unable to find the wallet's private key");
+    }
+
+    const privateKey = Buffer.from(pk, 'hex');
+
+    const entryFunctionPayload = new TransactionPayloadEntryFunction(
+      new EntryFunction(
+        ModuleId.fromStr('0x1::slow_wallet'),
+        new Identifier('user_set_slow'),
+        [],
+        [],
+      ),
+    );
+
+    const maxGasUnit = 2000000;
+    const gasPrice = 200;
+
+    const chainId = 1; // await this.aptosClient.getChainId();
+
+    const timeout = 10;
+
+    const account = await this.aptosClient.getAccount(walletAddress);
+
+    const rawTxn = new RawTransaction(
+      // Transaction sender account address
+      TxnBuilderTypes.AccountAddress.fromHex(walletAddress),
+
+      BigInt(account.sequence_number),
+      entryFunctionPayload,
+      // Max gas unit to spend
+      BigInt(maxGasUnit),
+      // Gas price per unit
+      BigInt(gasPrice),
+      // Expiration timestamp. Transaction is discarded if it is not executed within 10 seconds from now.
+      BigInt(Math.floor(Date.now() / 1_000) + timeout),
+      new ChainId(chainId),
+    );
+
+    const signer = new AptosAccount(privateKey!);
+
+    const hash = sha3Hash.create();
+    hash.update('DIEM::RawTransaction');
+
+    const prefix = hash.digest();
+    const body = BCS.bcsToBytes(rawTxn);
+    const mergedArray = new Uint8Array(prefix.length + body.length);
+    mergedArray.set(prefix);
+    mergedArray.set(body, prefix.length);
+
+    const signingMessage = mergedArray;
+
+    const signature = signer.signBuffer(signingMessage);
+    const sig = new Ed25519Signature(signature.toUint8Array());
+
+    const authenticator = new TransactionAuthenticatorEd25519(
+      new Ed25519PublicKey(signer.pubKey().toUint8Array()),
+      sig,
+    );
+    const signedTx = new SignedTransaction(rawTxn, authenticator);
+
+    const bcsTxn = BCS.bcsToBytes(signedTx);
+
+    console.log('sending...');
+
+    try {
+      const res = await axios<{
+        hash: string;
+      }>({
+        method: 'POST',
+        url: 'https://rpc.0l.fyi/v1/transactions',
+        headers: {
+          'content-type': 'application/x.diem.signed_transaction+bcs',
+        },
+        data: bcsTxn,
+      });
+      console.log(res.status);
+
+      if (res.status === 202) {
+        console.log(res.data);
+        // return new Uint8Array(Buffer.from(res.data.hash.substring(2), "hex"));
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
 
