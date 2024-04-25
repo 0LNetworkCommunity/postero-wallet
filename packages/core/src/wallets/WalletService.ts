@@ -492,12 +492,15 @@ class WalletService implements IWalletService {
           'content-type': 'application/x.diem.signed_transaction+bcs',
         },
         data: bcsTxn,
+        validateStatus: () => true,
       });
       console.log(res.status);
 
       if (res.status === 202) {
         console.log(res.data);
         // return new Uint8Array(Buffer.from(res.data.hash.substring(2), "hex"));
+      } else {
+        console.log(res.status, res.data);
       }
     } catch (error) {
       console.error(error);
