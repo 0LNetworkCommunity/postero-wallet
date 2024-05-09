@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ApiError, AptosClient, Types } from "aptos";
 
 import { IOpenLibraService } from "./interfaces";
+import { normalizeAddress } from "../utils";
 
 @Injectable()
 class OpenLibraService implements IOpenLibraService {
@@ -20,7 +21,8 @@ class OpenLibraService implements IOpenLibraService {
         type_arguments: [],
         arguments: [`0x${Buffer.from(authenticationKey).toString("hex")}`],
       })) as [string];
-      return Buffer.from(res[0].substring(2), "hex");
+      const address = normalizeAddress(res[0]);
+      return Buffer.from(address, "hex");
     } catch (error) {
       if (error instanceof ApiError) {
         const err = error as ApiError;

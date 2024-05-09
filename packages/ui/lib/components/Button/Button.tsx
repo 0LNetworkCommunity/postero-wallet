@@ -25,6 +25,9 @@ const styles = StyleSheet.create({
   containerHover: {
     backgroundColor: "#292929",
   },
+  containerPressed: {
+    opacity: 0.8,
+  },
 
   /* VARIATIONS */
   containerPrimary: {
@@ -109,6 +112,7 @@ export function Button({
   onPress,
 }: Props): ReactNode {
   const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
 
   return (
     <Pressable
@@ -117,11 +121,14 @@ export function Button({
         containerSizeStyles.get(size),
         containerVariationsStyles.get(variation),
         hovered && styles.containerHover,
+        pressed && styles.containerPressed,
         style,
       ]}
       onPress={onPress}
       onHoverIn={() => setHovered(true)}
       onHoverOut={() => setHovered(false)}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
     >
       <Text
         xxl={size === ButtonSize.XXL}

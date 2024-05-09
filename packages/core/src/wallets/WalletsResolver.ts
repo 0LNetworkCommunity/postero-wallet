@@ -48,7 +48,17 @@ class WalletsResolver {
   }
 
   @Mutation((returns) => Boolean)
-  public async importWallet(
+  public async importAddress(
+    @Args('address', { type: () => String })
+    address: string,
+  ) {
+    // await this.walletService.importWallet(mnemonic);
+    console.log('>>', address);
+    return true;
+  }
+
+  @Mutation((returns) => Boolean)
+  public async importMnemonic(
     @Args('mnemonic', { type: () => String })
     mnemonic: string,
   ) {

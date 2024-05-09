@@ -2,7 +2,6 @@ import React, { FC } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { gql, useMutation } from "@apollo/client";
-import { Wordlist, LangEn, Mnemonic, randomBytes } from 'ethers';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
 import { XMarkIcon } from '@heroicons/react/24/outline'
@@ -18,22 +17,6 @@ const styles = StyleSheet.create({
     appRegion: 'drag',
   },
 });
-
-const defaultPath = "m/44'/637'/0'/0'/0'";
-
-const createRandom = (password?: string, path?: string, wordlist?: Wordlist): string => {
-  if (password == null) {
-    password = "";
-  }
-  if (path == null) {
-    path = defaultPath;
-  }
-  if (wordlist == null) {
-    wordlist = LangEn.wordlist();
-  }
-  const mnemonic = Mnemonic.fromEntropy(randomBytes(32), password, wordlist)
-  return mnemonic.phrase;
-};
 
 const NEW_WALLET = gql`
   mutation NewWallet {

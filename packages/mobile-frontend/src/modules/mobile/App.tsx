@@ -21,6 +21,7 @@ import { ModalStackParams } from "./screens/params";
 import NewTransfer from "./screens/NewTransfer";
 import WalletDetails from "./screens/WalletDetails";
 import BarCodeScanner from "./screens/BarCodeScanner";
+import WalletPrivateKeys from "./screens/WalletPrivateKeys";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -84,9 +85,18 @@ const App: FC = () => {
                 component={WalletScreen}
                 options={{
                   headerShown: false,
-                  presentation: "modal",
+                  // presentation: "modal",
                 }}
               />
+              <Stack.Screen
+                name="WalletPrivateKeys"
+                component={WalletPrivateKeys}
+                options={{
+                  headerShown: false,
+                  // presentation: "modal",
+                }}
+              />
+
               <Stack.Screen
                 name="NewTransfer"
                 component={NewTransfer}

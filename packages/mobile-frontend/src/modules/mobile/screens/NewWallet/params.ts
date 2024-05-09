@@ -4,5 +4,9 @@ export type NewWalletStackParams = {
   CreateWallet: undefined;
   SafetyWarning: undefined;
   SeedPhrase: undefined;
-  ImportWallet: undefined;
+  MnemonicImport: undefined;
+  PrivateKeyImport: undefined;
+  AddressImport: {
+    redirectTo: "Main";
+  };
 };

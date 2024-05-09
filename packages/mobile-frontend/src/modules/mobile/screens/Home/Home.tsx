@@ -1,5 +1,5 @@
-import { FC } from "react";
-import { View, Text, SafeAreaView } from "react-native";
+import { FC, useRef } from "react";
+import { View, Text, SafeAreaView, TouchableOpacity } from "react-native";
 import tw from "twrnc";
 import { StackScreenProps } from "@react-navigation/stack";
 import { Button } from "@postero/ui";
@@ -9,6 +9,8 @@ import { WalletScreen } from "@postero/ui";
 import { useWallets } from "../Wallets/hook";
 import { ModalStackParams } from "../params";
 import Wallets from "../Wallets";
+import Bars4Icon from "../../icons/Bars4Icon";
+import ContextMenu, { ContextMenuHandle } from "./ContextMenu";
 
 const aHome: FC = () => {
   return <WalletScreen />;
@@ -18,6 +20,7 @@ const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
   route,
   navigation,
 }) => {
+  const contextMenu = useRef<ContextMenuHandle>(null);
   const wallets = useWallets();
 
   let totalLocked = 0;
@@ -51,19 +54,28 @@ const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
     totalUnlocked /= 1e6;
   }
 
-  const rate = 0.01159;
+  const rate = 0.0036;
 
   return (
-    <SafeAreaView>
-      <View style={tw.style("p-2")}>
-        <View style={tw.style("flex-row mb-2")}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={tw.style("flex-1 p-2")}>
+        <TouchableOpacity
+          onPress={() => {
+            contextMenu.current?.open();
+          }}
+        >
+          <Bars4Icon color="#000000" />
+        </TouchableOpacity>
 
+        <View style={tw.style("flex-row mb-2")}>
           <View style={tw.style("basis-1/2 pr-2")}>
             <View style={tw.style("p-2 rounded-md bg-white")}>
               <Text style={tw.style("text-gray-500 text-base leading-6")}>
                 Balance
               </Text>
-              <Text style={tw.style("text-black text-xl leading-6 font-semibold")}>
+              <Text
+                style={tw.style("text-black text-xl leading-6 font-semibold")}
+              >
                 {`Ƚ ${totalUnlocked.toLocaleString()}`}
               </Text>
               <Text style={tw.style("text-gray-600 text-base leading-6")}>
@@ -76,7 +88,9 @@ const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
             <Text style={tw.style("text-gray-500 text-base leading-6")}>
               Locked
             </Text>
-            <Text style={tw.style("text-black text-xl leading-6 font-semibold")}>
+            <Text
+              style={tw.style("text-black text-xl leading-6 font-semibold")}
+            >
               {`Ƚ ${totalLocked.toLocaleString()}`}
             </Text>
             <Text style={tw.style("text-gray-600 text-base leading-6")}>
@@ -86,15 +100,16 @@ const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
         </View>
 
         <Button
-          title="New Wallet"
+          title="Add Wallet"
           onPress={() => {
             navigation.navigate("NewWallet");
           }}
         />
 
         <Wallets />
-
       </View>
+
+      <ContextMenu ref={contextMenu} />
     </SafeAreaView>
   );
 };

@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useMemo } from "react";
 import { View, Text, Pressable } from "react-native";
 import tw from "twrnc";
 import { gql, useApolloClient } from "@apollo/client";
@@ -32,18 +32,12 @@ const IMPORT_WALLET = gql`
   }
 `;
 
-const defaultPath = "m/44'/637'/0'/0'/0'";
-
 const createRandom = (
   password?: string,
-  path?: string,
   wordlist?: Wordlist
 ): string => {
   if (password == null) {
     password = "";
-  }
-  if (path == null) {
-    path = defaultPath;
   }
   if (wordlist == null) {
     wordlist = LangEn.wordlist();

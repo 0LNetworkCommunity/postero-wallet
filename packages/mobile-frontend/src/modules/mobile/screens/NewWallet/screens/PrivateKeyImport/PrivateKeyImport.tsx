@@ -13,13 +13,13 @@ const IMPORT_WALLET = gql`
   }
 `;
 
-function ImportWallet({
+function PrivateKeyImport({
   navigation,
-}: StackScreenProps<NewWalletStackParams, "ImportWallet">) {
+}: StackScreenProps<NewWalletStackParams, "PrivateKeyImport">) {
   const [mnemonic, setMnemonic] = useState("");
   const apolloClient = useApolloClient();
 
-  const onImportWallet = async () => {
+  const onSeedPhraseImport = async () => {
     await apolloClient.mutate({
       mutation: IMPORT_WALLET,
       variables: {
@@ -40,9 +40,9 @@ function ImportWallet({
         secureTextEntry
         onChangeText={setMnemonic}
       />
-      <Button title="Import Wallet" onPress={onImportWallet} />
+      <Button title="Import from seed phrase" onPress={onSeedPhraseImport} />
     </View>
   );
 }
 
-export default ImportWallet;
+export default PrivateKeyImport;

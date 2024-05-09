@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { Text, View, StyleSheet, Button } from "react-native";
-import { CameraView, Camera, BarcodeScanningResult } from "expo-camera/next";
+import { CameraView, Camera, BarcodeScanningResult } from "expo-camera";
 import { StackScreenProps } from "@react-navigation/stack";
 import tw from "twrnc";
 

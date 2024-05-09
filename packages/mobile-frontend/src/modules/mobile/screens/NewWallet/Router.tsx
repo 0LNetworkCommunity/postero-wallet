@@ -5,7 +5,9 @@ import CreateWallet from "./screens/CreateWallet";
 import { NewWalletStackParams } from "./params";
 import SafetyWarning from "./screens/SafetyWarning";
 import SeedPhrase from "./screens/SeedPhrase";
-import ImportWallet from "./screens/ImportWallet";
+import MnemonicImport from "./screens/MnemonicImport";
+import PrivateKeyImport from "./screens/PrivateKeyImport";
+import AddressImport from "./screens/AddressImport";
 
 const Stack = createNativeStackNavigator<NewWalletStackParams>();
 
@@ -22,7 +24,9 @@ function NewWalletRouter() {
       <Stack.Screen name="CreateWallet" component={CreateWallet} />
       <Stack.Screen name="SafetyWarning" component={SafetyWarning} />
       <Stack.Screen name="SeedPhrase" component={SeedPhrase} />
-      <Stack.Screen name="ImportWallet" component={ImportWallet} />
+      <Stack.Screen name="MnemonicImport" component={MnemonicImport} />
+      <Stack.Screen name="PrivateKeyImport" component={PrivateKeyImport} />
+      <Stack.Screen name="AddressImport" component={AddressImport} />
     </Stack.Navigator>
   );
 }

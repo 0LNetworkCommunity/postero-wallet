@@ -43,7 +43,7 @@ export interface IGraphQLWallet {
   id: string;
   label: string;
   publicKey: Uint8Array;
-  authenticationKey: Uint8Array;
+  // authentiionKey: Uint8Array;
   accountAddress: Uint8Array;
 
   init(

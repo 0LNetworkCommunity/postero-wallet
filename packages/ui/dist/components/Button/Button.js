@@ -23,6 +23,9 @@ const styles = react_native_1.StyleSheet.create({
     containerHover: {
         backgroundColor: "#292929",
     },
+    containerPressed: {
+        opacity: 0.8,
+    },
     containerPrimary: {
         backgroundColor: "#0F0F0F",
     },
@@ -83,13 +86,15 @@ const textVariationsStyles = new Map([
 ]);
 function Button({ title, size = ButtonSize.MD, variation = ButtonVariation.Primary, style, onPress, }) {
     const [hovered, setHovered] = (0, react_1.useState)(false);
+    const [pressed, setPressed] = (0, react_1.useState)(false);
     return (<react_native_1.Pressable style={[
             styles.container,
             containerSizeStyles.get(size),
             containerVariationsStyles.get(variation),
             hovered && styles.containerHover,
+            pressed && styles.containerPressed,
             style,
-        ]} onPress={onPress} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}>
+        ]} onPress={onPress} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)} onPressIn={() => setPressed(true)} onPressOut={() => setPressed(false)}>
       <Text_1.default xxl={size === ButtonSize.XXL} style={[textVariationsStyles.get(variation)]}>
         {title}
       </Text_1.default>

@@ -34,15 +34,12 @@ class CryptoService implements ICryptoService {
 
   public createRandom(
     password?: string,
-    path?: string,
     wordlist?: Wordlist,
   ): string {
     if (password == null) {
       password = "";
     }
-    if (path == null) {
-      path = CryptoService.MNEMONIC_DEFAULT_PATH;
-    }
+
     if (wordlist == null) {
       wordlist = LangEn.wordlist();
     }

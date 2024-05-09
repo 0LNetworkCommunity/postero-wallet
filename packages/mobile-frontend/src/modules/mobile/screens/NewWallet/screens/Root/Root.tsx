@@ -15,10 +15,26 @@ function Root({ navigation }: StackScreenProps<NewWalletStackParams, "Root">) {
           }}
         />
         <Button
-          title="Import a wallet"
+          title="Import seed phrase"
           variation={ButtonVariation.Secondary}
           onPress={() => {
-            navigation.navigate("ImportWallet");
+            navigation.navigate("MnemonicImport");
+          }}
+        />
+        <Button
+          title="Import private key"
+          variation={ButtonVariation.Secondary}
+          onPress={() => {
+            navigation.navigate("PrivateKeyImport");
+          }}
+        />
+        <Button
+          title="Import address"
+          variation={ButtonVariation.Secondary}
+          onPress={() => {
+            navigation.navigate("AddressImport", {
+              redirectTo: "Main",
+            });
           }}
         />
       </View>

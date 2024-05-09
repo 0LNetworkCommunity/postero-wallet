@@ -437,7 +437,7 @@ class WalletService implements IWalletService {
 
     const chainId = 1; // await this.aptosClient.getChainId();
 
-    const timeout = 10;
+    const timeout = 120;
 
     const account = await this.aptosClient.getAccount(walletAddress);
 
@@ -451,7 +451,7 @@ class WalletService implements IWalletService {
       BigInt(maxGasUnit),
       // Gas price per unit
       BigInt(gasPrice),
-      // Expiration timestamp. Transaction is discarded if it is not executed within 10 seconds from now.
+      // Expiration timestamp. Transaction is discarded if it is not executed within {timeout} seconds from now.
       BigInt(Math.floor(Date.now() / 1_000) + timeout),
       new ChainId(chainId),
     );
