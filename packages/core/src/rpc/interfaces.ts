@@ -37,7 +37,6 @@ export interface IBrowserTabService {
 
 export interface SerializedWallet {
   address: string;
-  publicKey: string;
   minKeysRequired: undefined; // ?: number;
   ansName: undefined; // ?: string | null;
 }

@@ -123,10 +123,7 @@ class BrowserTab implements IBrowserTab {
           .then((wallet: Wallet | null) => {
             if (wallet) {
               resolve({
-                address: Buffer.from(wallet.accountAddress)
-                  .toString("hex")
-                  .toUpperCase(),
-                publicKey: Buffer.from(wallet.publicKey)
+                address: Buffer.from(wallet.address)
                   .toString("hex")
                   .toUpperCase(),
                 minKeysRequired: undefined, // ?: number;

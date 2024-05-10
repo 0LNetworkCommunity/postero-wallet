@@ -70,4 +70,7 @@ export enum Types {
   IMovement = "IMovement",
   IMovementFactory = "IMovementFactory",
   IMovementsRepository = "IMovementsRepository",
+
+  IKeychainService = "IKeychainService",
+  IKeychainRepository = "IKeychainRepository",
 }

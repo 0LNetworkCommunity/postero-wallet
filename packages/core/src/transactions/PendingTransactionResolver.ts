@@ -42,8 +42,8 @@ class PendingTransactionsResolver {
     @Args("pendingTransactionId", { type: () => ID })
     pendingTransactionId: string,
 
-    @Args("walletId", { type: () => ID })
-    walletId: string,
+    @Args("walletAddress", { type: () => String })
+    walletAddress: string,
 
     @Args("gasPrice", { type: () => Int })
     gasPrice: number,
@@ -57,7 +57,7 @@ class PendingTransactionsResolver {
     const transactionHash =
       await this.pendingTransactionsService.sendPendingTransaction(
         pendingTransactionId,
-        walletId,
+        Buffer.from(walletAddress, 'hex'),
         gasPrice,
         maxGasUnit,
         timeout,

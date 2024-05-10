@@ -20,6 +20,16 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
     await this.destroy();
   }
 
+  public raw<T = any>(value: Knex.Value): Knex.Raw<T> {
+    if (Buffer.isBuffer(value)) {
+      return this.db.raw(`X'${value.toString('hex')}'`);
+    }
+    if (value instanceof Uint8Array) {
+      return this.db.raw(`X'${Buffer.from(value).toString('hex')}'`);
+    }
+    return this.db.raw<T>(value);
+  }
+
   private async init(): Promise<void> {
     const knexConfig = await this.platformSqliteService.getKnexConfig();
     this.db = knex(knexConfig);
@@ -36,17 +46,23 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
 
     await this.db.raw(`
       CREATE TABLE IF NOT EXISTS "wallets" (
-        "id" TEXT PRIMARY KEY,
-        "label" TEXT,
-        "publicKey" BLOB NOT NULL,
-        "authenticationKey" BLOB NOT NULL,
-        "address" BLOB NOT NULL
+        "address" BLOB PRIMARY KEY,
+        "authKey" BLOB NOT NULL,
+        "label" TEXT
       )
     `);
 
     await this.db.raw(`
-      CREATE TABLE IF NOT EXISTS "slow_wallets" (
-        "walletId" TEXT PRIMARY KEY REFERENCES wallets(id) ON DELETE CASCADE,
+      CREATE TABLE IF NOT EXISTS "walletsAuthKeys" (
+        "walletAddress" BLOB NOT NULL REFERENCES wallets(address) ON DELETE CASCADE,
+        "authKey" BLOB NOT NULL,
+        PRIMARY KEY("walletAddress", "authKey")
+      )
+    `);
+
+    await this.db.raw(`
+      CREATE TABLE IF NOT EXISTS "slowWallets" (
+        "walletAddress" BLOB PRIMARY KEY REFERENCES wallets(address) ON DELETE CASCADE,
         "transferred" TEXT NOT NULL,
         "unlocked" TEXT NOT NULL
       )
@@ -55,21 +71,21 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
     await this.db.raw(`
       CREATE TABLE IF NOT EXISTS "balances" (
         "coinId" TEXT NOT NULL REFERENCES coins(id),
-        "walletId" TEXT NOT NULL REFERENCES wallets(id) ON DELETE CASCADE,
+        "walletAddress" BLOB NOT NULL REFERENCES wallets(address) ON DELETE CASCADE,
         "amount" TEXT NOT NULL,
-        PRIMARY KEY("coinId", "walletId")
+        PRIMARY KEY("coinId", "walletAddress")
       )
     `);
 
     await this.db.raw(`
       CREATE TABLE IF NOT EXISTS "movements" (
         "version" TEXT NOT NULL,
-        "walletId" TEXT NOT NULL REFERENCES wallets(id) ON DELETE CASCADE,
+        "walletAddress" BLOB NOT NULL REFERENCES wallets(address) ON DELETE CASCADE,
         "lockedBalance" TEXT NOT NULL,
         "balance" TEXT NOT NULL,
         "lockedAmount" TEXT NOT NULL,
         "unlockedAmount" TEXT NOT NULL,
-        PRIMARY KEY("version", "walletId")
+        PRIMARY KEY("version", "walletAddress")
       )
     `);
 
@@ -126,6 +142,13 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
         "success" INTEGER,
         "sender" TEXT NOT NULL,
         "timestamp" INTEGER NOT NULL
+      )
+    `);
+
+    await this.db.raw(`
+      CREATE TABLE IF NOT EXISTS "keys" (
+        "publicKey" BLOB PRIMARY KEY,
+        "authKey" BLOB
       )
     `);
   }

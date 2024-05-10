@@ -77,7 +77,7 @@ const MovementItem: FC<Props> = ({ movement }) => {
           {movement.unlockedAmount}
         </LibraAmount>
         {!movement.lockedAmount.isZero() && (
-          <>
+          <Text>
             {" - "}
             <LibraAmount
               style={tw.style(
@@ -89,7 +89,7 @@ const MovementItem: FC<Props> = ({ movement }) => {
             >
               {movement.lockedAmount}
             </LibraAmount>
-          </>
+          </Text>
         )}
       </View>
 

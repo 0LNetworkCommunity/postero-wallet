@@ -36,6 +36,7 @@ import TransactionsModule from './transactions/TransactionsModule';
 import { WindowManagerModule } from './window-manager/WindowManagerModule';
 import RpcModule from './rpc/RpcModule';
 import SettingsModule from './settings/SettingsModule';
+import KeychainModule from './keychain/KeychainModule';
 
 export * from './platform/platform-types';
 export * from './platform/interfaces';
@@ -80,6 +81,7 @@ export class Backend {
         WindowManagerModule,
         SettingsModule,
         RpcModule,
+        KeychainModule,
         ...(imports ?? []),
       ],
       providers: [],

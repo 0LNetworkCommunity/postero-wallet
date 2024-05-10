@@ -11,19 +11,19 @@ function WalletScreen({
   route,
   navigation,
 }: StackScreenProps<ModalStackParams, "Wallet">): ReactNode {
-  const { walletId } = route.params;
+  const { walletAddress } = route.params;
   const contextMenu = useRef<ContextMenuHandle>(null);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <WalletBase
-        walletId={walletId}
+        walletAddress={walletAddress}
         onPressSettings={() => {
           contextMenu.current?.open();
         }}
       />
 
-      <ContextMenu ref={contextMenu} walletId={walletId} />
+      <ContextMenu ref={contextMenu} walletAddress={walletAddress} />
     </SafeAreaView>
   );
 }

@@ -16,37 +16,41 @@ class MovementsResolver {
 
   @Query((returns) => PaginatedMovements)
   public async movements(
-    @Args('walletId', { type: () => ID })
-    walletId: string,
+    @Args('walletAddress', { type: () => Buffer })
+    walletAddress: Uint8Array,
 
     @Args({
-      name: "first",
+      name: 'first',
       type: () => Int,
       defaultValue: 10,
     })
     first: number,
 
     @Args({
-      name: "after",
+      name: 'after',
       type: () => String,
       nullable: true,
     })
     after: string | undefined,
 
     @Args({
-      name: "order",
+      name: 'order',
       type: () => OrderDirection,
       defaultValue: OrderDirection.ASC,
     })
     order: OrderDirection,
   ): Promise<PaginatedMovements> {
-
+    const a = this.dbService.db.raw(
+          `X'${Buffer.from(walletAddress).toString('hex')}'`,
+        );
     const r = await this.dbService
       .db('movements')
       .count('*', { as: 'total' })
-      .where({ walletId });
+      .where({
+        walletAddress: this.dbService.raw(walletAddress),
+      });
 
-    const movements = await this.movementsService.getWalletMovements(walletId);
+    const movements = await this.movementsService.getWalletMovements(walletAddress);
 
     return new PaginatedMovements(
       r[0].total as number,

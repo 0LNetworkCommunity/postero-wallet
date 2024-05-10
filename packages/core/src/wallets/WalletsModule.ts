@@ -1,20 +1,21 @@
-import { Module, Scope } from "@nestjs/common";
+import { Module, Scope } from '@nestjs/common';
 
-import { Types } from "../types";
-import WalletService from "./WalletService";
-import CryptoModule from "../crypto/CryptoModule";
-import CoinModule from "../coin/CoinModule";
-import OpenLibraModule from "../open-libra/OpenLibraModule";
-import DbModule from "../db/DbModule";
-import WalletRepository from "./WalletRepository";
-import GraphQLWalletFactory from "./GraphQLWalletFactory";
-import BalanceRepository from "./BalanceRepository";
-import BalanceFactory from "./BalanceFactory";
-import WalletsResolver from "./WalletsResolver";
-import { GraphQLWallet } from "./GraphQLWallet";
-import { Balance } from "./Balance";
-import SlowWalletFactory from "./SlowWalletFactory";
-import { SlowWallet } from "./SlowWallet";
+import { Types } from '../types';
+import WalletService from './WalletService';
+import CryptoModule from '../crypto/CryptoModule';
+import CoinModule from '../coin/CoinModule';
+import OpenLibraModule from '../open-libra/OpenLibraModule';
+import DbModule from '../db/DbModule';
+import WalletRepository from './WalletRepository';
+import GraphQLWalletFactory from './GraphQLWalletFactory';
+import BalanceRepository from './BalanceRepository';
+import BalanceFactory from './BalanceFactory';
+import WalletsResolver from './WalletsResolver';
+import { GraphQLWallet } from './GraphQLWallet';
+import { Balance } from './Balance';
+import SlowWalletFactory from './SlowWalletFactory';
+import { SlowWallet } from './SlowWallet';
+import KeychainModule from '../keychain/KeychainModule';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SlowWallet } from "./SlowWallet";
     CryptoModule,
     CoinModule,
     OpenLibraModule,
+    KeychainModule,
   ],
   providers: [
     WalletsResolver,

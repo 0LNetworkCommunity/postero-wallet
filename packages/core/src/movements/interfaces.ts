@@ -17,7 +17,7 @@ export interface IMovement {
 }
 
 export interface IMovementsService {
-  getWalletMovements(walletId: string): Promise<IMovement[]>;
+  getWalletMovements(walletAddress: Uint8Array): Promise<IMovement[]>;
 }
 
 export interface IMovementFactory {
@@ -25,5 +25,5 @@ export interface IMovementFactory {
 }
 
 export interface IMovementsRepository {
-  getWalletMovements(walletId: string): Promise<IMovement[]>;
+  getWalletMovements(walletAddress: Uint8Array): Promise<IMovement[]>;
 }

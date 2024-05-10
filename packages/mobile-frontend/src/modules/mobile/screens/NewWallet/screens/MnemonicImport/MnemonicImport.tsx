@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, TextInput, ActivityIndicator, TouchableOpacity, SafeAreaView } from "react-native";
+import { View, TextInput, ActivityIndicator, TouchableOpacity, SafeAreaView } from "react-native";
 import tw from "twrnc";
 import { gql, useApolloClient } from "@apollo/client";
 import * as Clipboard from 'expo-clipboard';
@@ -41,9 +41,9 @@ function MnemonicImport({
           mnemonic,
         },
       });
+      navigation.navigate("Main");
     } finally {
       setLoading(false);
-      navigation.navigate("Main");
     }
   };
 

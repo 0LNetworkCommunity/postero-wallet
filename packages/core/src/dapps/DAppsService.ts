@@ -129,14 +129,14 @@ class DAppService implements IDAppService {
 
   public async approveConnectionRequest(
     connectionRequestId: string,
-    walletId: string,
+    walletAddress: Uint8Array,
   ): Promise<boolean> {
     const connectionRequest = this.connectionRequests.get(connectionRequestId);
     if (!connectionRequest) {
       return false;
     }
 
-    const wallet = await this.walletService.getWallet(walletId);
+    const wallet = await this.walletService.getWallet(walletAddress);
     if (!wallet) {
       return false;
     }

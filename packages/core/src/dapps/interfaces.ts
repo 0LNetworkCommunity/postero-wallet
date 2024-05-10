@@ -44,7 +44,7 @@ export interface IDAppService {
   onConnectionRequest(connectionRequest: IConnectionRequest): void;
   approveConnectionRequest(
     connectionRequestId: string,
-    walletId: string,
+    walletAddress: Uint8Array,
   ): Promise<boolean>;
   denyConnectionRequest(connectionRequestId: string): Promise<boolean>;
   getDAppsById(ids: string[]): Promise<IDApp[]>;

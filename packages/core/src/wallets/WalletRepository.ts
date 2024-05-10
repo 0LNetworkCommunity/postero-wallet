@@ -2,23 +2,22 @@ import { Inject, Injectable } from "@nestjs/common";
 import { IWalletRepository } from "./interfaces";
 import { Types } from "../types";
 import { IDbService } from "../db/interfaces";
-import { CryptoWallet } from "../crypto/interfaces";
 import { PlatformTypes } from "../platform/platform-types";
 import Wallet from "../crypto/Wallet";
-import { PlatformEncryptedStoreService, PlatformCryptoService, EncryptedStoreRule } from "../platform/interfaces";
+import { PlatformEncryptedStoreService, PlatformCryptoService } from "../platform/interfaces";
 
 @Injectable()
 class WalletRepository implements IWalletRepository {
-  deleteWallet(id: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  deleteWallet(address: Uint8Array): Promise<void> {
+    throw new Error('Method not implemented.');
   }
 
-  setWalletLabel(walletId: string, label: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  setWalletLabel(address: Uint8Array, label: string): Promise<void> {
+    throw new Error('Method not implemented.');
   }
 
-  getWalletPrivateKey(id: string): Promise<Uint8Array> {
-    throw new Error("Method not implemented.");
+  getWalletPrivateKey(address: Uint8Array): Promise<Uint8Array> {
+    throw new Error('Method not implemented.');
   }
 
   @Inject(Types.IDbService)
@@ -30,62 +29,73 @@ class WalletRepository implements IWalletRepository {
   @Inject(PlatformTypes.EncryptedStoreService)
   private readonly platformEncryptedStoreService: PlatformEncryptedStoreService;
 
-  public async saveWallet(wallet: CryptoWallet): Promise<Wallet> {
-    const address = Buffer.from(wallet.accountAddress.address).toString("hex").toUpperCase();
-    const privateKey = Buffer.from(wallet.privateKey).toString("hex").toUpperCase();
-
-    await this.platformEncryptedStoreService.setItem(
-      address,
-      privateKey,
-      EncryptedStoreRule.WhenUnlockedThisDeviceOnly,
-    );
-
+  public async saveWallet(
+    address: Uint8Array,
+    authKey: Uint8Array,
+  ): Promise<Wallet> {
     const [{ total }] = await this.dbService
-      .db("wallets")
-      .count("*", { as: "total" });
+      .db('wallets')
+      .count('*', { as: 'total' });
 
-    // const query = this.dbService
-    //   .db("wallets")
-    //   .insert({
-    //     id: this.platformCryptoService.randomUUID(),
-    //     label: `Wallet #${(total as number) + 1}`,
-    //     publicKey: Buffer.from(wallet.publicKey),
-    //     authenticationKey: Buffer.from(wallet.authenticationKey.bytes),
-    //     address: Buffer.from(wallet.accountAddress.address),
-    //   })
-    //   .returning("*")
-    //   .toSQL();
+    const addressLit = this.dbService.raw(address);
 
-    const rows = await this.dbService.db.raw(`
-      insert into wallets (
-        address,
-        authenticationKey,
-        id,
-        label,
-        publicKey
-      ) values
-        (
-          X'${Buffer.from(wallet.accountAddress.address).toString("hex")}',
-          X'${Buffer.from(wallet.authenticationKey.bytes).toString("hex")}',
-          '${this.platformCryptoService.randomUUID()}',
-          'Wallet #${(total as number) + 1}',
-          X'${Buffer.from(wallet.publicKey).toString("hex")}'
-        )
-      returning *
-    `);
+    await this.dbService.db.transaction(async (trx) => {
+      await this.dbService
+        .db('wallets')
+        .insert({
+          address: addressLit,
+          authKey: this.dbService.raw(authKey),
+          label: `Wallet #${(total as number) + 1}`,
+        })
+        .onConflict('address')
+        .ignore()
+        .transacting(trx);
 
-    return this.walletMapper(rows[0]);
+      await this.dbService
+        .db('walletsAuthKeys')
+        .insert({
+          walletAddress: this.dbService.raw(address),
+          authKey: this.dbService.raw(authKey),
+        })
+        .onConflict(['walletAddress', 'authKey'])
+        .ignore()
+        .transacting(trx);
+    });
+
+    const wallet = await this.dbService
+      .db<{ label: string; address: number[] }>('wallets')
+      .where('address', addressLit)
+      .first();
+
+    return {
+      label: wallet!.label,
+      address: new Uint8Array(wallet!.address),
+    };
+  }
+
+  public async saveWalletAuthKey(
+    address: Uint8Array,
+    authKey: Uint8Array,
+  ): Promise<void> {
+    await this.dbService
+      .db('walletsAuthKeys')
+      .insert({
+        address: this.dbService.raw(address),
+        authKey: this.dbService.raw(authKey),
+      })
+      .onConflict(['address', 'authKey'])
+      .ignore();
   }
 
   public async getWallets(): Promise<Wallet[]> {
-    const rows = await this.dbService.db!("wallets").select("*");
+    const rows = await this.dbService.db!('wallets').select('*');
     return rows.map((row) => this.walletMapper(row));
   }
 
-  public async getWallet(id: string): Promise<Wallet | null> {
+  public async getWallet(id: Uint8Array): Promise<Wallet | null> {
     const row = await this.dbService
-      .db("wallets")
-      .where("id", id)
+      .db('wallets')
+      .where('address', this.dbService.raw(id))
       .first();
 
     if (!row) {
@@ -94,22 +104,12 @@ class WalletRepository implements IWalletRepository {
     return this.walletMapper(row);
   }
 
-  private walletMapper(entity: {
-    id: string;
-    label: string;
-    publicKey: Buffer;
-    authenticationKey: Buffer;
-    address: Buffer;
-  }): Wallet {
+  private walletMapper(entity: { label: string; address: Uint8Array }): Wallet {
     return {
-      id: entity.id,
       label: entity.label,
-      publicKey: entity.publicKey,
-      authenticationKey: entity.authenticationKey,
-      accountAddress: entity.address,
+      address: entity.address,
     };
   }
-
 }
 
 export default WalletRepository;

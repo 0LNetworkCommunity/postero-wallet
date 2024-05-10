@@ -22,14 +22,16 @@ class MovementsRepository implements IMovementsRepository {
   @Inject(Types.IMovementFactory)
   private readonly movementFactory: IMovementFactory;
 
-  public async getWalletMovements(walletId: string): Promise<IMovement[]> {
+  public async getWalletMovements(walletAddress: Uint8Array): Promise<IMovement[]> {
     const rows: {
       version: string;
       lockedBalance: string;
       balance: string;
       lockedAmount: string;
       unlockedAmount: string;
-    }[] = await this.dbService.db('movements').where({ walletId });
+    }[] = await this.dbService.db('movements').where({
+      walletAddress: this.dbService.raw(walletAddress),
+    });
 
     if (!rows.length) {
       return [];

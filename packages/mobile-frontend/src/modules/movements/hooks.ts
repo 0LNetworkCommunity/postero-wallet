@@ -5,7 +5,7 @@ import { gqlMovementMapper } from "./mappers";
 import { Movement } from "./types";
 
 export const useMovements = (
-  walletId: string
+  walletAddress: string
 ): {
   loading: boolean;
   total?: number;
@@ -25,7 +25,7 @@ export const useMovements = (
         const res = await apolloClient.query<GetAccountMovementsRes>({
           query: GET_MOVEMENTS,
           variables: {
-            walletId,
+            walletAddress,
           },
         });
         const { movements } = res.data;
@@ -37,7 +37,7 @@ export const useMovements = (
       }
     };
     load();
-  }, [walletId]);
+  }, [walletAddress]);
 
   return { loading, movements };
 };

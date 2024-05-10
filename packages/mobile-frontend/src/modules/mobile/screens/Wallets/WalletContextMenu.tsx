@@ -1,28 +1,19 @@
 import { forwardRef, useMemo, useCallback, useImperativeHandle, useRef } from 'react';
-import { Alert, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import { Button } from "@postero/ui";
 import { useNavigation } from '@react-navigation/native';
-import { gql, useApolloClient } from '@apollo/client';
 
-const SET_SLOW = gql`
-  mutation SetSlow($walletAddress: Bytes!) {
-    setSlow(walletAddress: $walletAddress)
-  }
-`;
-
-export interface ContextMenuHandle {
+export interface WalletContextMenuHandle {
   open: () => void;
   close: () => void;
 }
 
 interface Props {
-  walletAddress: string;
 }
 
-const ContextMenu = forwardRef<ContextMenuHandle, Props>(({ walletAddress }, ref) => {
+const WalletContextMenu = forwardRef<WalletContextMenuHandle, Props>(({}, ref) => {
   const navigation = useNavigation<any>();
-  const apolloClient = useApolloClient();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 	const snapPoints = useMemo(() => ["20%"], []);
@@ -55,30 +46,6 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({ walletAddress }, ref
     };
   }, []);
 
-  const onSetSlow = () => {
-    Alert.alert("Set slow", "Are you sure?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "OK",
-        onPress: async () => {
-          try {
-            const res = await apolloClient.mutate({
-              mutation: SET_SLOW,
-              variables: {
-                walletAddress,
-              },
-            });
-          } catch (error) {
-            console.error(error);
-          }
-        },
-      },
-    ]);
-  };
-
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -90,33 +57,9 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({ walletAddress }, ref
     >
       <BottomSheetView style={styles.contentContainer}>
         <Button
-          title="Set slow"
-          onPress={() => {
-            onSetSlow();
-            bottomSheetRef.current?.close();
-          }}
-        />
-
-        <Button
-          title="Rotate key"
-          onPress={() => {
-            bottomSheetRef.current?.close();
-            navigation.navigate("KeyRotation", {
-              screen: "Splash",
-              params: {
-                address: walletAddress,
-              },
-            });
-          }}
-        />
-
-        <Button
           title="Private Keys"
           onPress={() => {
             bottomSheetRef.current?.close();
-            navigation.navigate("WalletPrivateKeys", {
-              walletAddress,
-            });
           }}
         />
       </BottomSheetView>
@@ -136,4 +79,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ContextMenu;
+export default WalletContextMenu;

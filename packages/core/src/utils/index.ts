@@ -14,7 +14,13 @@ export const normalizeHexString = (str: string): string => {
     cleanStr = `0${cleanStr}`;
   }
 
-  return cleanStr.toUpperCase();
+  cleanStr = cleanStr.toUpperCase();
+
+  if (!/^[0-9ABCDEF]*$/.test(cleanStr)) {
+    throw new Error('Invalid hex input');
+  }
+
+  return cleanStr;
 };
 
 export const normalizeAddress = (address: string): string => {

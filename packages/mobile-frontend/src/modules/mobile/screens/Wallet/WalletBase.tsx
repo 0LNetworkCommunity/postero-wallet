@@ -30,13 +30,10 @@ import ChevronLeftIcon from "../../icons/ChevronLeftIcon";
 import NavBar from "../../../ui/NavBar";
 
 const GET_WALLET = gql`
-  query GetWallet($id: ID!) {
-    wallet(id: $id) {
-      id
+  query GetWallet($address: Bytes!) {
+    wallet(address: $address) {
       label
-      publicKey
-      authenticationKey
-      accountAddress
+      address
       slowWallet {
         unlocked
       }
@@ -53,26 +50,20 @@ const GET_WALLET = gql`
 `;
 
 const SYNC_WALLET = gql`
-  mutation SyncWallet($id: ID!) {
-    syncWallet(id: $id)
-  }
-`;
-
-const SET_SLOW = gql`
-  mutation SetSlow($walletId: ID!) {
-    setSlow(walletId: $walletId)
+  mutation SyncWallet($address: Bytes!) {
+    syncWallet(address: $address)
   }
 `;
 
 interface Props {
-  walletId: string;
+  walletAddress: string;
   onPressSettings: () => void;
 }
 
-function WalletBase({ walletId, onPressSettings }: Props): ReactNode {
+function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
   const navigation = useNavigation();
   const apolloClient = useApolloClient();
-  const { movements } = useMovements(walletId);
+  const { movements } = useMovements(walletAddress);
 
   const histData = useMemo(() => {
     const histBalance: { value: number; date: Date }[] = [];
@@ -106,11 +97,8 @@ function WalletBase({ walletId, onPressSettings }: Props): ReactNode {
 
   const { data, error, loading } = useQuery<{
     wallet: {
-      id: string;
+      address: string;
       label: string;
-      publicKey: string;
-      accountAddress: string;
-      authenticationKey: string;
       slowWallet: {
         unlocked: string;
       } | null;
@@ -125,39 +113,15 @@ function WalletBase({ walletId, onPressSettings }: Props): ReactNode {
     };
   }>(GET_WALLET, {
     variables: {
-      id: walletId,
+      address: walletAddress,
     },
   });
-
-  const onSetSlow = () => {
-    Alert.alert("Set slow", "Are you sure?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "OK",
-        onPress: async () => {
-          try {
-            const res = await apolloClient.mutate({
-              mutation: SET_SLOW,
-              variables: {
-                walletId,
-              },
-            });
-          } catch (error) {
-            console.error(error);
-          }
-        },
-      },
-    ]);
-  };
 
   const onRefresh = async () => {
     await apolloClient.mutate({
       mutation: SYNC_WALLET,
       variables: {
-        id: walletId,
+        address: walletAddress,
       },
     });
   };
@@ -257,22 +221,6 @@ function WalletBase({ walletId, onPressSettings }: Props): ReactNode {
             })}
           >
             <View style={tw.style("basis-1/2 justify-center items-center")}>
-              <TouchableOpacity
-                style={tw.style(
-                  "w-full justify-center items-center p-2 rounded-md mr-2",
-                  "bg-white"
-                )}
-                onPress={onSetSlow}
-              >
-                <Text
-                  style={tw.style("font-semibold text-slate-900 text-base")}
-                >
-                  Set slow
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={tw.style("basis-1/2 justify-center items-center")}>
               {/* <TouchableOpacity
                 style={tw.style(
                   "w-full justify-center items-center p-2 rounded-md ml-2",
@@ -303,7 +251,7 @@ function WalletBase({ walletId, onPressSettings }: Props): ReactNode {
                   "bg-white"
                 )}
                 onPress={() => {
-                  navigation.navigate("NewTransfer", { walletId });
+                  navigation.navigate("NewTransfer", { walletAddress });
                 }}
               >
                 <Text
@@ -322,7 +270,7 @@ function WalletBase({ walletId, onPressSettings }: Props): ReactNode {
                 )}
                 onPress={() => {
                   navigation.navigate("WalletDetails", {
-                    walletAddress: data.wallet.accountAddress,
+                    walletAddress: data.wallet.address,
                   });
                 }}
               >

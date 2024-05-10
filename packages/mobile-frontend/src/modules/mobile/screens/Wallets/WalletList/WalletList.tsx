@@ -1,15 +1,16 @@
 import { FC } from 'react';
 import { StyleSheet, Text, View, I18nManager } from 'react-native';
-import { FlatList, RectButton } from 'react-native-gesture-handler';
+import { FlatList, Gesture, GestureDetector, RectButton } from 'react-native-gesture-handler';
 import tw from "twrnc";
 
 import SwipeableRow from './SwipeableRow';
 import { Wallet } from '../hook';
+import { runOnJS } from 'react-native-reanimated';
 
 //  To toggle LTR/RTL change to `true`
 I18nManager.allowRTL(false);
 
-const Row: FC<{ wallet: Wallet; onPress: () => void }> = ({ wallet, onPress }) => {
+const Row: FC<{ wallet: Wallet }> = ({ wallet }) => {
   const slowWallet = wallet.slowWallet;
   const libraBalance = wallet.balances.find((balance) => balance.coin.symbol === 'LIBRA');
   let libraAmount = libraBalance ? parseInt(libraBalance.amount, 10) : undefined;
@@ -27,7 +28,6 @@ const Row: FC<{ wallet: Wallet; onPress: () => void }> = ({ wallet, onPress }) =
         "p-3 bg-white justify-between flex-col",
         styles.rectButton
       )}
-      onPress={onPress}
     >
       <View style={tw.style("flex-row justify-between")}>
         <Text style={styles.fromText}>{wallet.label}</Text>
@@ -61,7 +61,7 @@ const Row: FC<{ wallet: Wallet; onPress: () => void }> = ({ wallet, onPress }) =
         </View>
       </View>
       <Text numberOfLines={2} style={styles.messageText}>
-        {wallet.accountAddress}
+        {wallet.address}
       </Text>
     </RectButton>
   );
@@ -71,19 +71,41 @@ interface Props {
   wallets: Wallet[];
   onWalletPress: (wallet: Wallet) => void;
   onWalletDelete: (wallet: Wallet) => void;
+  onWalletContext: (wallet: Wallet) => void;
 }
 
-const WalletList: FC<Props> = ({ wallets, onWalletPress, onWalletDelete }) => {
+const WalletList: FC<Props> = ({
+  wallets,
+  onWalletPress,
+  onWalletDelete,
+  onWalletContext,
+}) => {
   return (
     <FlatList
       data={wallets}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.address}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
-      renderItem={({ item }) => (
-        <SwipeableRow onDelete={() => onWalletDelete(item)}>
-          <Row wallet={item} onPress={() => onWalletPress(item)} />
-        </SwipeableRow>
-      )}
+      renderItem={({ item }) => {
+        const tap = Gesture.Tap()
+          .maxDuration(500)
+          .onEnd(() => {
+            runOnJS(onWalletPress)(item);
+          });
+
+        const longPress = Gesture.LongPress()
+          .minDuration(800)
+          .onStart(() => {
+            runOnJS(onWalletContext)(item);
+          });
+
+        return (
+          <SwipeableRow onDelete={() => onWalletDelete(item)}>
+            <GestureDetector gesture={Gesture.Exclusive(tap, longPress)}>
+              <Row wallet={item} />
+            </GestureDetector>
+          </SwipeableRow>
+        );
+      }}
     />
   );
 };

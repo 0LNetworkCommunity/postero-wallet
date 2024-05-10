@@ -68,5 +68,5 @@ export interface GetAccountMovementsRes {
   account: {
     balance: number;
     movements: Paginated<GqlMovement>;
-  };
+  } | null;
 }

@@ -3,10 +3,10 @@ import BN from 'bn.js';
 
 export const GET_MOVEMENTS = gql`
   query GetMovements(
-    $walletId: ID!,
+    $walletAddress: Bytes!,
   ) {
     movements(
-      walletId: $walletId
+      walletAddress: $walletAddress
     ) {
       totalCount
       pageInfo {

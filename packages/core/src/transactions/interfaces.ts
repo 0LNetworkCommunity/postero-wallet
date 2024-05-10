@@ -35,7 +35,7 @@ export interface IPendingTransactionsService {
   getPendingTransactions(): Promise<IPendingTransaction[]>;
   sendPendingTransaction(
     pendingTransactionId: string,
-    walletId: string,
+    walletAddress: Uint8Array,
     gasPrice: number,
     maxGasUnit: number,
     timeout: number,

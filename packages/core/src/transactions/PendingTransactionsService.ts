@@ -36,7 +36,7 @@ class PendingTransactionsService implements IPendingTransactionsService {
 
   public async sendPendingTransaction(
     pendingTransactionId: string,
-    walletId: string,
+    walletAddress: Uint8Array,
     gasPrice: number,
     maxGasUnit: number,
     timeout: number,
@@ -46,13 +46,14 @@ class PendingTransactionsService implements IPendingTransactionsService {
       return null;
     }
 
-    const wallet = await this.walletService.getWallet(walletId);
-    const privateKey = await this.walletService.getWalletPrivateKey(walletId);
+    const wallet = await this.walletService.getWallet(walletAddress);
+    const privateKey = await this.walletService.getWalletPrivateKey(walletAddress);
 
     const chainId = await this.aptosClient.getChainId();
 
-    const walletAddress = Buffer.from(wallet!.accountAddress).toString('hex').toLocaleUpperCase();
-    const account = await this.aptosClient.getAccount(walletAddress);
+    const account = await this.aptosClient.getAccount(
+      Buffer.from(wallet!.address).toString('hex').toUpperCase(),
+    );
 
     const deserializer = new BCS.Deserializer(pendingTransaction.payload);
 
@@ -62,7 +63,7 @@ class PendingTransactionsService implements IPendingTransactionsService {
 
     const rawTxn = new RawTransaction(
       // Transaction sender account address
-      AccountAddress.fromHex(walletAddress),
+      new AccountAddress(wallet!.address),
 
       BigInt(account.sequence_number),
       entryFunctionPayload,

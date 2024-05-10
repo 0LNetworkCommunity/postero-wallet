@@ -1,7 +1,6 @@
 import { UnsubscribeFn } from "emittery";
 
 import Wallet from "../crypto/Wallet";
-import { CryptoWallet } from "../crypto/interfaces";
 import { Balance } from "./Balance";
 import Coin from "../coin/Coin";
 import { ICoin } from "../coin/interfaces";
@@ -13,25 +12,28 @@ export enum WalletServiceEvent {
 }
 
 export interface IWalletRepository {
-  getWallet(id: string): Promise<Wallet | null>;
-  deleteWallet(id: string): Promise<void>;
+  getWallet(address: Uint8Array): Promise<Wallet | null>;
+  deleteWallet(address: Uint8Array): Promise<void>;
   getWallets(): Promise<Wallet[]>;
-  saveWallet(wallet: CryptoWallet): Promise<Wallet>;
-  setWalletLabel(walletId: string, label: string): Promise<void>;
-  getWalletPrivateKey(id: string): Promise<Uint8Array | null>;
+  saveWallet(address: Uint8Array, authKey: Uint8Array): Promise<Wallet>;
+  saveWalletAuthKey(address: Uint8Array, authKey: Uint8Array): Promise<void>;
+  setWalletLabel(address: Uint8Array, label: string): Promise<void>;
+  getWalletPrivateKey(address: Uint8Array): Promise<Uint8Array | null>;
 }
 
 export interface IWalletService {
-  syncWallet(walletId: string): Promise<void>;
-  importWallet(mnemonic: string): Promise<Wallet>;
-  newWallet(): Promise<Wallet>;
-  deleteWallet(id: string): Promise<void>;
-  setWalletLabel(walletId: string, label: string): Promise<void>;
-  getWallet(walletId: string): Promise<Wallet | null>;
-  getWalletPrivateKey(walletId: string): Promise<Uint8Array | null>;
-  getWalletBalances(walletId: string): Promise<Balance[]>;
-  getSlowWallet(walletId: string): Promise<ISlowWallet | undefined>;
-  setSlow(walletId: string): Promise<void>;
+  syncWallet(address: Uint8Array): Promise<void>;
+
+  importMnemonic(mnemonic: string): Promise<Wallet>;
+  importPrivateKey(privateKey: Uint8Array): Promise<Wallet>;
+
+  deleteWallet(walletAddress: Uint8Array): Promise<void>;
+  setWalletLabel(walletAddress: Uint8Array, label: string): Promise<void>;
+  getWallet(address: Uint8Array): Promise<Wallet | null>;
+  getWalletPrivateKey(walletAddress: Uint8Array): Promise<Uint8Array | null>;
+  getWalletBalances(walletAddress: Uint8Array): Promise<Balance[]>;
+  getSlowWallet(walletAddress: Uint8Array): Promise<ISlowWallet | undefined>;
+  setSlow(address: Uint8Array): Promise<void>;
 
   on(
     eventName: WalletServiceEvent,
@@ -40,28 +42,18 @@ export interface IWalletService {
 }
 
 export interface IGraphQLWallet {
-  id: string;
   label: string;
-  publicKey: Uint8Array;
-  // authentiionKey: Uint8Array;
-  accountAddress: Uint8Array;
-
+  address: Uint8Array;
   init(
-    id: string,
     label: string,
-    publicKey: Uint8Array,
-    authenticationKey: Uint8Array,
-    accountAddress: Uint8Array,
+    address: Uint8Array,
   ): void;
 }
 
 export interface IGraphQLWalletFactory {
   getGraphQLWallet(
-    id: string,
     label: string,
-    publicKey: Uint8Array,
-    authenticationKey: Uint8Array,
-    accountAddress: Uint8Array,
+    address: Uint8Array,
   ): Promise<IGraphQLWallet>;
 }
 
@@ -74,7 +66,7 @@ export interface IBalanceFactory {
 }
 
 export interface IBalanceRepository {
-  getBalances(walletId: string): Promise<Balance[]>;
+  getBalances(walletAddress: Uint8Array): Promise<Balance[]>;
 }
 
 export interface IBalance {

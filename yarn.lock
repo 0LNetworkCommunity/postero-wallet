@@ -4830,6 +4830,7 @@ __metadata:
     expo-device: "npm:~6.0.2"
     expo-font: "npm:12.0.4"
     expo-gl: "npm:14.0.2"
+    expo-haptics: "npm:~13.0.1"
     expo-linear-gradient: "npm:~13.0.2"
     expo-local-authentication: "npm:~14.0.1"
     expo-notifications: "npm:~0.28.1"
@@ -4847,7 +4848,7 @@ __metadata:
     react-native-gesture-handler: "npm:2.16.2"
     react-native-paper: "npm:^5.12.3"
     react-native-qrcode-svg: "npm:^6.3.1"
-    react-native-reanimated: "npm:3.6.2"
+    react-native-reanimated: "npm:~3.10.1"
     react-native-reanimated-carousel: "npm:^3.5.1"
     react-native-safe-area-context: "npm:4.10.1"
     react-native-screens: "npm:~3.31.1"
@@ -12530,6 +12531,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-haptics@npm:~13.0.1":
+  version: 13.0.1
+  resolution: "expo-haptics@npm:13.0.1"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/30037b569c256c4f332c679045c01cdd0fb74c64d8fed6be0b59da9ef10293732ab7e2d3d4deda7c566be8398bcb1ce78973ebf97bd3729d287eaf159087248c
+  languageName: node
+  linkType: hard
+
 "expo-keep-awake@npm:~12.8.2":
   version: 12.8.2
   resolution: "expo-keep-awake@npm:12.8.2"
@@ -18718,6 +18728,26 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10c0/7bf044a808981e293cfb75953afc53173382cb1b3fe036f6e6d26a2ea530f795f4a25c886e6cdc724fbca88f3a6a106d56e71cb080a6a224754ae1d11c1f823c
+  languageName: node
+  linkType: hard
+
+"react-native-reanimated@npm:~3.10.1":
+  version: 3.10.1
+  resolution: "react-native-reanimated@npm:3.10.1"
+  dependencies:
+    "@babel/plugin-transform-arrow-functions": "npm:^7.0.0-0"
+    "@babel/plugin-transform-nullish-coalescing-operator": "npm:^7.0.0-0"
+    "@babel/plugin-transform-optional-chaining": "npm:^7.0.0-0"
+    "@babel/plugin-transform-shorthand-properties": "npm:^7.0.0-0"
+    "@babel/plugin-transform-template-literals": "npm:^7.0.0-0"
+    "@babel/preset-typescript": "npm:^7.16.7"
+    convert-source-map: "npm:^2.0.0"
+    invariant: "npm:^2.2.4"
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/0154123649214bd8a83710056594590d9b5f073c5f8911f5b59a0a4f5dcca671d98b475bc4f3bb106b6c8b5c3dcb645a4973efdbe8dbd997bfae2797bd83f546
   languageName: node
   linkType: hard
 

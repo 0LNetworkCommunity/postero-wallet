@@ -18,7 +18,7 @@ class BalanceRepository implements IBalanceRepository {
   @Inject(Types.ICoinFactory)
   private readonly coinFactory: ICoinFactory;
 
-  public async getBalances(walletId: string): Promise<Balance[]> {
+  public async getBalances(walletAddress: Uint8Array): Promise<Balance[]> {
     const rows = await this.dbService
       .db<{ id: number; coinId: number; walletId: number; balance: string }>(
         "balances",
@@ -30,7 +30,7 @@ class BalanceRepository implements IBalanceRepository {
         coinDecimals: "coins.decimals",
         coinSymbol: "coins.symbol",
       })
-      .where("walletId", walletId)
+      .where("walletAddress", walletAddress)
       .leftJoin("coins", "balances.coinId", "coins.id");
 
     return Bluebird.map(rows, async (row) => {

@@ -3,11 +3,8 @@ import _ from "lodash";
 import { gql, useApolloClient, useSubscription } from "@apollo/client";
 
 export interface Wallet {
-  id: string;
   label: string;
-  publicKey: string;
-  authenticationKey: string;
-  accountAddress: string;
+  address: string;
   slowWallet?: {
     unlocked: string;
   };
@@ -23,11 +20,8 @@ export interface Wallet {
 const GET_WALLETS = gql`
   query GetWallets {
     wallets {
-      id
       label
-      publicKey
-      authenticationKey
-      accountAddress
+      address
       slowWallet {
         unlocked
       }
@@ -45,11 +39,7 @@ const GET_WALLETS = gql`
 const NEW_WALLET_SUBSCRIPTION = gql`
   subscription OnWalletAdded {
     walletAdded {
-      id
-      label
-      publicKey
-      authenticationKey
-      accountAddress
+      address
       slowWallet {
         unlocked
       }
@@ -75,9 +65,7 @@ const WALLET_UPDATED = gql`
     walletUpdated {
       id
       label
-      publicKey
-      authenticationKey
-      accountAddress
+      address
       slowWallet {
         unlocked
       }
@@ -106,10 +94,10 @@ export const useWallets = () => {
       if (!res.data.data) {
         return;
       }
-      const walletId = res.data.data.walletRemoved;
-      if (walletId !== undefined) {
+      const walletAddress = res.data.data.walletRemoved;
+      if (walletAddress !== undefined) {
         setWallets((wallets) =>
-          wallets.filter((wallet) => wallet.id !== walletId)
+          wallets.filter((wallet) => wallet.address !== walletAddress)
         );
       }
     },
@@ -122,7 +110,7 @@ export const useWallets = () => {
       }
       const wallet = res.data.data.walletUpdated;
       setWallets((wallets) => {
-        const index = wallets.findIndex((it) => it.id === wallet.id);
+        const index = wallets.findIndex((it) => it.address === wallet.address);
         if (index === -1) {
           return [...wallets, wallet];
         }
@@ -143,6 +131,7 @@ export const useWallets = () => {
       const res = await apolloClient.query<{ wallets: Wallet[] }>({
         query: GET_WALLETS,
       });
+      console.log('res', res);
       setWallets(res.data.wallets);
     };
 

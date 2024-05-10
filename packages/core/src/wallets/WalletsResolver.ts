@@ -26,6 +26,7 @@ import { Balance } from './Balance';
 import { PlatformTypes } from '../platform/platform-types';
 import { LocalAuthenticationService } from '../platform/interfaces';
 import { SlowWallet } from './SlowWallet';
+import { normalizeHexString } from '../utils';
 
 @Resolver(GraphQLWallet)
 class WalletsResolver {
@@ -41,10 +42,21 @@ class WalletsResolver {
   @Inject(PlatformTypes.LocalAuthenticationService)
   private readonly localAuthenticationService!: LocalAuthenticationService;
 
-  @Mutation((returns) => GraphQLWallet)
-  public async newWallet() {
-    const wallet = await this.walletService.newWallet();
-    return wallet;
+  @Mutation((returns) => Boolean)
+  public async importPrivateKey(
+    @Args('privateKey', { type: () => String })
+    privateKey: string,
+  ) {
+    const privateKeyHex = normalizeHexString(privateKey.trim());
+    if (privateKeyHex.length !== 64) {
+      throw new Error('Invalid private key length. Must be 64 characters long');
+    }
+
+    await this.walletService.importPrivateKey(
+      Buffer.from(privateKeyHex, 'hex'),
+    );
+
+    return true;
   }
 
   @Mutation((returns) => Boolean)
@@ -62,25 +74,25 @@ class WalletsResolver {
     @Args('mnemonic', { type: () => String })
     mnemonic: string,
   ) {
-    await this.walletService.importWallet(mnemonic);
+    await this.walletService.importMnemonic(mnemonic);
     return true;
   }
 
   @Mutation((returns) => Boolean)
   public async setSlow(
-    @Args('walletId', { type: () => ID })
-    walletId: string,
+    @Args('walletAddress', { type: () => Buffer })
+    walletAddress: Uint8Array,
   ) {
-    await this.walletService.setSlow(walletId);
+    await this.walletService.setSlow(walletAddress);
     return true;
   }
 
   @Query((returns) => GraphQLWallet)
   public async wallet(
-    @Args('id', { type: () => ID })
-    id: string,
+    @Args('address', { type: () => Buffer })
+    address: Uint8Array,
   ): Promise<IGraphQLWallet | null> {
-    const wallet = await this.walletRepository.getWallet(id);
+    const wallet = await this.walletRepository.getWallet(address);
     if (!wallet) {
       return null;
     }
@@ -90,26 +102,26 @@ class WalletsResolver {
   @Query((returns) => [GraphQLWallet])
   public async wallets() {
     const wallets = await this.walletRepository.getWallets();
-    return wallets.map((wallet) => this.walletMapper(wallet));
+    return Promise.all(wallets.map((wallet) => this.walletMapper(wallet)));
   }
 
   @Mutation((returns) => Boolean)
   public async syncWallet(
-    @Args('id', { type: () => ID })
-    id: string,
+    @Args('address', { type: () => String })
+    address: string,
   ) {
-    await this.walletService.syncWallet(id);
+    await this.walletService.syncWallet(Buffer.from(address, 'hex'));
     return true;
   }
 
   @Mutation((returns) => Boolean)
   public async deleteWallet(
-    @Args('id', { type: () => ID })
-    id: string,
+    @Args('address', { type: () => String })
+    address: string,
   ) {
     const success = await this.localAuthenticationService.authenticate();
     if (success) {
-      await this.walletService.deleteWallet(id);
+      await this.walletService.deleteWallet(Buffer.from(address, 'hex'));
       return true;
     }
     return false;
@@ -118,7 +130,7 @@ class WalletsResolver {
   @ResolveField((returns) => [Balance])
   public async balances(@Parent() wallet: GraphQLWallet) {
     try {
-      await this.walletService.syncWallet(wallet.id);
+      await this.walletService.syncWallet(wallet.address);
     } catch (error) {
       console.error(error);
     }
@@ -167,11 +179,8 @@ class WalletsResolver {
 
   private walletMapper(wallet: Wallet): Promise<IGraphQLWallet> {
     return this.graphQLWalletFactory.getGraphQLWallet(
-      `${wallet.id}`,
       wallet.label,
-      wallet.publicKey,
-      wallet.authenticationKey,
-      wallet.accountAddress,
+      wallet.address,
     );
   }
 }

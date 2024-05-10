@@ -20,12 +20,12 @@ class ConnectionRequestsResolver {
     @Args("connectionRequestId", { type: () => ID })
     connectionRequestId: string,
 
-    @Args("walletId", { type: () => ID })
-    walletId: string,
+    @Args("walletAddress", { type: () => String })
+    walletAddress: string,
   ) {
     return this.dAppsService.approveConnectionRequest(
       connectionRequestId,
-      walletId,
+      Buffer.from(walletAddress, 'hex'),
     );
   }
 

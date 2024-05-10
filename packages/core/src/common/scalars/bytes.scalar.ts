@@ -1,26 +1,38 @@
-import { CustomScalar, Scalar } from "@nestjs/graphql";
-import { Kind, ValueNode } from "graphql";
+import { Scalar, CustomScalar } from '@nestjs/graphql';
+import { Kind, ValueNode } from 'graphql';
 
-@Scalar("Bytes", (type) => Buffer)
-export class BytesScalar implements CustomScalar<string, Buffer> {
-  description = "Date custom scalar type";
+@Scalar('Bytes', () => Buffer)
+export class BytesScalar implements CustomScalar<string, Buffer | Uint8Array> {
+  public readonly description = 'Bytes';
 
-  parseValue(value: string): Buffer {
-    return Buffer.from(value, "hex");
-  }
+  private static INVALID_HEX_REPRESENTATION =
+    'Invalid bytes literal hex representation';
 
-  serialize(value: Buffer): string {
-    // Handle case when value is an Uint8Array
-    if (!Buffer.isBuffer(value)) {
-      return Buffer.from(value).toString("hex").toUpperCase();
+  private static checkLiteral(value: string) {
+    if ((value.length & 1) === 1) {
+      throw new Error(BytesScalar.INVALID_HEX_REPRESENTATION);
     }
-    return value.toString("hex").toUpperCase();
+
+    if (/^[0-9ABCDEF]*$/i.test(value) === false) {
+      throw new Error(BytesScalar.INVALID_HEX_REPRESENTATION);
+    }
   }
 
-  parseLiteral(ast: ValueNode): Buffer {
+  public parseValue(value: string): Uint8Array {
+    BytesScalar.checkLiteral(value);
+    return new Uint8Array(Buffer.from(value, 'hex'));
+  }
+
+  public serialize(value: Buffer | Uint8Array): string {
+    const buff = Buffer.isBuffer(value) ? value : Buffer.from(value);
+    return buff.toString('hex').toUpperCase();
+  }
+
+  public parseLiteral(ast: ValueNode): Uint8Array {
     if (ast.kind === Kind.STRING) {
-      return Buffer.from(ast.value, "hex");
+      BytesScalar.checkLiteral(ast.value);
+      return new Uint8Array(Buffer.from(ast.value, 'hex'));
     }
-    throw new Error(`Cannot parse value for Bytes: ${ast}`);
+    throw new Error(BytesScalar.INVALID_HEX_REPRESENTATION);
   }
 }

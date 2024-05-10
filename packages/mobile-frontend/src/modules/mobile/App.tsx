@@ -22,6 +22,8 @@ import NewTransfer from "./screens/NewTransfer";
 import WalletDetails from "./screens/WalletDetails";
 import BarCodeScanner from "./screens/BarCodeScanner";
 import WalletPrivateKeys from "./screens/WalletPrivateKeys";
+import Settings from "./screens/Settings";
+import KeyRotation from "./screens/KeyRotation";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -41,7 +43,6 @@ const App: FC = () => {
   useEffect(() => {
     const load = async () => {
       const backend = await bootstrap();
-
       setApolloClient(getApolloClient(backend));
     };
     load().catch((error) => {
@@ -120,6 +121,18 @@ const App: FC = () => {
                   headerShown: false,
                   presentation: "modal",
                 }}
+              />
+
+              <Stack.Screen
+                name="KeyRotation"
+                component={KeyRotation}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="Settings"
+                component={Settings}
               />
             </Stack.Navigator>
           </NavigationContainer>

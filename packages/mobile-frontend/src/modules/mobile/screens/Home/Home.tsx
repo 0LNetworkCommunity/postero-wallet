@@ -11,6 +11,7 @@ import { ModalStackParams } from "../params";
 import Wallets from "../Wallets";
 import Bars4Icon from "../../icons/Bars4Icon";
 import ContextMenu, { ContextMenuHandle } from "./ContextMenu";
+import CogIcon from "../../icons/CogIcon";
 
 const aHome: FC = () => {
   return <WalletScreen />;
@@ -58,14 +59,23 @@ const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={tw.style("flex-1 p-2")}>
-        <TouchableOpacity
-          onPress={() => {
-            contextMenu.current?.open();
-          }}
-        >
-          <Bars4Icon color="#000000" />
-        </TouchableOpacity>
+      <View style={tw.style("p-2")}>
+        <View style={tw.style("pb-2 flex-row justify-between")}>
+          <TouchableOpacity
+            onPress={() => {
+              contextMenu.current?.open();
+            }}
+          >
+            <Bars4Icon color="#000000" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("Settings");
+            }}
+          >
+            <CogIcon color="#000000" />
+          </TouchableOpacity>
+        </View>
 
         <View style={tw.style("flex-row mb-2")}>
           <View style={tw.style("basis-1/2 pr-2")}>
@@ -105,9 +115,9 @@ const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
             navigation.navigate("NewWallet");
           }}
         />
-
-        <Wallets />
       </View>
+
+      <Wallets />
 
       <ContextMenu ref={contextMenu} />
     </SafeAreaView>

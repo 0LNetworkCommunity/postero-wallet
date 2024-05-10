@@ -1,53 +1,38 @@
-import { Field, ID, ObjectType } from "@nestjs/graphql";
+import { Field, ObjectType } from "@nestjs/graphql";
 
-import { IBalance, IGraphQLWallet, ISlowWallet, IWalletService } from "./interfaces";
+import {
+  IBalance,
+  IGraphQLWallet,
+  ISlowWallet,
+  IWalletService,
+} from './interfaces';
 import { Inject } from "@nestjs/common";
 import { Types } from "../types";
 
 @ObjectType('Wallet')
 export class GraphQLWallet implements IGraphQLWallet {
-  @Field((type) => ID)
-  public id!: string;
-
   @Field(() => String)
   public label!: string;
 
-  @Field()
-  public publicKey: Buffer;
-
-  @Field()
-  public authenticationKey: Buffer;
-
-  @Field()
-  public accountAddress: Buffer;
-
-  @Field({
-    nullable: true,
-  })
-  public mnemonic?: String;
+  @Field(() => Buffer)
+  public address: Uint8Array;
 
   @Inject(Types.IWalletService)
   private readonly walletService: IWalletService;
 
   public init(
-    id: string,
     label: string,
-    publicKey: Buffer,
-    authenticationKey: Buffer,
-    accountAddress: Buffer,
+    address: Uint8Array,
   ) {
-    this.id = id;
     this.label = label;
-    this.publicKey = publicKey;
-    this.authenticationKey = authenticationKey;
-    this.accountAddress = accountAddress;
+    this.address = address;
   }
 
   public async balances(): Promise<IBalance[]> {
-    return this.walletService.getWalletBalances(this.id);
+    return this.walletService.getWalletBalances(this.address);
   }
 
   public async slowWallet(): Promise<ISlowWallet | undefined> {
-    return this.walletService.getSlowWallet(this.id);
+    return this.walletService.getSlowWallet(this.address);
   }
 }

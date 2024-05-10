@@ -36,8 +36,8 @@ class TransfersResolver {
 
   @Mutation((returns) => Boolean)
   public async newTransfer(
-    @Args("walletId", { type: () => ID })
-    walletId: string,
+    @Args("walletAddress", { type: () => Buffer })
+    walletAddress: Uint8Array,
 
     @Args("recipient", { type: () => String })
     recipient: string,
@@ -45,14 +45,14 @@ class TransfersResolver {
     @Args("amount", { type: () => Int })
     amount: number,
   ) {
-    const wallet = await this.walletRepository.getWallet(walletId);
+    const wallet = await this.walletRepository.getWallet(walletAddress);
     if (!wallet) {
       return false;
     }
 
-    const walletAddress = Buffer.from(wallet.accountAddress).toString('hex').toUpperCase();
-
-    const pk = await this.platformEncryptedStoreService.getItem(walletAddress);
+    const pk = await this.platformEncryptedStoreService.getItem(
+      Buffer.from(walletAddress).toString('hex').toUpperCase(),
+    );
     if (!pk) {
       return false;
     }
@@ -81,11 +81,13 @@ class TransfersResolver {
 
     const timeout = 10;
 
-    const account = await this.aptosClient.getAccount(walletAddress);
+    const account = await this.aptosClient.getAccount(
+      Buffer.from(walletAddress).toString('hex'),
+    );
 
     const rawTxn = new RawTransaction(
       // Transaction sender account address
-      AccountAddress.fromHex(walletAddress),
+      new AccountAddress(walletAddress),
 
       BigInt(account.sequence_number),
       entryFunctionPayload,
