@@ -73,4 +73,8 @@ export enum Types {
 
   IKeychainService = "IKeychainService",
   IKeychainRepository = "IKeychainRepository",
+  IWalletKey = "IWalletKey",
+  IWalletKeyFactory = "IWalletKeyFactory",
+
+  IKeyRotationService = "IKeyRotationService",
 }

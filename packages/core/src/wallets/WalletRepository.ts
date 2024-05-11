@@ -1,13 +1,146 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { IWalletRepository } from "./interfaces";
+import _ from 'lodash';
+import { IGraphQLWallet, IGraphQLWalletFactory, IWalletRepository } from "./interfaces";
 import { Types } from "../types";
 import { IDbService } from "../db/interfaces";
 import { PlatformTypes } from "../platform/platform-types";
 import Wallet from "../crypto/Wallet";
 import { PlatformEncryptedStoreService, PlatformCryptoService } from "../platform/interfaces";
 
+class WalletsFromAuthKeysQueue {
+  private timeout: NodeJS.Timeout | undefined = undefined;
+
+  private processing: boolean = false;
+
+  private readonly queue = new Map<
+    string,
+    {
+      resolve: (res: Uint8Array[]) => void;
+      reject: (error: Error) => void;
+      promise: Promise<Uint8Array[]>;
+    }
+  >();
+
+  public constructor(private readonly dbService: IDbService) {}
+
+  public getWalletsFromAuthKey(authKey: Uint8Array): Promise<Uint8Array[]> {
+    const authKeyStr = Buffer.from(authKey).toString('hex');
+    const prom = this.queue.get(authKeyStr);
+    if (prom) {
+      return prom.promise;
+    }
+
+    let resolve: ((res: Uint8Array[]) => void) | undefined = undefined;
+    let reject: ((error: Error) => void) | undefined = undefined;
+    const promise = new Promise<Uint8Array[]>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+
+    this.queue.set(authKeyStr, { promise, resolve: resolve!, reject: reject! });
+
+    this.tick();
+
+    return promise;
+  }
+
+  private tick() {
+    if (this.queue.size === 0) {
+      return;
+    }
+
+    if (this.timeout !== undefined) {
+      return;
+    }
+
+    this.timeout = setTimeout(() => {
+      this.timeout = undefined;
+      this.requestProcessNextBatch();
+    }, 0);
+  }
+
+  private requestProcessNextBatch() {
+    if (this.processing) {
+      console.log('already processing');
+      return;
+    }
+    this.processing = true;
+
+    this.processNextBatch().finally(() => {
+      this.processing = false;
+      this.tick();
+    });
+  }
+
+  private async processNextBatch() {
+    const keys = Array.from(this.queue.keys()).slice(0, 10);
+
+    if (!keys.length) {
+      return;
+    }
+
+    try {
+      const q = this.dbService
+        .db<{
+          walletAddress: Uint8Array;
+          authKey: Uint8Array;
+        }>('walletsAuthKeys')
+        .whereIn(
+          'authKey',
+          keys.map((key) => {
+            return this.dbService.db.raw(`X'${key}'`);
+          }),
+        ).toSQL();
+        console.log(q.sql);
+
+      const rows = await this.dbService
+        .db<{
+          walletAddress: Uint8Array;
+          authKey: Uint8Array;
+        }>('walletsAuthKeys')
+        .whereIn(
+          'authKey',
+          keys.map((key) => {
+            return this.dbService.db.raw(`X'${key}'`);
+          }),
+        );
+      const grouped = _.groupBy(rows, (row) =>
+        Buffer.from(row.authKey).toString('hex'),
+      );
+
+      for (const authKey of Object.keys(grouped)) {
+        const el = this.queue.get(authKey);
+        if (el) {
+          const res = grouped[authKey].map((it) => it.walletAddress);
+          console.log('authKey', authKey, res);
+          this.queue.delete(authKey);
+          el.resolve(res);
+        }
+      }
+
+      for (const key of keys) {
+        const el = this.queue.get(key);
+        if (el) {
+          this.queue.delete(key);
+          el.resolve([]);
+        }
+      }
+    } catch (error) {
+      for (const key of keys) {
+        const el = this.queue.get(key);
+        if (el) {
+          this.queue.delete(key);
+          el.reject(error);
+        }
+      }
+    }
+  }
+}
+
 @Injectable()
 class WalletRepository implements IWalletRepository {
+  private readonly walletsFromAuthKeysQueue: WalletsFromAuthKeysQueue;
+
   deleteWallet(address: Uint8Array): Promise<void> {
     throw new Error('Method not implemented.');
   }
@@ -20,14 +153,15 @@ class WalletRepository implements IWalletRepository {
     throw new Error('Method not implemented.');
   }
 
-  @Inject(Types.IDbService)
-  private readonly dbService: IDbService;
+  public constructor(
+    @Inject(Types.IDbService)
+    private readonly dbService: IDbService,
 
-  @Inject(PlatformTypes.CryptoService)
-  private readonly platformCryptoService: PlatformCryptoService;
-
-  @Inject(PlatformTypes.EncryptedStoreService)
-  private readonly platformEncryptedStoreService: PlatformEncryptedStoreService;
+    @Inject(Types.IGraphQLWalletFactory)
+    private readonly graphQLWalletFactory: IGraphQLWalletFactory,
+  ) {
+    this.walletsFromAuthKeysQueue = new WalletsFromAuthKeysQueue(dbService);
+  }
 
   public async saveWallet(
     address: Uint8Array,
@@ -109,6 +243,35 @@ class WalletRepository implements IWalletRepository {
       label: entity.label,
       address: entity.address,
     };
+  }
+
+  public async getWalletsFromAuthKey(
+    authKey: Uint8Array,
+  ): Promise<IGraphQLWallet[]> {
+    const addresses =
+      await this.walletsFromAuthKeysQueue.getWalletsFromAuthKey(authKey);
+
+    if (!addresses.length) {
+      return [];
+    }
+
+    const wallets = await this.dbService
+      .db<{
+        address: Uint8Array;
+        label: string;
+      }>('wallets')
+      .whereIn(
+        'address',
+        addresses.map((addr) => this.dbService.raw(addr)),
+      );
+    return Promise.all(
+      wallets.map((wallet) =>
+        this.graphQLWalletFactory.getGraphQLWallet(
+          wallet.label,
+          wallet.address,
+        ),
+      ),
+    );
   }
 }
 

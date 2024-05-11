@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Splash from "./screens/Splash";
 import Mnemonic from "./screens/Mnemonic";
+import Transaction from "./screens/Transaction";
 
 export type KeyRotationRoutes = {
   Splash: {
@@ -9,6 +10,10 @@ export type KeyRotationRoutes = {
   };
   Mnemonic: {
     address: string;
+  };
+  Transaction: {
+    address: string;
+    publicKey: string;
   };
 }
 
@@ -24,6 +29,10 @@ function KeyRotationRouter() {
       <Stack.Screen
         name="Mnemonic"
         component={Mnemonic}
+      />
+      <Stack.Screen
+        name="Transaction"
+        component={Transaction}
       />
     </Stack.Navigator>
   );

@@ -60,6 +60,14 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({}, ref) => {
           title="Private Keys"
           onPress={() => {
             bottomSheetRef.current?.close();
+            navigation.navigate("PrivateKeys");
+          }}
+        />
+        <Button
+          title="App settings"
+          onPress={() => {
+            bottomSheetRef.current?.close();
+            navigation.navigate("Settings");
           }}
         />
       </BottomSheetView>

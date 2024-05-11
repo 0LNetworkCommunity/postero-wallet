@@ -8,6 +8,7 @@ import { sha3_256 as sha3Hash } from "@noble/hashes/sha3";
 import {
   IBalance,
   IBalanceRepository,
+  IGraphQLWallet,
   ISlowWallet,
   ISlowWalletFactory,
   IWalletRepository,
@@ -24,6 +25,7 @@ import { PlatformTypes } from "../platform/platform-types";
 import { PlatformEncryptedStoreService } from "../platform/interfaces";
 import { Knex } from "knex";
 import { IKeychainService } from "../keychain/interfaces";
+import { GraphQLWallet } from "./GraphQLWallet";
 
 const {
   EntryFunction,
@@ -492,6 +494,12 @@ class WalletService implements IWalletService {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  public async getWalletsFromAuthKey(
+    authKey: Uint8Array,
+  ): Promise<IGraphQLWallet[]> {
+    return this.walletRepository.getWalletsFromAuthKey(authKey);
   }
 }
 

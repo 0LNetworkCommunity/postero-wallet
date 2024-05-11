@@ -11,4 +11,5 @@ export type ModalStackParams = {
   };
   Settings: undefined;
   KeyRotation: { walletAddress: string };
+  PrivateKeys: undefined;
 };

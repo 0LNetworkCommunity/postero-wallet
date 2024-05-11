@@ -1,26 +1,28 @@
-import { Resolver, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
 import { Inject } from '@nestjs/common';
 
 import { Types } from '../types';
-import { IKeychainService } from './interfaces';
+import { IKeychainService, IWalletKey } from './interfaces';
+import WalletKey from './WalletKey';
 
 @Resolver()
 class KeychainResolver {
   @Inject(Types.IKeychainService)
   private readonly keychainService!: IKeychainService;
 
-  @Mutation(() => Boolean)
+  @Mutation(() => WalletKey)
   public async createKeyFromMnemonic(
     @Args('mnemonic', { type: () => String })
     mnemonic: string,
-  ) {
-    const { publicKey, authKey } =
-      await this.keychainService.newKeyFromMnemonic(mnemonic);
-    console.log({
-      publicKey: Buffer.from(publicKey).toString('hex'),
-      authKey: Buffer.from(authKey).toString('hex'),
-    });
-    return true;
+  ): Promise<IWalletKey> {
+    const walletKey = await this.keychainService.newKeyFromMnemonic(mnemonic);
+    return walletKey;
+  }
+
+  @Query(() => [WalletKey])
+  public async privateKeys(): Promise<IWalletKey[]> {
+    const keys = await this.keychainService.getWalletKeys();
+    return keys;
   }
 }
 

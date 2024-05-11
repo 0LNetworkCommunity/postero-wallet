@@ -24,6 +24,7 @@ import BarCodeScanner from "./screens/BarCodeScanner";
 import WalletPrivateKeys from "./screens/WalletPrivateKeys";
 import Settings from "./screens/Settings";
 import KeyRotation from "./screens/KeyRotation";
+import PrivateKeys from "./screens/PrivateKeys";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -130,10 +131,10 @@ const App: FC = () => {
                   headerShown: false,
                 }}
               />
-              <Stack.Screen
-                name="Settings"
-                component={Settings}
-              />
+
+              <Stack.Screen name="PrivateKeys" component={PrivateKeys} />
+
+              <Stack.Screen name="Settings" component={Settings} />
             </Stack.Navigator>
           </NavigationContainer>
         </GestureHandlerRootView>

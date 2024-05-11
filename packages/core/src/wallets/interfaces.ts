@@ -19,6 +19,7 @@ export interface IWalletRepository {
   saveWalletAuthKey(address: Uint8Array, authKey: Uint8Array): Promise<void>;
   setWalletLabel(address: Uint8Array, label: string): Promise<void>;
   getWalletPrivateKey(address: Uint8Array): Promise<Uint8Array | null>;
+  getWalletsFromAuthKey(authKey: Uint8Array): Promise<IGraphQLWallet[]>;
 }
 
 export interface IWalletService {
@@ -34,6 +35,8 @@ export interface IWalletService {
   getWalletBalances(walletAddress: Uint8Array): Promise<Balance[]>;
   getSlowWallet(walletAddress: Uint8Array): Promise<ISlowWallet | undefined>;
   setSlow(address: Uint8Array): Promise<void>;
+
+  getWalletsFromAuthKey(authKey: Uint8Array): Promise<IGraphQLWallet[]>;
 
   on(
     eventName: WalletServiceEvent,

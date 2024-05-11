@@ -1,4 +1,4 @@
-import { Module, Scope } from '@nestjs/common';
+import { Module, Scope, forwardRef } from '@nestjs/common';
 
 import { Types } from '../types';
 import WalletService from './WalletService';
@@ -23,7 +23,7 @@ import KeychainModule from '../keychain/KeychainModule';
     CryptoModule,
     CoinModule,
     OpenLibraModule,
-    KeychainModule,
+    forwardRef(() => KeychainModule),
   ],
   providers: [
     WalletsResolver,

@@ -2,12 +2,22 @@ import * as Crypto from "expo-crypto";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, SafeAreaView, View, Text } from "react-native";
 import { LangEn, Mnemonic } from "ethers";
-import { Button } from "@postero/ui";
 import { gql, useApolloClient } from "@apollo/client";
+import { CompositeScreenProps } from "@react-navigation/native";
+import { StackScreenProps } from "@react-navigation/stack";
+import * as Clipboard from 'expo-clipboard';
+
+import { Button } from "@postero/ui";
+
+import { KeyRotationRoutes } from "../../Router";
+import { ModalStackParams } from "../../../params";
 
 const CREATE_KEY_FROM_MNEMONIC = gql`
   mutation CreateKeyFromMnemonic($mnemonic: String!) {
-    createKeyFromMnemonic(mnemonic: $mnemonic)
+    createKeyFromMnemonic(mnemonic: $mnemonic) {
+      publicKey
+      authKey
+    }
   }
 `;
 
@@ -18,7 +28,13 @@ const createMnemonic = () => {
   return mnemonic.phrase;
 };
 
-function MnemonicScreen() {
+function MnemonicScreen({
+  navigation,
+  route,
+}: CompositeScreenProps<
+  StackScreenProps<KeyRotationRoutes, "Mnemonic">,
+  StackScreenProps<ModalStackParams>
+>) {
   const apolloClient = useApolloClient();
   const [mnemonic, setMnemonic] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,12 +47,24 @@ function MnemonicScreen() {
     setLoading(true);
     try {
       setMnemonic("");
-      await apolloClient.mutate({
+      const res = await apolloClient.mutate<{
+        createKeyFromMnemonic: {
+          authKey: string;
+          publicKey: string;
+        };
+      }>({
         mutation: CREATE_KEY_FROM_MNEMONIC,
         variables: {
           mnemonic,
         },
       });
+
+      if (res.data) {
+        navigation.navigate("Transaction", {
+          address: route.params.address,
+          publicKey: res.data.createKeyFromMnemonic.publicKey,
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -56,6 +84,12 @@ function MnemonicScreen() {
         <Text>{mnemonic}</Text>
       </View>
 
+      <Button
+        title="Copy to clipboard"
+        onPress={async () => {
+          await Clipboard.setStringAsync(mnemonic);
+        }}
+      />
       <Button title="Continue" onPress={() => saveMnemonic()} />
     </SafeAreaView>
   );

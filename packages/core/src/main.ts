@@ -37,6 +37,7 @@ import { WindowManagerModule } from './window-manager/WindowManagerModule';
 import RpcModule from './rpc/RpcModule';
 import SettingsModule from './settings/SettingsModule';
 import KeychainModule from './keychain/KeychainModule';
+import KeyRotationModule from './key-rotation/KeyRotationModule';
 
 export * from './platform/platform-types';
 export * from './platform/interfaces';
@@ -82,6 +83,7 @@ export class Backend {
         SettingsModule,
         RpcModule,
         KeychainModule,
+        KeyRotationModule,
         ...(imports ?? []),
       ],
       providers: [],

@@ -70,7 +70,7 @@ const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("Settings");
+              contextMenu.current?.open();
             }}
           >
             <CogIcon color="#000000" />
