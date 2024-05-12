@@ -6,8 +6,6 @@ import {
   Subscription,
   ID,
   Args,
-  ResolveField,
-  Parent,
 } from '@nestjs/graphql';
 import { Repeater } from '@repeaterjs/repeater';
 
@@ -18,17 +16,14 @@ import {
   IWalletService,
   IGraphQLWalletFactory,
   WalletServiceEvent,
-  ISlowWallet,
 } from './interfaces';
 import Wallet from '../crypto/Wallet';
 import { GraphQLWallet } from './GraphQLWallet';
-import { Balance } from './Balance';
 import { PlatformTypes } from '../platform/platform-types';
 import { LocalAuthenticationService } from '../platform/interfaces';
-import { SlowWallet } from './SlowWallet';
 import { normalizeHexString } from '../utils';
 
-@Resolver(GraphQLWallet)
+@Resolver()
 class WalletsResolver {
   @Inject(Types.IWalletService)
   private readonly walletService!: IWalletService;
@@ -125,23 +120,6 @@ class WalletsResolver {
       return true;
     }
     return false;
-  }
-
-  @ResolveField((returns) => [Balance])
-  public async balances(@Parent() wallet: GraphQLWallet) {
-    try {
-      await this.walletService.syncWallet(wallet.address);
-    } catch (error) {
-      console.error(error);
-    }
-    return wallet.balances();
-  }
-
-  @ResolveField((returns) => SlowWallet, { nullable: true })
-  public async slowWallet(
-    @Parent() wallet: GraphQLWallet,
-  ): Promise<ISlowWallet | undefined> {
-    return wallet.slowWallet();
   }
 
   @Subscription((returns) => GraphQLWallet)

@@ -24,6 +24,15 @@ class KeychainResolver {
     const keys = await this.keychainService.getWalletKeys();
     return keys;
   }
+
+  @Query(() => WalletKey)
+  public async privateKey(
+    @Args('publicKey', { type: () => Buffer })
+    publicKey: Uint8Array,
+  ): Promise<IWalletKey> {
+    const keys = await this.keychainService.getWalletKey(publicKey);
+    return keys;
+  }
 }
 
 export default KeychainResolver;

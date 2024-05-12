@@ -25,6 +25,7 @@ import WalletPrivateKeys from "./screens/WalletPrivateKeys";
 import Settings from "./screens/Settings";
 import KeyRotation from "./screens/KeyRotation";
 import PrivateKeys from "./screens/PrivateKeys";
+import PrivateKey from "./screens/PrivateKey";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -133,6 +134,7 @@ const App: FC = () => {
               />
 
               <Stack.Screen name="PrivateKeys" component={PrivateKeys} />
+              <Stack.Screen name="PrivateKey" component={PrivateKey} />
 
               <Stack.Screen name="Settings" component={Settings} />
             </Stack.Navigator>

@@ -16,6 +16,7 @@ import { Balance } from './Balance';
 import SlowWalletFactory from './SlowWalletFactory';
 import { SlowWallet } from './SlowWallet';
 import KeychainModule from '../keychain/KeychainModule';
+import WalletResolver from './WalletResolver';
 
 @Module({
   imports: [
@@ -27,6 +28,8 @@ import KeychainModule from '../keychain/KeychainModule';
   ],
   providers: [
     WalletsResolver,
+    WalletResolver,
+
     {
       provide: Types.IGraphQLWalletFactory,
       useClass: GraphQLWalletFactory,

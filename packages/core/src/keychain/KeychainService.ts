@@ -60,6 +60,10 @@ class KeychainService implements IKeychainService {
   public getWalletKeys(): Promise<IWalletKey[]> {
     return this.keychainRepository.getWalletKeys();
   }
+
+  public async getWalletWalletKeys(address: Uint8Array): Promise<IWalletKey[]> {
+    return this.keychainRepository.getWalletWalletKeys(address);
+  }
 }
 
 export default KeychainService;

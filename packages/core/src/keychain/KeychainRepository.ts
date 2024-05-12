@@ -44,7 +44,9 @@ class KeychainRepository implements IKeychainRepository {
     return this.walletKeyFactory.createWalletKey(item.publicKey, item.authKey);
   }
 
-  public async getWalletKeyFromAuthKey(authKey: Uint8Array): Promise<IWalletKey> {
+  public async getWalletKeyFromAuthKey(
+    authKey: Uint8Array,
+  ): Promise<IWalletKey> {
     const item = await this.dbService
       .db<{
         authKey: Uint8Array;
@@ -59,11 +61,24 @@ class KeychainRepository implements IKeychainRepository {
   }
 
   public async getWalletKeys(): Promise<IWalletKey[]> {
+    const items = await this.dbService.db<{
+      authKey: Uint8Array;
+      publicKey: Uint8Array;
+    }>('keys');
+    return Promise.all(
+      items.map(({ authKey, publicKey }) =>
+        this.walletKeyFactory.createWalletKey(publicKey, authKey),
+      ),
+    );
+  }
+
+  public async getWalletWalletKeys(address: Uint8Array): Promise<IWalletKey[]> {
     const items = await this.dbService
-      .db<{
-        authKey: Uint8Array;
-        publicKey: Uint8Array;
-      }>('keys');
+      .db('walletsAuthKeys')
+      .select('keys.*')
+      .leftJoin('keys', 'keys.authKey', 'walletsAuthKeys.authKey')
+      .where('walletAddress', this.dbService.raw(address));
+
     return Promise.all(
       items.map(({ authKey, publicKey }) =>
         this.walletKeyFactory.createWalletKey(publicKey, authKey),

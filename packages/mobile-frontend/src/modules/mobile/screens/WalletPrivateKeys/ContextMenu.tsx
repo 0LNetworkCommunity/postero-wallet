@@ -10,10 +10,10 @@ export interface ContextMenuHandle {
 }
 
 interface Props {
-  walletId: string;
+  walletAddress: string;
 }
 
-const ContextMenu = forwardRef<ContextMenuHandle, Props>(({ walletId }, ref) => {
+const ContextMenu = forwardRef<ContextMenuHandle, Props>(({ walletAddress }, ref) => {
   const navigation = useNavigation<any>();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -62,7 +62,7 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({ walletId }, ref) => 
           onPress={() => {
             bottomSheetRef.current?.close();
             navigation.navigate("WalletPrivateKeys", {
-              walletId,
+              walletAddress,
             });
           }}
         />
@@ -71,7 +71,7 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({ walletId }, ref) => 
           onPress={() => {
             bottomSheetRef.current?.close();
             navigation.navigate("WalletPrivateKeys", {
-              walletId,
+              walletAddress,
             });
           }}
         />

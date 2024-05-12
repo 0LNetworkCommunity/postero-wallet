@@ -8,6 +8,7 @@ import {
 } from './interfaces';
 import { Inject } from "@nestjs/common";
 import { Types } from "../types";
+import { IKeychainService, IWalletKey } from "../keychain/interfaces";
 
 @ObjectType('Wallet')
 export class GraphQLWallet implements IGraphQLWallet {
@@ -19,6 +20,9 @@ export class GraphQLWallet implements IGraphQLWallet {
 
   @Inject(Types.IWalletService)
   private readonly walletService: IWalletService;
+
+  @Inject(Types.IKeychainService)
+  private readonly keychainService: IKeychainService;
 
   public init(
     label: string,
@@ -34,5 +38,9 @@ export class GraphQLWallet implements IGraphQLWallet {
 
   public async slowWallet(): Promise<ISlowWallet | undefined> {
     return this.walletService.getSlowWallet(this.address);
+  }
+
+  public async keys(): Promise<IWalletKey[]> {
+    return this.keychainService.getWalletWalletKeys(this.address);
   }
 }
