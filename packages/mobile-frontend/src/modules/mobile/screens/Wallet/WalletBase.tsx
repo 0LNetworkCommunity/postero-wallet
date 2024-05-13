@@ -60,7 +60,7 @@ interface Props {
 }
 
 function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const apolloClient = useApolloClient();
   const { movements } = useMovements(walletAddress);
 

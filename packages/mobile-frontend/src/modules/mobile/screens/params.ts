@@ -15,4 +15,6 @@ export type ModalStackParams = {
   PrivateKey: {
     publicKey: string;
   };
+  Transactions: undefined;
+  Transaction: undefined;
 };

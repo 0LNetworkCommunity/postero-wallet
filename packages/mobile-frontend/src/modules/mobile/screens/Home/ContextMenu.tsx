@@ -70,6 +70,13 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({}, ref) => {
             navigation.navigate("Settings");
           }}
         />
+        <Button
+          title="Transactions"
+          onPress={() => {
+            bottomSheetRef.current?.close();
+            navigation.navigate("Transactions");
+          }}
+        />
       </BottomSheetView>
     </BottomSheet>
   );

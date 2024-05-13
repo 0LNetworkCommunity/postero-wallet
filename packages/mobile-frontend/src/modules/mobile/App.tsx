@@ -26,6 +26,8 @@ import Settings from "./screens/Settings";
 import KeyRotation from "./screens/KeyRotation";
 import PrivateKeys from "./screens/PrivateKeys";
 import PrivateKey from "./screens/PrivateKey";
+import Transactions from "./screens/Transactions";
+import Transaction from "./screens/Transaction";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -133,8 +135,35 @@ const App: FC = () => {
                 }}
               />
 
-              <Stack.Screen name="PrivateKeys" component={PrivateKeys} />
-              <Stack.Screen name="PrivateKey" component={PrivateKey} />
+              <Stack.Screen
+                name="PrivateKeys"
+                component={PrivateKeys}
+              />
+
+              <Stack.Screen
+                name="PrivateKey"
+                component={PrivateKey}
+                options={{
+                  headerShown: false
+                }}
+              />
+
+              <Stack.Screen
+                name="Transactions"
+                component={Transactions}
+                options={{
+                  headerShown: false
+                }}
+              />
+
+              <Stack.Screen
+                name="Transaction"
+                component={Transaction}
+                options={{
+                  headerShown: false,
+                  presentation: "modal",
+                }}
+              />
 
               <Stack.Screen name="Settings" component={Settings} />
             </Stack.Navigator>
