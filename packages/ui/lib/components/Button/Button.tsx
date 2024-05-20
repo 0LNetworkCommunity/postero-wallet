@@ -131,7 +131,9 @@ export function Button({
       onPressOut={() => setPressed(false)}
     >
       <Text
-        xxl={size === ButtonSize.XXL}
+        medium
+        text
+        lg={size === ButtonSize.XXL}
         style={[textVariationsStyles.get(variation)]}
       >
         {title}

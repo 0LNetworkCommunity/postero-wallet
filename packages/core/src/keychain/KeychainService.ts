@@ -64,6 +64,18 @@ class KeychainService implements IKeychainService {
   public async getWalletWalletKeys(address: Uint8Array): Promise<IWalletKey[]> {
     return this.keychainRepository.getWalletWalletKeys(address);
   }
+
+  public async getWalletPrivateKey(address: Uint8Array): Promise<Uint8Array> {
+    const walletKey =
+      await this.keychainRepository.getWalletKeyFromAddress(address);
+    const privateKey = await this.platformEncryptedStoreService.getItem(
+      Buffer.from(walletKey.publicKey).toString('hex').toUpperCase(),
+    );
+    if (!privateKey) {
+      throw new Error('private key not found');
+    }
+    return new Uint8Array(Buffer.from(privateKey, 'hex'));
+  }
 }
 
 export default KeychainService;

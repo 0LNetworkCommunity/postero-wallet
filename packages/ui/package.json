@@ -2,7 +2,7 @@
   "name": "@postero/ui",
   "version": "0.0.1",
   "private": true,
-  "main": "dist/main.js",
+  "amain": "dist/main.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -23,7 +23,7 @@
     "react-dom": "18.3.1",
     "react-native": "0.73.6",
     "react-native-gesture-handler": "2.16.2",
-    "react-native-reanimated": "3.6.2",
+    "react-native-reanimated": "~3.10.1",
     "react-native-reanimated-carousel": "^3.5.1",
     "react-native-svg": "15.2.0",
     "react-native-web": "0.19.11"

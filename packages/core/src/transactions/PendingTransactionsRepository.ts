@@ -11,6 +11,8 @@ import {
 import { Types } from "../types";
 import { IDbService } from "../db/interfaces";
 import { IDApp, IDAppService } from "../dapps/interfaces";
+import { PlatformTypes } from "../platform/platform-types";
+import { PlatformCryptoService } from "../platform/interfaces";
 
 @Injectable()
 class PendingTransactionsRepository implements IPendingTransactionsRepository {
@@ -23,32 +25,41 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
   @Inject(Types.IDAppService)
   private dAppService: IDAppService;
 
+  @Inject(PlatformTypes.CryptoService)
+  private readonly platformCryptoService: PlatformCryptoService;
+
   public async createPendingTransaction(
-    dApp: IDApp,
-    type: RawPendingTransactionPayloadType,
-    payload: Buffer,
+    sender: Uint8Array,
+    transactionPayload: Uint8Array,
+    maxGasUnit: bigint,
+    gasPrice: bigint,
+    expirationTimestamp: bigint
   ): Promise<IPendingTransaction> {
-    const id = uuid();
+    const id = this.platformCryptoService.randomUUID();
     const createdAt = new Date();
 
     await this.dbService.db("pendingTransactions").insert({
       id,
-      dAppId: dApp.id,
-      type,
-      payload,
+      sender: this.dbService.raw(sender),
+      payload: this.dbService.raw(transactionPayload),
+      maxGasUnit: maxGasUnit.toString(10),
+      gasPrice: gasPrice.toString(10),
+      expirationTimestamp: expirationTimestamp.toString(10),
       createdAt: createdAt.toISOString(),
     });
 
-    const pendingTransaction =
-      await this.pendingTransactionFactory.getPendingTransaction(
-        id,
-        dApp,
-        type,
-        payload,
-        createdAt,
-      );
+    return {} as IPendingTransaction;
 
-    return pendingTransaction;
+    // const pendingTransaction =
+    //   await this.pendingTransactionFactory.getPendingTransaction(
+    //     id,
+    //     dApp,
+    //     type,
+    //     payload,
+    //     createdAt,
+    //   );
+
+    // return pendingTransaction;
   }
 
   public async getPendingTransaction(

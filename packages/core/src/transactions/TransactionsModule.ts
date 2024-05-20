@@ -12,9 +12,10 @@ import PendingTransactionFactory from "./PendingTransactionFactory";
 import PendingTransactionsRepository from "./PendingTransactionsRepository";
 import WalletsModule from "../wallets/WalletsModule";
 import DAppsModule from "../dapps/DAppsModule";
+import KeychainModule from "../keychain/KeychainModule";
 
 @Module({
-  imports: [DAppsModule, DbModule, WalletsModule],
+  imports: [DAppsModule, DbModule, WalletsModule, KeychainModule],
   providers: [
     PendingTransactionsResolver,
     {

@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import tw from "twrnc";
-import { gql, useApolloClient, useQuery } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 
 import { ModalStackParams } from "../params";
 import NavBar from "../../../ui/NavBar";
@@ -39,7 +39,6 @@ function WalletPrivateKeys({
 }: StackScreenProps<ModalStackParams, "WalletPrivateKeys">) {
   const { walletAddress } = route.params;
 
-  const apolloClient = useApolloClient();
   const contextMenu = useRef<ContextMenuHandle>(null);
 
   const { data, error, loading } = useQuery<{

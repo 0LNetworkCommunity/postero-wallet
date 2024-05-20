@@ -7,12 +7,12 @@ import { ModalStackParams } from "../params";
 
 const NEW_TRANSFER = gql`
   mutation NewTransfer(
-    $walletId: ID!,
-    $recipient: String!,
+    $walletAddress: Bytes!,
+    $recipient: Bytes!,
     $amount: Int!
   ) {
     newTransfer(
-      walletId: $walletId,
+      walletAddress: $walletAddress,
       recipient: $recipient,
       amount: $amount
     )
@@ -30,9 +30,9 @@ const NewTransfer: FC<StackScreenProps<ModalStackParams, "NewTransfer">> = ({ ro
         mutation: NEW_TRANSFER,
         variables: {
           recipient,
-          walletId: route.params.walletId,
+          walletAddress: route.params.walletAddress,
           amount: parseInt(amount, 10),
-        }
+        },
       });
     } catch (error) {
       console.error(error);

@@ -22,7 +22,11 @@ function NewWalletRouter() {
         }}
       />
       <Stack.Screen name="CreateWallet" component={CreateWallet} />
-      <Stack.Screen name="SafetyWarning" component={SafetyWarning} />
+      <Stack.Screen
+        name="SafetyWarning"
+        component={SafetyWarning}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="SeedPhrase" component={SeedPhrase} />
       <Stack.Screen name="MnemonicImport" component={MnemonicImport} />
       <Stack.Screen name="PrivateKeyImport" component={PrivateKeyImport} />

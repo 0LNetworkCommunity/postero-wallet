@@ -77,4 +77,8 @@ export enum Types {
   IWalletKeyFactory = "IWalletKeyFactory",
 
   IKeyRotationService = "IKeyRotationService",
+
+  ITransfersService = "ITransfersService",
+
+  ISettingsRepository = "ISettingsRepository",
 }

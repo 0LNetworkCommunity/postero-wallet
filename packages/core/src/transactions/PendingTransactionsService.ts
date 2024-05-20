@@ -9,10 +9,12 @@ import { IPendingTransaction, IPendingTransactionsRepository, IPendingTransactio
 import { Types } from "../types";
 import { IWalletService } from "../wallets/interfaces";
 import { IDApp } from "../dapps/interfaces";
+import { IKeychainService } from "../keychain/interfaces";
 
 const {
   AccountAddress,
   EntryFunction,
+  TransactionPayload,
   TransactionPayloadEntryFunction,
   RawTransaction,
   ChainId,
@@ -29,6 +31,9 @@ class PendingTransactionsService implements IPendingTransactionsService {
 
   @Inject(Types.IPendingTransactionsRepository)
   private readonly pendingTransactionsRepository!: IPendingTransactionsRepository;
+
+  @Inject(Types.IKeychainService)
+  private readonly keychainService!: IKeychainService;
 
   private aptosClient = new AptosClient("https://rpc.0l.fyi");
 
@@ -135,6 +140,87 @@ class PendingTransactionsService implements IPendingTransactionsService {
     return null;
   }
 
+  public async newPendingTransaction(
+    sender: Uint8Array,
+    transactionPayload: Uint8Array,
+    maxGasUnit: bigint,
+    gasPrice: bigint,
+    expirationTimestamp: bigint
+  ) {
+    console.log("PendingTransactionService::newPendingTransaction");
+    await this.pendingTransactionsRepository.createPendingTransaction(
+      sender,
+      transactionPayload,
+      maxGasUnit,
+      gasPrice,
+      expirationTimestamp
+    );
+
+    const account = await this.aptosClient.getAccount(
+      Buffer.from(sender).toString('hex'),
+    );
+
+    const deserializer = new BCS.Deserializer(transactionPayload);
+    const txPayload = TransactionPayload.deserialize(deserializer);
+
+    const rawTxn = new RawTransaction(
+      new AccountAddress(sender),
+      BigInt(account.sequence_number),
+      txPayload,
+      maxGasUnit,
+      gasPrice,
+      expirationTimestamp,
+      new ChainId(await this.aptosClient.getChainId()),
+    );
+
+    const privateKey = await this.keychainService.getWalletPrivateKey(sender);
+    const signer = new AptosAccount(privateKey!);
+
+    const hash = sha3Hash.create();
+    hash.update("DIEM::RawTransaction");
+
+    const prefix = hash.digest();
+    const body = BCS.bcsToBytes(rawTxn);
+    const mergedArray = new Uint8Array(prefix.length + body.length);
+    mergedArray.set(prefix);
+    mergedArray.set(body, prefix.length);
+
+    const signingMessage = mergedArray;
+
+    const signature = signer.signBuffer(signingMessage);
+    const sig = new Ed25519Signature(signature.toUint8Array());
+
+    const authenticator = new TransactionAuthenticatorEd25519(
+      new Ed25519PublicKey(signer.pubKey().toUint8Array()),
+      sig
+    );
+    const signedTx = new SignedTransaction(rawTxn, authenticator);
+
+    const bcsTxn = BCS.bcsToBytes(signedTx);
+
+    try {
+      const res = await axios<{
+        hash: string;
+      }>({
+        method: 'POST',
+        url: 'https://rpc.0l.fyi/v1/transactions',
+        headers: {
+          "content-type": "application/x.diem.signed_transaction+bcs",
+        },
+        data: bcsTxn,
+      });
+      console.log(res.status);
+
+      if (res.status === 202) {
+        console.log(res.data);
+        // console.log(`tx hash = ${res.data.hash}`);
+        // return new Uint8Array(Buffer.from(res.data.hash.substring(2), "hex"));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   public async newTransaction(
     dApp: IDApp,
     transaction: RawPendingTransactionPayload,
@@ -142,18 +228,20 @@ class PendingTransactionsService implements IPendingTransactionsService {
     switch (transaction.type) {
       case RawPendingTransactionPayloadType.EntryFunctionPayload:
         {
-          const payload = Buffer.from(transaction.payload, "base64");
-          const pendingTransaction =
-            await this.pendingTransactionsRepository.createPendingTransaction(
-              dApp,
-              transaction.type,
-              payload,
-            );
-          await this.eventEmitter.emit(
-            PendingTransactionsServiceEvent.NewPendingTransaction,
-            pendingTransaction,
-          );
-          return pendingTransaction;
+          throw new Error('unimplemented');
+          // const payload = Buffer.from(transaction.payload, "base64");
+          // const pendingTransaction =
+          //   await this.pendingTransactionsRepository.createPendingTransaction(
+          //     dApp,
+          //     transaction.type,
+          //     payload,
+          //   );
+
+          // await this.eventEmitter.emit(
+          //   PendingTransactionsServiceEvent.NewPendingTransaction,
+          //   pendingTransaction,
+          // );
+          // return pendingTransaction;
 
           // const deserializer = new BCS.Deserializer(tx);
 

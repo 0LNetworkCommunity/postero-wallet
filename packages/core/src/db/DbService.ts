@@ -102,9 +102,11 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
     await this.db.raw(`
       CREATE TABLE IF NOT EXISTS "pendingTransactions" (
         "id" TEXT PRIMARY KEY,
-        "dAppId" TEXT NOT NULL REFERENCES dApps(id),
-        "type" TEXT NOT NULL,
+        "sender" BLOB NOT NULL,
         "payload" BLOB NOT NULL,
+        "maxGasUnit" INTEGER NOT NULL,
+        "gasPrice" INTEGER NOT NULL,
+        "expirationTimestamp"  INTEGER NOT NULL,
         "createdAt" TEXT NOT NULL
       )
     `);
@@ -149,6 +151,13 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
       CREATE TABLE IF NOT EXISTS "keys" (
         "publicKey" BLOB PRIMARY KEY,
         "authKey" BLOB
+      )
+    `);
+
+    await this.db.raw(`
+      CREATE TABLE IF NOT EXISTS "settings" (
+        "key" TEXT PRIMARY KEY,
+        "value" TEXT
       )
     `);
   }

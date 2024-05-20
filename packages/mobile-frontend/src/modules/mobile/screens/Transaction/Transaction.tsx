@@ -23,7 +23,7 @@ function Transaction({
           </TouchableOpacity>
         }
       />
-      </SafeAreaView>
+    </SafeAreaView>
   );
 }
 

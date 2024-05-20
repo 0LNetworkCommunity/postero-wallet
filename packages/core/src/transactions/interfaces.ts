@@ -8,6 +8,7 @@ export enum RawPendingTransactionPayloadType {
 export interface RawPendingTransactionPayload {
   type: RawPendingTransactionPayloadType;
   payload: string;
+  sender: Uint8Array;
 }
 
 export interface ITransactionsService {
@@ -49,6 +50,14 @@ export interface IPendingTransactionsService {
     event: PendingTransactionsServiceEvent.PendingTransactionRemoved,
     listener: (pendingTransactionId: string) => void,
   ): UnsubscribeFn;
+
+  newPendingTransaction(
+    sender: Uint8Array,
+    transactionPayload: Uint8Array,
+    maxGasUnit: bigint,
+    gasPrice: bigint,
+    expirationTimestamp: bigint,
+  ): Promise<void>;
 }
 
 export interface IPendingTransaction {
@@ -78,9 +87,11 @@ export interface IPendingTransactionFactory {
 
 export interface IPendingTransactionsRepository {
   createPendingTransaction(
-    dApp: IDApp,
-    type: RawPendingTransactionPayloadType,
-    payload: Buffer,
+    sender: Uint8Array,
+    transactionPayload: Uint8Array,
+    maxGasUnit: bigint,
+    gasPrice: bigint,
+    expirationTimestamp: bigint,
   ): Promise<IPendingTransaction>;
   getPendingTransaction(id: string): Promise<IPendingTransaction | null>;
   getPendingTransactions(): Promise<IPendingTransaction[]>;

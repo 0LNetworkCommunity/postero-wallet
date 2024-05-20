@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import * as Crypto from "expo-crypto";
 import { View, Text, ActivityIndicator } from "react-native";
+import { LangEn, Mnemonic } from "ethers";
 import { StackScreenProps } from "@react-navigation/stack";
 import * as Clipboard from 'expo-clipboard';
 import { gql, useApolloClient } from "@apollo/client";
@@ -7,40 +9,57 @@ import { Button } from "@postero/ui";
 
 import { NewWalletStackParams } from "../../params";
 
-const NEW_WALLET = gql`
-  mutation NewWallet {
-    newWallet {
-      id
-      label
-      mnemonic
+const CREATE_KEY_FROM_MNEMONIC = gql`
+  mutation CreateKeyFromMnemonic($mnemonic: String!) {
+    createKeyFromMnemonic(mnemonic: $mnemonic) {
+      publicKey
+      authKey
     }
   }
 `;
 
+const createMnemonic = () => {
+  const rand = Crypto.getRandomBytes(32);
+  const wordlist = LangEn.wordlist();
+  const mnemonic = Mnemonic.fromEntropy(rand, "", wordlist);
+  return mnemonic.phrase;
+};
+
 function SeedPhrase({
   navigation,
 }: StackScreenProps<NewWalletStackParams, "SeedPhrase">) {
-  const [loading, setLoading] = useState(false);
-  const [mnemonic, setMnemonic] = useState('');
   const apolloClient = useApolloClient();
+  const [mnemonic, setMnemonic] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const createWallet = async () => {
-      try {
-        setLoading(true);
-        const res = await apolloClient.mutate({
-          mutation: NEW_WALLET,
-        });
-        setMnemonic(res.data.newWallet.mnemonic);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    createWallet();
+    setMnemonic(createMnemonic);
   }, []);
+
+  const saveMnemonic = async () => {
+    setLoading(true);
+    try {
+      setMnemonic("");
+      const res = await apolloClient.mutate<{
+        createKeyFromMnemonic: {
+          authKey: string;
+          publicKey: string;
+        };
+      }>({
+        mutation: CREATE_KEY_FROM_MNEMONIC,
+        variables: {
+          mnemonic,
+        },
+      });
+
+      console.log('res', res);
+      // if (res.data) {
+      //   navigation.navigate('Home');
+      // }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -63,8 +82,12 @@ function SeedPhrase({
         }}
       />
 
-      <Button title="I wrote it down" onPress={() => {}} />
-      <Button title="I'll do this later" onPress={() => {}} />
+      <Button
+        title="Continue"
+        onPress={() => {
+          saveMnemonic();
+        }}
+      />
     </View>
   );
 }

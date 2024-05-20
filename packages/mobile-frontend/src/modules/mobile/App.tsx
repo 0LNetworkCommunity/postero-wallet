@@ -135,16 +135,13 @@ const App: FC = () => {
                 }}
               />
 
-              <Stack.Screen
-                name="PrivateKeys"
-                component={PrivateKeys}
-              />
+              <Stack.Screen name="PrivateKeys" component={PrivateKeys} />
 
               <Stack.Screen
                 name="PrivateKey"
                 component={PrivateKey}
                 options={{
-                  headerShown: false
+                  headerShown: false,
                 }}
               />
 
@@ -152,7 +149,7 @@ const App: FC = () => {
                 name="Transactions"
                 component={Transactions}
                 options={{
-                  headerShown: false
+                  headerShown: false,
                 }}
               />
 
@@ -165,7 +162,13 @@ const App: FC = () => {
                 }}
               />
 
-              <Stack.Screen name="Settings" component={Settings} />
+              <Stack.Screen
+                name="Settings"
+                component={Settings}
+                options={{
+                  headerShown: false,
+                }}
+              />
             </Stack.Navigator>
           </NavigationContainer>
         </GestureHandlerRootView>

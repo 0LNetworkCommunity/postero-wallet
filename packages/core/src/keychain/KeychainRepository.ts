@@ -85,6 +85,27 @@ class KeychainRepository implements IKeychainRepository {
       ),
     );
   }
+
+  public async getWalletKeyFromAddress(
+    address: Uint8Array,
+  ): Promise<IWalletKey> {
+    const item:
+      | {
+          publicKey: Uint8Array;
+          authKey: Uint8Array;
+        }
+      | undefined = await this.dbService
+      .db('wallets')
+      .select(['keys.publicKey', 'keys.authKey'])
+      .innerJoin('keys', 'keys.authKey', 'wallets.authKey')
+      .where('address', this.dbService.raw(address))
+      .first();
+    if (!item) {
+      throw new Error('wallet key not found');
+    }
+
+    return this.walletKeyFactory.createWalletKey(item.publicKey, item.authKey);
+  }
 }
 
 export default KeychainRepository;

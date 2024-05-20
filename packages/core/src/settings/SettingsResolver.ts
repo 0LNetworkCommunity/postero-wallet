@@ -1,21 +1,39 @@
-// import process from "node:process";
+import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 
-import { Query, Resolver } from "@nestjs/graphql";
-// import { systemPreferences } from "electron";
-
-import Settings from "./Settings";
-
-const isMac = process.platform === "darwin";
+import Settings, { SettingsKey } from "./Settings";
 
 @Resolver()
 class SettingsResolver {
-  @Query((returns) => Settings)
+  @Query(() => Settings)
   public async settings() {
-    // const accentColor = isMac ? systemPreferences.getAccentColor() : "0000DD";
-    const accentColor = "0000DD";
+    const settings = new Settings();
+    settings.init({
+      rpcUrl: 'https://rpc.0l.fyi/',
+      chainId: 1,
+      maxGasUnit: 2_000_000,
+      gasPricePerUnit: 200,
+    });
+
+    return settings;
+  }
+
+  @Mutation(() => Settings)
+  public async setSetting(
+    @Args('key', { type: () => String })
+    key: SettingsKey,
+
+    @Args('value', { type: () => String })
+    value: string,
+  ): Promise<Settings> {
+    console.log('>', key, value);
 
     const settings = new Settings();
-    settings.init({ accentColor: `#${accentColor}` });
+    settings.init({
+      rpcUrl: 'https://rpc.0l.fyi/',
+      chainId: 1,
+      maxGasUnit: 2_000_000,
+      gasPricePerUnit: 200,
+    });
 
     return settings;
   }

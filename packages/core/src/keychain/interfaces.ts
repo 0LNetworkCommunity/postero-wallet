@@ -5,6 +5,7 @@ export interface IKeychainService {
   getWalletKeyFromAuthKey(authKey: Uint8Array): Promise<IWalletKey>;
   getWalletKeys(): Promise<IWalletKey[]>;
   getWalletWalletKeys(address: Uint8Array): Promise<IWalletKey[]>;
+  getWalletPrivateKey(address: Uint8Array): Promise<Uint8Array>;
 }
 
 export interface IKeychainRepository {
@@ -13,6 +14,7 @@ export interface IKeychainRepository {
   getWalletKeyFromAuthKey(authKey: Uint8Array): Promise<IWalletKey>;
   getWalletKeys(): Promise<IWalletKey[]>;
   getWalletWalletKeys(address: Uint8Array): Promise<IWalletKey[]>;
+  getWalletKeyFromAddress(address: Uint8Array): Promise<IWalletKey>;
 }
 
 export interface IWalletKey {

@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { Text as RNText, TextProps, StyleSheet, TextStyle } from "react-native";
+import { Text as RNText, TextProps, TextStyle } from "react-native";
 import { fonts } from "../../theme";
 
 interface Props {
@@ -17,6 +17,8 @@ interface Props {
   medium?: boolean;
   semibold?: boolean;
   bold?: boolean;
+
+  secondary?: boolean;
 }
 
 const Text = forwardRef<RNText, TextProps & Props>(function Text(props, ref) {
@@ -33,44 +35,52 @@ const Text = forwardRef<RNText, TextProps & Props>(function Text(props, ref) {
     medium,
     semibold,
     bold,
+    secondary,
+    style,
     ...rnTextProps
   } = props;
 
-  const style: TextStyle = {};
+  const textStyle: TextStyle = {};
 
-
-  if (md) {
-    style.fontSize = 36;
-    style.lineHeight = 44;
-    style.letterSpacing = -0.72;
+  if (xs) {
+    textStyle.fontSize = 24;
+    textStyle.lineHeight = 32;
+  } else if (md) {
+    textStyle.fontSize = 36;
+    textStyle.lineHeight = 44;
+    textStyle.letterSpacing = -0.72;
   } else if (lg) {
-    style.fontSize = 48;
-    style.lineHeight = 60;
-    style.letterSpacing = -0.96;
+    textStyle.fontSize = 18;
+    textStyle.lineHeight = 28;
   } else if (xl) {
-    style.fontSize = 60;
-    style.lineHeight = 72;
-    style.letterSpacing = -1.2;
+    textStyle.fontSize = 60;
+    textStyle.lineHeight = 72;
+    textStyle.letterSpacing = -1.2;
   } else if (xxl) {
-    style.fontSize = 72;
-    style.lineHeight = 90;
-    style.letterSpacing = -1.44;
+    textStyle.fontSize = 72;
+    textStyle.lineHeight = 90;
+    textStyle.letterSpacing = -1.44;
   }
 
-  if (display) {
+  if (display || text) {
     if (regular) {
-      style.fontFamily = fonts.primary[400];
+      textStyle.fontFamily = fonts.primary[400];
     } else if (medium) {
-      style.fontFamily = fonts.primary[500];
+      textStyle.fontFamily = fonts.primary[500];
     } else if (semibold) {
-      style.fontFamily = fonts.primary[600];
+      textStyle.fontFamily = fonts.primary[600];
     } else if (bold) {
-      style.fontFamily = fonts.primary[700];
+      textStyle.fontFamily = fonts.primary[700];
     }
   }
 
+  if (secondary) {
+    textStyle.color = '#424242';
+  } else {
+    textStyle.color = '#141414';
+  }
 
-  return <RNText style={style} {...rnTextProps} ref={ref} />;
+  return <RNText style={[textStyle, style]} {...rnTextProps} ref={ref} />;
 });
 
 export default Text;

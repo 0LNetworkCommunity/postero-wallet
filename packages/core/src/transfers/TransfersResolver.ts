@@ -7,11 +7,13 @@ import { PlatformTypes } from "../platform/platform-types";
 import { PlatformEncryptedStoreService } from "../platform/interfaces";
 import { Types } from "../types";
 import { IWalletRepository } from "../wallets/interfaces";
+import { IPendingTransactionsService } from "../transactions/interfaces";
 
 const {
   AccountAddress,
   EntryFunction,
   TransactionPayloadEntryFunction,
+  TransactionPayload,
   RawTransaction,
   ChainId,
   TransactionAuthenticatorEd25519,
@@ -34,13 +36,16 @@ class TransfersResolver {
   @Inject(Types.IWalletRepository)
   private readonly walletRepository: IWalletRepository;
 
-  @Mutation((returns) => Boolean)
+  @Inject(Types.IPendingTransactionsService)
+  private readonly pendingTransactionsService: IPendingTransactionsService;
+
+  @Mutation(() => Boolean)
   public async newTransfer(
     @Args("walletAddress", { type: () => Buffer })
     walletAddress: Uint8Array,
 
-    @Args("recipient", { type: () => String })
-    recipient: string,
+    @Args("recipient", { type: () => Buffer })
+    recipient: Uint8Array,
 
     @Args("amount", { type: () => Int })
     amount: number,
@@ -50,102 +55,134 @@ class TransfersResolver {
       return false;
     }
 
-    const pk = await this.platformEncryptedStoreService.getItem(
-      Buffer.from(walletAddress).toString('hex').toUpperCase(),
-    );
-    if (!pk) {
-      return false;
-    }
+    // const pk = await this.platformEncryptedStoreService.getItem(
+    //   Buffer.from(walletAddress).toString('hex').toUpperCase(),
+    // );
+    // if (!pk) {
+    //   return false;
+    // }
 
-    const privateKey = Buffer.from(
-      pk,
-      'hex',
-    );
+    // const privateKey = Buffer.from(
+    //   pk,
+    //   'hex',
+    // );
 
-    const entryFunctionPayload = new TransactionPayloadEntryFunction(
-      new EntryFunction(
-        ModuleId.fromStr('0x1::ol_account'),
-        new Identifier('transfer'),
-        [],
-        [
-          Buffer.from(recipient, 'hex'),
-          BCS.bcsSerializeUint64(amount),
-        ],
-      ),
+    const func = new EntryFunction(
+      ModuleId.fromStr('0x1::ol_account'),
+      new Identifier('transfer'),
+      [],
+      [recipient, BCS.bcsSerializeUint64(amount)],
     );
 
-    const maxGasUnit = 2000000;
-    const gasPrice = 200;
+    const entryFunctionPayload = new TransactionPayloadEntryFunction(func);
 
-    const chainId = 1; // await this.aptosClient.getChainId();
+    // const serializer = new BCS.Serializer();
+    // func.serialize(serializer);
+
+    // await this.pendingTransactionsService.newPendingTransaction(
+    //   walletAddress,
+    //   serializer.getBytes(),
+    // );
+
+    // console.log('entryFunctionPayload', entryFunctionPayload);
+
+    const maxGasUnit = BigInt(2_000_000);
+    const gasPrice = BigInt(200);
+
+    // const chainId = 1; // await this.aptosClient.getChainId();
 
     const timeout = 10;
+    const expirationTimestamp = BigInt(Math.floor(Date.now() / 1_000) + timeout);
 
-    const account = await this.aptosClient.getAccount(
-      Buffer.from(walletAddress).toString('hex'),
+    // const account = await this.aptosClient.getAccount(
+    //   Buffer.from(walletAddress).toString('hex'),
+    // );
+
+    const serializer = new BCS.Serializer();
+    entryFunctionPayload.serialize(serializer);
+    const b = serializer.getBytes();
+
+    await this.pendingTransactionsService.newPendingTransaction(
+      walletAddress,
+      b,
+      maxGasUnit,
+      gasPrice,
+      expirationTimestamp,
     );
 
-    const rawTxn = new RawTransaction(
-      // Transaction sender account address
-      new AccountAddress(walletAddress),
+    // const rawTxn = new RawTransaction(
+    //   // Transaction sender account address
+    //   new AccountAddress(walletAddress),
 
-      BigInt(account.sequence_number),
-      entryFunctionPayload,
-      // Max gas unit to spend
-      BigInt(maxGasUnit),
-      // Gas price per unit
-      BigInt(gasPrice),
-      // Expiration timestamp. Transaction is discarded if it is not executed within 10 seconds from now.
-      BigInt(Math.floor(Date.now() / 1_000) + timeout),
-      new ChainId(chainId),
-    );
+    //   BigInt(account.sequence_number),
+    //   entryFunctionPayload,
+    //   // Max gas unit to spend
+    //   maxGasUnit,
+    //   // Gas price per unit
+    //   gasPrice,
+    //   // Expiration timestamp. Transaction is discarded if it is not executed within 10 seconds from now.
+    //   expirationTimestamp,
+    //   new ChainId(chainId),
+    // );
 
-    const signer = new AptosAccount(privateKey!);
+    // {
 
-    const hash = sha3Hash.create();
-    hash.update("DIEM::RawTransaction");
+    //   const deserializer = new BCS.Deserializer(b);
+    //   const transactionPayload = TransactionPayload.deserialize(deserializer);
+    //   if (transactionPayload instanceof TransactionPayloadEntryFunction) {
 
-    const prefix = hash.digest();
-    const body = BCS.bcsToBytes(rawTxn);
-    const mergedArray = new Uint8Array(prefix.length + body.length);
-    mergedArray.set(prefix);
-    mergedArray.set(body, prefix.length);
+    //   }
+    //   // console.log('>>>', transactionPayload instanceof TransactionPayloadEntryFunction);
+    // }
 
-    const signingMessage = mergedArray;
 
-    const signature = signer.signBuffer(signingMessage);
-    const sig = new Ed25519Signature(signature.toUint8Array());
 
-    const authenticator = new TransactionAuthenticatorEd25519(
-      new Ed25519PublicKey(signer.pubKey().toUint8Array()),
-      sig
-    );
-    const signedTx = new SignedTransaction(rawTxn, authenticator);
+    // const signer = new AptosAccount(privateKey!);
 
-    const bcsTxn = BCS.bcsToBytes(signedTx);
+    // const hash = sha3Hash.create();
+    // hash.update("DIEM::RawTransaction");
 
-    console.log('sending...');
+    // const prefix = hash.digest();
+    // const body = BCS.bcsToBytes(rawTxn);
+    // const mergedArray = new Uint8Array(prefix.length + body.length);
+    // mergedArray.set(prefix);
+    // mergedArray.set(body, prefix.length);
 
-    try {
-      const res = await axios<{
-        hash: string;
-      }>({
-        method: 'POST',
-        url: 'https://rpc.0l.fyi/v1/transactions',
-        headers: {
-          "content-type": "application/x.diem.signed_transaction+bcs",
-        },
-        data: bcsTxn,
-      });
-      console.log(res.status);
+    // const signingMessage = mergedArray;
 
-      if (res.status === 202) {
-        console.log(res.data);
-        // return new Uint8Array(Buffer.from(res.data.hash.substring(2), "hex"));
-      }
-    } catch (error) {
-      console.error(error);
-    }
+    // const signature = signer.signBuffer(signingMessage);
+    // const sig = new Ed25519Signature(signature.toUint8Array());
+
+    // const authenticator = new TransactionAuthenticatorEd25519(
+    //   new Ed25519PublicKey(signer.pubKey().toUint8Array()),
+    //   sig
+    // );
+    // const signedTx = new SignedTransaction(rawTxn, authenticator);
+
+    // const bcsTxn = BCS.bcsToBytes(signedTx);
+
+    // console.log('sending...');
+
+    // try {
+    //   const res = await axios<{
+    //     hash: string;
+    //   }>({
+    //     method: 'POST',
+    //     url: 'https://rpc.0l.fyi/v1/transactions',
+    //     headers: {
+    //       "content-type": "application/x.diem.signed_transaction+bcs",
+    //     },
+    //     data: bcsTxn,
+    //   });
+    //   console.log(res.status);
+
+    //   if (res.status === 202) {
+    //     console.log(res.data);
+    //     // return new Uint8Array(Buffer.from(res.data.hash.substring(2), "hex"));
+    //   }
+    // } catch (error) {
+    //   console.error(error);
+    // }
 
     return true;
   }

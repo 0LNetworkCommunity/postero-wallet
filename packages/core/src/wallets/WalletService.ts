@@ -144,7 +144,7 @@ class WalletService implements IWalletService {
   public async syncWallet(address: Uint8Array) {
     {
       const res = await axios<{ data: GetAccountMovementsRes }>({
-        url: 'https://canary.api.0l.fyi/graphql',
+        url: 'https://api.0l.fyi/graphql',
         method: 'POST',
         data: {
           operationName: 'GetAccountMovements',
