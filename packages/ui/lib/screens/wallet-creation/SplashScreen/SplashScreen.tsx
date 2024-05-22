@@ -14,6 +14,7 @@ const Tip = styled.View({
   paddingHorizontal: 16,
   flexDirection: "row",
   alignItems: "center",
+  backgroundColor: "#FCFCFC",
 });
 
 const TipText = styled.View({
@@ -24,12 +25,17 @@ const Icon = styled.View({
   marginRight: 8,
 });
 
-export function SplashScreen() {
+interface Props {
+  onBack?: () => void;
+  onContinue?: () => void;
+}
+
+export function SplashScreen({ onBack, onContinue }: Props) {
   return (
     <GenericScreen
       title="Create new wallet"
-      subtitle="You have full control and custody over your assets. A 12-word secret recovery phase will be generated to secure your account."
-      onBack={() => {}}
+      subtitle="You have full control and custody over your assets. A 24-word secret recovery phase will be generated to secure your account."
+      onBack={onBack}
       body={
         <View>
           <Separator />
@@ -71,10 +77,11 @@ export function SplashScreen() {
       footer={
         <View style={{ padding: 16 }}>
           <Button
+            disabled={!onContinue}
             variation={ButtonVariation.Primary}
             size={ButtonSize.XXL}
             title="Continue"
-            onPress={() => {}}
+            onPress={onContinue}
           />
         </View>
       }

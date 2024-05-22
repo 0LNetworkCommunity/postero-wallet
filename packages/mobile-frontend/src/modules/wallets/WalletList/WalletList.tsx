@@ -16,7 +16,7 @@ interface Props {
   onWalletPress: (id: string) => void;
 }
 
-const WalletList: FC<Props> = ({ activeWalletId, onWalletPress }) => {
+const WalletList: FC<Props> = ({ activeWalletId: activeWalletAddress, onWalletPress }) => {
   const apolloClient = useApolloClient();
   const wallets = useWallets();
 
@@ -28,7 +28,7 @@ const WalletList: FC<Props> = ({ activeWalletId, onWalletPress }) => {
     await apolloClient.mutate({
       mutation: OPEN_WALLET_WINDOW_MUTATION,
       variables: {
-        id: wallet.id,
+        address: wallet.address,
       }
     });
   };
@@ -38,13 +38,13 @@ const WalletList: FC<Props> = ({ activeWalletId, onWalletPress }) => {
       <ScrollView>
         {wallets.map((wallet) => (
           <ListItem
-            key={wallet.id}
+            key={wallet.address}
             onPress={() => {
-              onWalletPress(wallet.id!);
+              onWalletPress(wallet.address);
             }}
             onDoubleClick={() => onDoubleClick(wallet)}
             wallet={wallet}
-            active={activeWalletId === wallet.id}
+            active={activeWalletAddress === wallet.address}
           />
         ))}
       </ScrollView>

@@ -3,21 +3,15 @@ import _ from "lodash";
 import { gql, useApolloClient, useSubscription } from "@apollo/client";
 
 export interface Wallet {
-  id: string;
   label: string;
-  publicKey: string;
-  authenticationKey: string;
-  accountAddress: string;
+  address: string;
 }
 
 const GET_WALLETS = gql`
   query GetWallets {
     wallets {
-      id
       label
-      publicKey
-      authenticationKey
-      accountAddress
+      address
     }
   }
 `;
@@ -25,11 +19,8 @@ const GET_WALLETS = gql`
 const NEW_WALLET_SUBSCRIPTION = gql`
   subscription OnWalletAdded {
     walletAdded {
-      id
       label
-      publicKey
-      authenticationKey
-      accountAddress
+      address
     }
   }
 `;
@@ -43,16 +34,13 @@ const WALLET_REMOVED_SUBSCRIPTION = gql`
 const WALLET_UPDATED = gql`
   subscription OnWalletUpdated {
     walletUpdated {
-      id
       label
-      publicKey
-      authenticationKey
-      accountAddress
+      address
     }
   }
 `;
 
-export const useWallets = () => {
+export const useWallets = (): Wallet[] => {
   const apolloClient = useApolloClient();
   const [wallets, setWallets] = useState<Wallet[]>([]);
 
@@ -73,10 +61,10 @@ export const useWallets = () => {
       if (!res.data.data) {
         return;
       }
-      const walletId = res.data.data.walletRemoved;
-      if (walletId !== undefined) {
+      const walletAddress = res.data.data.walletRemoved;
+      if (walletAddress !== undefined) {
         setWallets((wallets) =>
-          wallets.filter((wallet) => wallet.id !== walletId)
+          wallets.filter((wallet) => wallet.address !== walletAddress)
         );
       }
     },
@@ -84,12 +72,14 @@ export const useWallets = () => {
 
   useSubscription<{ walletUpdated: Wallet }>(WALLET_UPDATED, {
     onData: (res) => {
+      console.log('wallet updated', res);
+
       if (!res.data.data) {
         return;
       }
       const wallet = res.data.data.walletUpdated;
       setWallets((wallets) => {
-        const index = wallets.findIndex((it) => it.id === wallet.id);
+        const index = wallets.findIndex((it) => it.address === wallet.address);
         if (index === -1) {
           return [...wallets, wallet];
         }

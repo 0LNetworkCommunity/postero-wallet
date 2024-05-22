@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 import tw from "twrnc";
 
 interface Props {
-  title?: string;
+  title?: ReactNode;
   leftActions?: ReactNode;
   rightActions?: ReactNode;
 }
@@ -11,12 +11,14 @@ interface Props {
 function NavBar({ title, leftActions, rightActions }: Props) {
   return (
     <View style={tw.style("flex-row items-center justify-between")}>
-      <View style={tw.style("flex-row items-center")}>
+      <View style={tw.style("flex-row items-center flex-1")}>
         {leftActions}
-        {title && (
+        {typeof title === "string" ? (
           <Text style={tw.style("font-semibold text-gray-900 text-xl")}>
             {title}
           </Text>
+        ) : (
+          title
         )}
       </View>
 

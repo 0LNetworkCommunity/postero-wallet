@@ -20,6 +20,8 @@ const Wallets: FC = () => {
   const navigation = useNavigation<any>();
   const wallets = useWallets();
 
+  console.log('wallets', wallets);
+
   const onWalletDelete = (wallet: Wallet) => {
     Alert.alert("Delete wallet", "This action is irreversible", [
       {

@@ -82,7 +82,12 @@ const WalletList: FC<Props> = ({
 }) => {
   return (
     <FlatList
-      data={wallets}
+      // the array need to be copied here otherwise the `onEnd` callback of the
+      // tap gesture in render item crashes for the wallet comming from the graphql subscription.
+      // "Attempted to extract from a HostObject that wasn't converted to a Shareable"
+      data={wallets.map((wallet) => ({
+        ...wallet,
+      }))}
       keyExtractor={(item) => item.address}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
       renderItem={({ item }) => {

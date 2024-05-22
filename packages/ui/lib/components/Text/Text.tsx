@@ -19,6 +19,7 @@ interface Props {
   bold?: boolean;
 
   secondary?: boolean;
+  quarterary?: boolean;
 }
 
 const Text = forwardRef<RNText, TextProps & Props>(function Text(props, ref) {
@@ -35,7 +36,10 @@ const Text = forwardRef<RNText, TextProps & Props>(function Text(props, ref) {
     medium,
     semibold,
     bold,
+
     secondary,
+    quarterary,
+
     style,
     ...rnTextProps
   } = props;
@@ -46,9 +50,8 @@ const Text = forwardRef<RNText, TextProps & Props>(function Text(props, ref) {
     textStyle.fontSize = 24;
     textStyle.lineHeight = 32;
   } else if (md) {
-    textStyle.fontSize = 36;
-    textStyle.lineHeight = 44;
-    textStyle.letterSpacing = -0.72;
+    textStyle.fontSize = 16;
+    textStyle.lineHeight = 24;
   } else if (lg) {
     textStyle.fontSize = 18;
     textStyle.lineHeight = 28;
@@ -76,7 +79,10 @@ const Text = forwardRef<RNText, TextProps & Props>(function Text(props, ref) {
 
   if (secondary) {
     textStyle.color = '#424242';
+  } else if (quarterary) {
+    textStyle.color = '#737373';
   } else {
+    // primary
     textStyle.color = '#141414';
   }
 

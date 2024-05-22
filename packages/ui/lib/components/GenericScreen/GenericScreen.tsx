@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { View,} from "react-native";
+import { View, SafeAreaView } from "react-native";
 import styled from "@emotion/native";
 
 import Text from "../../components/Text";
@@ -15,10 +15,10 @@ const Body = styled.View({
   flex: 1,
 });
 
-const Container = styled.View({
+const Container = styled.SafeAreaView({
   flex: 1,
-  borderWidth: 1,
   justifyContent: "space-between",
+  backgroundColor: "#FFFFFF",
 });
 
 interface Props {
@@ -43,13 +43,13 @@ export function GenericScreen({
           {onBack && <BackButton onPress={onBack} />}
 
           {title && (
-            <Text display xs regular style={{ marginBottom: 8 }}>
+            <Text display xs regular>
               {title}
             </Text>
           )}
 
           {subtitle && (
-            <Text text sm regular secondary>
+            <Text text sm regular secondary style={{ marginTop: 8 }}>
               {subtitle}
             </Text>
           )}

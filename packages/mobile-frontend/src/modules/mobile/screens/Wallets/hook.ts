@@ -39,6 +39,7 @@ const GET_WALLETS = gql`
 const NEW_WALLET_SUBSCRIPTION = gql`
   subscription OnWalletAdded {
     walletAdded {
+      label
       address
       slowWallet {
         unlocked
@@ -63,11 +64,17 @@ const WALLET_REMOVED_SUBSCRIPTION = gql`
 const WALLET_UPDATED = gql`
   subscription OnWalletUpdated {
     walletUpdated {
-      id
       label
       address
       slowWallet {
         unlocked
+      }
+      balances {
+        amount
+        coin {
+          decimals
+          symbol
+        }
       }
     }
   }
@@ -131,7 +138,6 @@ export const useWallets = () => {
       const res = await apolloClient.query<{ wallets: Wallet[] }>({
         query: GET_WALLETS,
       });
-      console.log('res', res);
       setWallets(res.data.wallets);
     };
 

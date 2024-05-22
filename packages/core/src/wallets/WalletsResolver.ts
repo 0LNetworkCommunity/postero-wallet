@@ -122,6 +122,19 @@ class WalletsResolver {
     return false;
   }
 
+  @Mutation(() => GraphQLWallet)
+  public async newWalletFromMnemonic(
+    @Args('mnemonic', { type: () => String })
+    mnemonic: string,
+  ): Promise<IGraphQLWallet> {
+    const wallet = await this.walletService.importMnemonic(mnemonic);
+
+    return this.graphQLWalletFactory.getGraphQLWallet(
+      wallet.label,
+      wallet.address,
+    );
+  }
+
   @Subscription((returns) => GraphQLWallet)
   public walletAdded() {
     return new Repeater(async (push, stop) => {
@@ -129,8 +142,27 @@ class WalletsResolver {
         WalletServiceEvent.NewWallet,
         async (wallet: Wallet) => {
           const graphqlWallet = await this.walletMapper(wallet);
+          console.log('walletAdded',graphqlWallet);
           push({
             walletAdded: graphqlWallet,
+          });
+        },
+      );
+      await stop;
+      release();
+    });
+  }
+
+  @Subscription(() => GraphQLWallet)
+  public walletUpdated() {
+    return new Repeater(async (push, stop) => {
+      const release = this.walletService.on(
+        WalletServiceEvent.WalletUpdated,
+        async (wallet: Wallet) => {
+          const graphqlWallet = await this.walletMapper(wallet);
+          console.log('walletUpdated',graphqlWallet);
+          push({
+            walletUpdated: graphqlWallet,
           });
         },
       );

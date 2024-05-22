@@ -4,7 +4,7 @@ import Root from "./screens/Root";
 import CreateWallet from "./screens/CreateWallet";
 import { NewWalletStackParams } from "./params";
 import SafetyWarning from "./screens/SafetyWarning";
-import SeedPhrase from "./screens/SeedPhrase";
+import NewMnemonic from "./screens/NewMnemonic";
 import MnemonicImport from "./screens/MnemonicImport";
 import PrivateKeyImport from "./screens/PrivateKeyImport";
 import AddressImport from "./screens/AddressImport";
@@ -27,7 +27,11 @@ function NewWalletRouter() {
         component={SafetyWarning}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="SeedPhrase" component={SeedPhrase} />
+      <Stack.Screen
+        name="NewMnemonic"
+        component={NewMnemonic}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="MnemonicImport" component={MnemonicImport} />
       <Stack.Screen name="PrivateKeyImport" component={PrivateKeyImport} />
       <Stack.Screen name="AddressImport" component={AddressImport} />

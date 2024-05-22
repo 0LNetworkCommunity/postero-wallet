@@ -1,7 +1,7 @@
 import Emittery, { UnsubscribeFn } from "emittery";
 import { Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
-import _ from 'lodash';
+import _, { add } from 'lodash';
 import { AptosAccount, AptosClient, BCS, TxnBuilderTypes } from "aptos";
 import { sha3_256 as sha3Hash } from "@noble/hashes/sha3";
 
@@ -105,10 +105,6 @@ class WalletService implements IWalletService {
 
   @Inject(Types.IBalanceRepository)
   private readonly balanceRepository: IBalanceRepository;
-
-  setWalletLabel(walletAddress: Uint8Array, label: string): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
 
   getWallet(walletAddress: Uint8Array): Promise<Wallet> {
     throw new Error('Method not implemented.');
@@ -500,6 +496,14 @@ class WalletService implements IWalletService {
     authKey: Uint8Array,
   ): Promise<IGraphQLWallet[]> {
     return this.walletRepository.getWalletsFromAuthKey(authKey);
+  }
+
+  public async setWalletLabel(address: Uint8Array, label: string): Promise<void> {
+    await this.walletRepository.setWalletLabel(address, label);
+    this.eventEmitter.emit(WalletServiceEvent.WalletUpdated, {
+      label,
+      address,
+    });
   }
 }
 

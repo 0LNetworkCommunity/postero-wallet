@@ -1,11 +1,49 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, createElement } from "react";
 import {
   Pressable,
   StyleProp,
   StyleSheet,
   ViewStyle,
+  View,
+  RegisteredStyle,
 } from "react-native";
 import Text from "../Text";
+
+type Falsy = undefined | null | false;
+interface RecursiveArray<T>
+  extends Array<T | ReadonlyArray<T> | RecursiveArray<T>> {}
+
+type StyleList<T> =
+  | RegisteredStyle<T>
+  | RecursiveArray<T | RegisteredStyle<T> | Falsy>
+  | Falsy;
+
+const primaryStyles = StyleSheet.create({
+  container: {
+    backgroundColor: "#0F0F0F",
+  },
+  containerDisabled: {
+    backgroundColor: '#F5F5F5',
+  },
+  text: {
+    color: "#FFFFFF",
+  },
+  textDisabled: {
+    color: '#A3A3A3',
+  }
+});
+
+const secondaryStyles = StyleSheet.create({
+  container: {
+    backgroundColor: "#F5F5F5",
+  },
+  containerDisabled: {},
+  text: {
+    color: "#424242",
+  },
+  textDisabled: {
+  }
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -29,22 +67,7 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
 
-  /* VARIATIONS */
-  containerPrimary: {
-    backgroundColor: "#0F0F0F",
-  },
-  containerSecondary: {
-    backgroundColor: "#F5F5F5",
-  },
-  textPrimary: {
-    color: "#FFFFFF",
-  },
-  textSecondary: {
-    color: "#424242",
-  },
-
   /* SIZES */
-
   containerMd: {
     paddingVertical: 8,
     paddingHorizontal: 12,
@@ -69,10 +92,10 @@ const styles = StyleSheet.create({
 });
 
 export enum ButtonSize {
-  SM,
-  MD,
-  XL,
-  XXL,
+  SM = "SM",
+  MD = "MD",
+  XL = "XL",
+  XXL = "XXL",
 }
 
 export enum ButtonVariation {
@@ -82,30 +105,29 @@ export enum ButtonVariation {
 
 interface Props {
   title: string;
+  disabled?: boolean;
   size?: ButtonSize;
   variation?: ButtonVariation;
-  onPress: () => void;
+  onPress?: () => void;
   style?: StyleProp<ViewStyle>;
+  icon?: (props: { size: number; color: string }) => ReactNode;
 }
 
-const containerVariationsStyles = new Map([
-  [ButtonVariation.Primary, styles.containerPrimary],
-  [ButtonVariation.Secondary, styles.containerSecondary],
+const variationsStyles = new Map([
+  [ButtonVariation.Primary, primaryStyles],
+  [ButtonVariation.Secondary, secondaryStyles],
 ]);
 
-const containerSizeStyles = new Map([
+const containerSizeStyles = new Map<ButtonSize, ViewStyle>([
   [ButtonSize.MD, styles.containerMd],
   [ButtonSize.XL, styles.containerXl],
   [ButtonSize.XXL, styles.containerXxl],
 ]);
 
-const textVariationsStyles = new Map([
-  [ButtonVariation.Primary, styles.textPrimary],
-  [ButtonVariation.Secondary, styles.textSecondary],
-]);
-
 export function Button({
   title,
+  disabled,
+  icon,
   size = ButtonSize.MD,
   variation = ButtonVariation.Primary,
   style,
@@ -114,27 +136,43 @@ export function Button({
   const [hovered, setHovered] = useState(false);
   const [pressed, setPressed] = useState(false);
 
+  const variationStyle = variationsStyles.get(variation)!;
+
+  const containerStyle: StyleList<ViewStyle> = [
+    styles.container,
+    containerSizeStyles.get(size)!,
+    variationStyle.container,
+  ];
+  if (disabled) {
+    containerStyle.push(variationStyle.containerDisabled);
+  } else {
+    containerStyle.push(
+      hovered && styles.containerHover,
+      pressed && styles.containerPressed
+    );
+  }
+
+  containerStyle.push(style);
+
   return (
     <Pressable
-      style={[
-        styles.container,
-        containerSizeStyles.get(size),
-        containerVariationsStyles.get(variation),
-        hovered && styles.containerHover,
-        pressed && styles.containerPressed,
-        style,
-      ]}
+      style={containerStyle}
       onPress={onPress}
       onHoverIn={() => setHovered(true)}
       onHoverOut={() => setHovered(false)}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
     >
+      {icon && (
+        <View style={{ marginRight: 6 }}>
+          {createElement(icon, { size: 20, color: "#424242" })}
+        </View>
+      )}
       <Text
         medium
         text
         lg={size === ButtonSize.XXL}
-        style={[textVariationsStyles.get(variation)]}
+        style={[variationStyle.text, disabled && variationStyle.textDisabled]}
       >
         {title}
       </Text>

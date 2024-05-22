@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { Resolver, ResolveField, Parent } from '@nestjs/graphql';
+import { Resolver, ResolveField, Parent, Mutation, Args } from '@nestjs/graphql';
 import { GraphQLWallet } from './GraphQLWallet';
 import { SlowWallet } from './SlowWallet';
 import { Balance } from './Balance';
@@ -33,6 +33,18 @@ class WalletResolver {
   @ResolveField(() => [WalletKey])
   public async keys(@Parent() wallet: GraphQLWallet): Promise<IWalletKey[]> {
     return wallet.keys();
+  }
+
+  @Mutation(() => Boolean)
+  public async setWalletLabel(
+    @Args('address', { type: () => Buffer })
+    address: Uint8Array,
+
+    @Args('label', { type: () => String })
+    label: string,
+  ): Promise<boolean> {
+    await this.walletService.setWalletLabel(address, label);
+    return true;
   }
 }
 
