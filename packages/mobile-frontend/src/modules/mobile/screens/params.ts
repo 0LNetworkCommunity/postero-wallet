@@ -5,7 +5,7 @@ export type ModalStackParams = {
   Wallet: { walletAddress: string };
   WalletPrivateKeys: { walletAddress: string };
   NewTransfer: { walletAddress: string };
-  WalletDetails: { walletAddress: string };
+  WalletDetails: { label: string; address: string };
   BarCodeScanner: {
     onScan: (data: string) => void;
   };

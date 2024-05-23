@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button } from "react-native";
 import { gql, useApolloClient } from "@apollo/client";
 import tw from "twrnc";
 import { StackScreenProps } from "@react-navigation/stack";
+import { AmountInput } from "@postero/ui";
 import { ModalStackParams } from "../params";
 
 const NEW_TRANSFER = gql`
@@ -47,18 +48,16 @@ const NewTransfer: FC<StackScreenProps<ModalStackParams, "NewTransfer">> = ({ ro
     <View style={tw.style("flex-1 p-2")}>
       <Text style={tw.style("font-medium text-lg")}>New Transfer</Text>
 
-      <Text>Recipient</Text>
+      <AmountInput
+        value={amount}
+        onChange={setAmount}
+      />
+
       <TextInput
         style={tw.style("border p-1")}
         value={recipient}
         onChangeText={setRecipient}
-      />
-
-      <Text>Amount</Text>
-      <TextInput
-        style={tw.style("border p-1")}
-        value={amount}
-        onChangeText={setAmount}
+        placeholder="Recipient"
       />
 
       <Button onPress={onConfirm} title="Send" />

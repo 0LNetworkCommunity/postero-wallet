@@ -4922,6 +4922,7 @@ __metadata:
     expo-haptics: "npm:~13.0.1"
     expo-linear-gradient: "npm:~13.0.2"
     expo-local-authentication: "npm:~14.0.1"
+    expo-localization: "npm:~15.0.3"
     expo-notifications: "npm:~0.28.3"
     expo-secure-store: "npm:~13.0.1"
     expo-splash-screen: "npm:~0.27.4"
@@ -4974,6 +4975,7 @@ __metadata:
     expo: "npm:51.0.8"
     expo-font: "npm:12.0.5"
     expo-gl: "npm:14.0.2"
+    expo-localization: "npm:~15.0.3"
     react: "npm:18.3.1"
     react-dom: "npm:18.3.1"
     react-native: "npm:0.73.6"
@@ -12697,6 +12699,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-localization@npm:~15.0.3":
+  version: 15.0.3
+  resolution: "expo-localization@npm:15.0.3"
+  dependencies:
+    rtl-detect: "npm:^1.0.2"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/caa6f68a0f22a067b6940d7f7e64a68eb5f17a767d172aa5793bff24baa2d804b4f827027ea071d1e23f4d8b41f693cfb2790db095f95dadc1d41a3b07072398
+  languageName: node
+  linkType: hard
+
 "expo-modules-autolinking@npm:1.10.3":
   version: 1.10.3
   resolution: "expo-modules-autolinking@npm:1.10.3"
@@ -19643,6 +19656,13 @@ __metadata:
   version: 0.6.0
   resolution: "rrweb-cssom@npm:0.6.0"
   checksum: 10c0/3d9d90d53c2349ea9c8509c2690df5a4ef930c9cf8242aeb9425d4046f09d712bb01047e00da0e1c1dab5db35740b3d78fd45c3e7272f75d3724a563f27c30a3
+  languageName: node
+  linkType: hard
+
+"rtl-detect@npm:^1.0.2":
+  version: 1.1.2
+  resolution: "rtl-detect@npm:1.1.2"
+  checksum: 10c0/1b92888aafca1593314f837e83fdf02eb208faae3e713ab87c176804728efd3b1980d53b64f65f1fa593348087e852c5cd729b7b9372950f6e9b7be489afc0ca
   languageName: node
   linkType: hard
 

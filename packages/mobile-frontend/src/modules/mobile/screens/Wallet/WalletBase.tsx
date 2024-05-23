@@ -328,7 +328,8 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
                 )}
                 onPress={() => {
                   navigation.navigate("WalletDetails", {
-                    walletAddress: wallet.address,
+                    address: wallet.address,
+                    label: wallet.label,
                   });
                 }}
               >
