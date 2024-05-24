@@ -1,13 +1,13 @@
+import { useState } from "react";
 import { View } from "react-native";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import * as Clipboard from 'expo-clipboard';
 
 import Text from "../Text";
 import { Button, ButtonSize, ButtonVariation } from "../Button";
 import { Copy03Icon } from "../../icons/Copy03Icon";
-import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
-import EyeIcon from "../../icons/EyeIcon";
-import { useState } from "react";
-import EyeOffIcon from "../../icons/EyeOffIcon";
+import { EyeIcon } from "../../icons/EyeIcon";
+import { EyeOffIcon } from "../../icons/EyeOffIcon";
 
 interface Props {
   mnemonic: string;

@@ -3,8 +3,7 @@ import styled from "@emotion/native";
 
 import Text from "../../../components/Text";
 import Separator from "../../../components/Separator";
-import { Edit04Icon, PasscodeLockIcon } from "../../../icons";
-import EyeOffIcon from "../../../icons/EyeOffIcon";
+import { EyeOffIcon, Edit04Icon, PasscodeLockIcon } from "../../../icons";
 import { Button, ButtonSize, ButtonVariation } from "../../../components";
 import { GenericScreen } from "../../../components/GenericScreen";
 

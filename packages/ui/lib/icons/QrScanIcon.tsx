@@ -1,7 +1,7 @@
 import Svg, { Path } from "react-native-svg";
 import { IconProps } from "./types";
 
-function QrScanIcon({ size = 24, color = "#000000" }: IconProps) {
+export function QrScanIcon({ size = 24, color = "#000000" }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
       <Path
@@ -12,5 +12,3 @@ function QrScanIcon({ size = 24, color = "#000000" }: IconProps) {
     </Svg>
   );
 }
-
-export default QrScanIcon;

@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import EyeIcon from "../../icons/EyeIcon";
-import EyeOffIcon from "../../icons/EyeOffIcon";
-import QrScanIcon from "../../icons/QrScanIcon";
-import SwitchVerticalIcon from "../../icons/SwitchVerticalIcon";
+import { EyeIcon } from "../../icons/EyeIcon";
+import { EyeOffIcon } from "../../icons/EyeOffIcon";
+import { QrScanIcon } from "../../icons/QrScanIcon";
+import { SwitchVerticalIcon } from "../../icons/SwitchVerticalIcon";
 import { Button, ButtonSize, ButtonVariation } from "../../components/Button";
 import WalletsCarousel from "./WalletsCarousel";
 

@@ -34,7 +34,7 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
     maxGasUnit: bigint,
     gasPrice: bigint,
     expirationTimestamp: bigint
-  ): Promise<IPendingTransaction> {
+  ): Promise<string> {
     const id = this.platformCryptoService.randomUUID();
     const createdAt = new Date();
 
@@ -48,7 +48,9 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
       createdAt: createdAt.toISOString(),
     });
 
-    return {} as IPendingTransaction;
+    return id;
+
+    // return {} as IPendingTransaction;
 
     // const pendingTransaction =
     //   await this.pendingTransactionFactory.getPendingTransaction(

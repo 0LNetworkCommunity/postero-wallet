@@ -8,6 +8,7 @@ import { PlatformEncryptedStoreService } from "../platform/interfaces";
 import { Types } from "../types";
 import { IWalletRepository } from "../wallets/interfaces";
 import { IPendingTransactionsService } from "../transactions/interfaces";
+import BN from "bn.js";
 
 const {
   AccountAddress,
@@ -39,7 +40,7 @@ class TransfersResolver {
   @Inject(Types.IPendingTransactionsService)
   private readonly pendingTransactionsService: IPendingTransactionsService;
 
-  @Mutation(() => Boolean)
+  @Mutation(() => String)
   public async newTransfer(
     @Args("walletAddress", { type: () => Buffer })
     walletAddress: Uint8Array,
@@ -47,12 +48,21 @@ class TransfersResolver {
     @Args("recipient", { type: () => Buffer })
     recipient: Uint8Array,
 
-    @Args("amount", { type: () => Int })
-    amount: number,
+    @Args("amount", { type: () => BN })
+    amount: BN,
   ) {
     const wallet = await this.walletRepository.getWallet(walletAddress);
     if (!wallet) {
       return false;
+    }
+
+    let recipient32: Uint8Array;
+    if (recipient.length === 16) {
+      recipient32 = new Uint8Array(Buffer.concat([Buffer.alloc(16), recipient]));
+    } else if (recipient.length === 32) {
+      recipient32 = recipient;
+    } else {
+      throw new Error(`invalid address length ${recipient.length}`);
     }
 
     // const pk = await this.platformEncryptedStoreService.getItem(
@@ -71,7 +81,7 @@ class TransfersResolver {
       ModuleId.fromStr('0x1::ol_account'),
       new Identifier('transfer'),
       [],
-      [recipient, BCS.bcsSerializeUint64(amount)],
+      [recipient32, BCS.bcsSerializeUint64(BigInt(amount.toString(10)))],
     );
 
     const entryFunctionPayload = new TransactionPayloadEntryFunction(func);
@@ -102,7 +112,7 @@ class TransfersResolver {
     entryFunctionPayload.serialize(serializer);
     const b = serializer.getBytes();
 
-    await this.pendingTransactionsService.newPendingTransaction(
+    const id = await this.pendingTransactionsService.newPendingTransaction(
       walletAddress,
       b,
       maxGasUnit,
@@ -184,7 +194,7 @@ class TransfersResolver {
     //   console.error(error);
     // }
 
-    return true;
+    return id;
   }
 
 }

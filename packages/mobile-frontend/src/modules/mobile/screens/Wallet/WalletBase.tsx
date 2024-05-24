@@ -4,16 +4,21 @@ import {
   Text,
   ActivityIndicator,
   TouchableOpacity,
-  TextInput,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import {
   gql,
   useApolloClient,
-  useQuery,
 } from "@apollo/client";
 import tw from "twrnc";
 import BN from "bn.js"
+import {
+  ArrowUpRightIcon,
+  Button,
+  ButtonSize,
+  ButtonVariation,
+  Download02Icon,
+} from "@postero/ui";
 
 import RefreshIcon from "../../icons/RefreshIcon";
 import AdjustmentsHorizontalIcon from "../../icons/AdjustmentsHorizontalIcon";
@@ -215,7 +220,7 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
 
   if (wallet) {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={tw.style("flex-1")}>
         <View style={tw.style("px-3 pt-2")}>
           <NavBar
             title={
@@ -254,7 +259,6 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
             )}
           >
             {histData.length > 0 && <Chart data={histData} />}
-            {/* <HistoricalBalance /> */}
           </View>
 
           <View style={tw.style("bg-white p-2 rounded-md my-2")}>
@@ -302,41 +306,31 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
               flexDirection: "row",
             })}
           >
-            <View style={tw.style("basis-1/2 justify-center items-center")}>
-              <TouchableOpacity
-                style={tw.style(
-                  "w-full justify-center items-center p-2 rounded-md mr-2",
-                  "bg-white"
-                )}
+            <View style={tw.style("basis-1/2 pr-1")}>
+              <Button
+                size={ButtonSize.MD}
+                variation={ButtonVariation.Secondary}
+                title="Send"
+                icon={ArrowUpRightIcon}
                 onPress={() => {
                   navigation.navigate("NewTransfer", { walletAddress });
                 }}
-              >
-                <Text
-                  style={tw.style("font-semibold text-slate-900 text-base")}
-                >
-                  Send
-                </Text>
-              </TouchableOpacity>
+              />
             </View>
 
-            <View style={tw.style("basis-1/2 justify-center items-center")}>
-              <TouchableOpacity
-                style={tw.style(
-                  "w-full justify-center items-center p-2 rounded-md ml-2",
-                  "bg-slate-950"
-                )}
+            <View style={tw.style("basis-1/2 pl-1")}>
+              <Button
+                size={ButtonSize.MD}
+                variation={ButtonVariation.Primary}
+                title="Receive"
+                icon={Download02Icon}
                 onPress={() => {
                   navigation.navigate("WalletDetails", {
                     address: wallet.address,
                     label: wallet.label,
                   });
                 }}
-              >
-                <Text style={tw.style("font-semibold text-white text-base")}>
-                  Receive
-                </Text>
-              </TouchableOpacity>
+              />
             </View>
           </View>
         </View>

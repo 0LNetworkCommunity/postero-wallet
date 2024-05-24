@@ -57,7 +57,7 @@ export interface IPendingTransactionsService {
     maxGasUnit: bigint,
     gasPrice: bigint,
     expirationTimestamp: bigint,
-  ): Promise<void>;
+  ): Promise<string>;
 }
 
 export interface IPendingTransaction {
@@ -92,7 +92,7 @@ export interface IPendingTransactionsRepository {
     maxGasUnit: bigint,
     gasPrice: bigint,
     expirationTimestamp: bigint,
-  ): Promise<IPendingTransaction>;
+  ): Promise<string>;
   getPendingTransaction(id: string): Promise<IPendingTransaction | null>;
   getPendingTransactions(): Promise<IPendingTransaction[]>;
   removePendingTransaction(id: string): Promise<void>;

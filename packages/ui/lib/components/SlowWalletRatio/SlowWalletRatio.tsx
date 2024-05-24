@@ -1,6 +1,6 @@
 import { View, StyleSheet } from "react-native";
-import UnlockedIcon from "../../icons/UnlockedIcon";
-import LockedIcon from "../../icons/LockedIcon";
+import { UnlockedIcon } from "../../icons/UnlockedIcon";
+import { LockedIcon } from "../../icons/LockedIcon";
 
 const styles = StyleSheet.create({
   container: {

@@ -8,7 +8,7 @@ import { Share } from "react-native";
 import Text from "../../components/Text";
 import { Button, ButtonSize, ButtonVariation } from "../../components/Button";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import XCloseIcon from "../../icons/XCloseIcon";
+import { XCloseIcon } from "../../icons/XCloseIcon";
 
 const Container = styled.SafeAreaView({
   flex: 1,

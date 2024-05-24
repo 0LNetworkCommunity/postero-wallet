@@ -21,6 +21,11 @@ type StyleList<T> =
 const primaryStyles = StyleSheet.create({
   container: {
     backgroundColor: "#0F0F0F",
+
+    shadowColor: "#141414",
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
   },
   containerDisabled: {
     backgroundColor: '#F5F5F5',
@@ -36,6 +41,11 @@ const primaryStyles = StyleSheet.create({
 const secondaryStyles = StyleSheet.create({
   container: {
     backgroundColor: "#F5F5F5",
+
+    // shadowColor: "#141414",
+    // shadowRadius: 2,
+    // shadowOffset: { width: 0, height: 1 },
+    // shadowOpacity: 0.05,
   },
   containerDisabled: {},
   text: {
@@ -50,6 +60,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     justifyContent: "center",
     flexDirection: "row",
+    alignItems: "center",
 
     shadowColor: "#141414",
     shadowOpacity: 0.05,
@@ -124,6 +135,11 @@ const containerSizeStyles = new Map<ButtonSize, ViewStyle>([
   [ButtonSize.XXL, styles.containerXxl],
 ]);
 
+const iconColor = new Map<ButtonVariation, string>([
+  [ButtonVariation.Primary, "#FFFFFF"],
+  [ButtonVariation.Secondary, "#424242"],
+]);
+
 export function Button({
   title,
   disabled,
@@ -165,12 +181,14 @@ export function Button({
     >
       {icon && (
         <View style={{ marginRight: 6 }}>
-          {createElement(icon, { size: 20, color: "#424242" })}
+          {createElement(icon, { size: 20, color: iconColor.get(variation)! })}
         </View>
       )}
       <Text
         medium
         text
+        sm={size === ButtonSize.SM}
+        md={size === ButtonSize.MD}
         lg={size === ButtonSize.XXL}
         style={[variationStyle.text, disabled && variationStyle.textDisabled]}
       >

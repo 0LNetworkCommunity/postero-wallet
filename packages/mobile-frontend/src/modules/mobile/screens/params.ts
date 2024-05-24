@@ -17,4 +17,7 @@ export type ModalStackParams = {
   };
   Transactions: undefined;
   Transaction: undefined;
+  PendingTransaction: {
+    id: string;
+  };
 };

@@ -1,5 +1,6 @@
 import { ReactNode, useRef } from "react";
 import { SafeAreaView } from "react-native";
+import tw from "twrnc";
 
 import { StackScreenProps } from "@react-navigation/stack";
 
@@ -15,7 +16,7 @@ function WalletScreen({
   const contextMenu = useRef<ContextMenuHandle>(null);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={tw.style("flex-1 bg-white")}>
       <WalletBase
         walletAddress={walletAddress}
         onPressSettings={() => {

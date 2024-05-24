@@ -37,46 +37,49 @@ class PendingTransactionsResolver {
     return this.pendingTransactionsService.getPendingTransactions();
   }
 
-  @Mutation((returns) => Buffer)
+  @Mutation((returns) => Boolean)
   public async sendPendingTransaction(
-    @Args("pendingTransactionId", { type: () => ID })
-    pendingTransactionId: string,
+    @Args("id", { type: () => String })
+    id: string,
 
-    @Args("walletAddress", { type: () => String })
-    walletAddress: string,
+    // @Args("walletAddress", { type: () => String })
+    // walletAddress: string,
 
-    @Args("gasPrice", { type: () => Int })
-    gasPrice: number,
+    // @Args("gasPrice", { type: () => Int })
+    // gasPrice: number,
 
-    @Args("maxGasUnit", { type: () => Int })
-    maxGasUnit: number,
+    // @Args("maxGasUnit", { type: () => Int })
+    // maxGasUnit: number,
 
-    @Args("timeout", { type: () => Int })
-    timeout: number,
+    // @Args("timeout", { type: () => Int })
+    // timeout: number,
   ) {
-    const transactionHash =
-      await this.pendingTransactionsService.sendPendingTransaction(
-        pendingTransactionId,
-        Buffer.from(walletAddress, 'hex'),
-        gasPrice,
-        maxGasUnit,
-        timeout,
-      );
+    // const transactionHash =
+    //   await this.pendingTransactionsService.sendPendingTransaction(
+    //     pendingTransactionId,
+    //     Buffer.from(walletAddress, 'hex'),
+    //     gasPrice,
+    //     maxGasUnit,
+    //     timeout,
+    //   );
 
-    if (transactionHash) {
-      console.log(
-        `https://rpc.0l.fyi/v1/transactions/by_hash/0x${Buffer.from(
-          transactionHash,
-        ).toString("hex")}`,
-      );
-      // shell.openExternal(
-      //   `https://rpc.0l.fyi/v1/transactions/by_hash/0x${Buffer.from(
-      //     transactionHash,
-      //   ).toString("hex")}`,
-      // );
-    }
+    // if (transactionHash) {
+    //   console.log(
+    //     `https://rpc.0l.fyi/v1/transactions/by_hash/0x${Buffer.from(
+    //       transactionHash,
+    //     ).toString("hex")}`,
+    //   );
+    //   // shell.openExternal(
+    //   //   `https://rpc.0l.fyi/v1/transactions/by_hash/0x${Buffer.from(
+    //   //     transactionHash,
+    //   //   ).toString("hex")}`,
+    //   // );
+    // }
+    // return transactionHash;
 
-    return transactionHash;
+    console.log('sendPendingTransaction', id);
+
+    return true;
   }
 
   @Mutation((returns) => Boolean)

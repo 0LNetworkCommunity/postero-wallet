@@ -10,6 +10,7 @@ import { Types } from "../types";
 import { IWalletService } from "../wallets/interfaces";
 import { IDApp } from "../dapps/interfaces";
 import { IKeychainService } from "../keychain/interfaces";
+// import AccountAddress from "../crypto/AccountAddress";
 
 const {
   AccountAddress,
@@ -146,9 +147,8 @@ class PendingTransactionsService implements IPendingTransactionsService {
     maxGasUnit: bigint,
     gasPrice: bigint,
     expirationTimestamp: bigint
-  ) {
-    console.log("PendingTransactionService::newPendingTransaction");
-    await this.pendingTransactionsRepository.createPendingTransaction(
+  ): Promise<string> {
+    const id = await this.pendingTransactionsRepository.createPendingTransaction(
       sender,
       transactionPayload,
       maxGasUnit,
@@ -156,69 +156,76 @@ class PendingTransactionsService implements IPendingTransactionsService {
       expirationTimestamp
     );
 
-    const account = await this.aptosClient.getAccount(
-      Buffer.from(sender).toString('hex'),
-    );
+    // console.log('getAccount', sender);
+    // const account = await this.aptosClient.getAccount(
+    //   Buffer.from(sender).toString('hex'),
+    // );
+    // console.log('account', account);
 
-    const deserializer = new BCS.Deserializer(transactionPayload);
-    const txPayload = TransactionPayload.deserialize(deserializer);
+    // const deserializer = new BCS.Deserializer(transactionPayload);
+    // const txPayload = TransactionPayload.deserialize(deserializer);
 
-    const rawTxn = new RawTransaction(
-      new AccountAddress(sender),
-      BigInt(account.sequence_number),
-      txPayload,
-      maxGasUnit,
-      gasPrice,
-      expirationTimestamp,
-      new ChainId(await this.aptosClient.getChainId()),
-    );
+    // console.log('new RawTransaction');
 
-    const privateKey = await this.keychainService.getWalletPrivateKey(sender);
-    const signer = new AptosAccount(privateKey!);
+    // const rawTxn = new RawTransaction(
+    //   new AccountAddress(sender32),
+    //   BigInt(account.sequence_number),
+    //   txPayload,
+    //   maxGasUnit,
+    //   gasPrice,
+    //   expirationTimestamp,
+    //   new ChainId(await this.aptosClient.getChainId()),
+    // );
+    // console.log('rawTxn', rawTxn);
 
-    const hash = sha3Hash.create();
-    hash.update("DIEM::RawTransaction");
+    // const privateKey = await this.keychainService.getWalletPrivateKey(sender);
+    // const signer = new AptosAccount(privateKey!);
 
-    const prefix = hash.digest();
-    const body = BCS.bcsToBytes(rawTxn);
-    const mergedArray = new Uint8Array(prefix.length + body.length);
-    mergedArray.set(prefix);
-    mergedArray.set(body, prefix.length);
+    // const hash = sha3Hash.create();
+    // hash.update("DIEM::RawTransaction");
 
-    const signingMessage = mergedArray;
+    // const prefix = hash.digest();
+    // const body = BCS.bcsToBytes(rawTxn);
+    // const mergedArray = new Uint8Array(prefix.length + body.length);
+    // mergedArray.set(prefix);
+    // mergedArray.set(body, prefix.length);
 
-    const signature = signer.signBuffer(signingMessage);
-    const sig = new Ed25519Signature(signature.toUint8Array());
+    // const signingMessage = mergedArray;
 
-    const authenticator = new TransactionAuthenticatorEd25519(
-      new Ed25519PublicKey(signer.pubKey().toUint8Array()),
-      sig
-    );
-    const signedTx = new SignedTransaction(rawTxn, authenticator);
+    // const signature = signer.signBuffer(signingMessage);
+    // const sig = new Ed25519Signature(signature.toUint8Array());
 
-    const bcsTxn = BCS.bcsToBytes(signedTx);
+    // const authenticator = new TransactionAuthenticatorEd25519(
+    //   new Ed25519PublicKey(signer.pubKey().toUint8Array()),
+    //   sig
+    // );
+    // const signedTx = new SignedTransaction(rawTxn, authenticator);
 
-    try {
-      const res = await axios<{
-        hash: string;
-      }>({
-        method: 'POST',
-        url: 'https://rpc.0l.fyi/v1/transactions',
-        headers: {
-          "content-type": "application/x.diem.signed_transaction+bcs",
-        },
-        data: bcsTxn,
-      });
-      console.log(res.status);
+    // const bcsTxn = BCS.bcsToBytes(signedTx);
 
-      if (res.status === 202) {
-        console.log(res.data);
-        // console.log(`tx hash = ${res.data.hash}`);
-        // return new Uint8Array(Buffer.from(res.data.hash.substring(2), "hex"));
-      }
-    } catch (error) {
-      console.error(error);
-    }
+    // try {
+    //   const res = await axios<{
+    //     hash: string;
+    //   }>({
+    //     method: 'POST',
+    //     url: 'https://rpc.0l.fyi/v1/transactions',
+    //     headers: {
+    //       "content-type": "application/x.diem.signed_transaction+bcs",
+    //     },
+    //     data: bcsTxn,
+    //   });
+    //   console.log(res.status);
+
+    //   if (res.status === 202) {
+    //     console.log(res.data);
+    //     // console.log(`tx hash = ${res.data.hash}`);
+    //     // return new Uint8Array(Buffer.from(res.data.hash.substring(2), "hex"));
+    //   }
+    // } catch (error) {
+    //   console.error(error);
+    // }
+
+    return id;
   }
 
   public async newTransaction(
