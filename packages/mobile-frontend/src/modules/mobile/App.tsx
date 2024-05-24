@@ -3,6 +3,7 @@ import { View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
   ApolloClient,
   ApolloProvider,
@@ -65,115 +66,117 @@ const App: FC = () => {
   }
 
   return (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <ApolloProvider client={apolloClient}>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <NavigationContainer>
-            <Stack.Navigator>
-              <Stack.Screen
-                name="Main"
-                component={HomeScreen}
-                options={{
-                  headerShown: false,
-                }}
-              />
-              <Stack.Screen
-                name="NewWallet"
-                component={NewWalletScreen}
-                options={{
-                  headerShown: false,
-                  presentation: "modal",
-                }}
-              />
-              <Stack.Screen
-                name="Wallet"
-                component={WalletScreen}
-                options={{
-                  headerShown: false,
-                  // presentation: "modal",
-                }}
-              />
-              <Stack.Screen
-                name="WalletPrivateKeys"
-                component={WalletPrivateKeys}
-                options={{
-                  headerShown: false,
-                  // presentation: "modal",
-                }}
-              />
+    <SafeAreaProvider>
+      <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+        <ApolloProvider client={apolloClient}>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <NavigationContainer>
+              <Stack.Navigator>
+                <Stack.Screen
+                  name="Main"
+                  component={HomeScreen}
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="NewWallet"
+                  component={NewWalletScreen}
+                  options={{
+                    headerShown: false,
+                    presentation: "modal",
+                  }}
+                />
+                <Stack.Screen
+                  name="Wallet"
+                  component={WalletScreen}
+                  options={{
+                    headerShown: false,
+                    // presentation: "modal",
+                  }}
+                />
+                <Stack.Screen
+                  name="WalletPrivateKeys"
+                  component={WalletPrivateKeys}
+                  options={{
+                    headerShown: false,
+                    // presentation: "modal",
+                  }}
+                />
 
-              <Stack.Screen
-                name="NewTransfer"
-                component={NewTransfer}
-                options={{
-                  headerShown: false,
-                  presentation: "modal",
-                }}
-              />
-              <Stack.Screen
-                name="WalletDetails"
-                component={WalletDetails}
-                options={{
-                  headerShown: false,
-                  presentation: "modal",
-                }}
-              />
-              <Stack.Screen
-                name="BarCodeScanner"
-                component={BarCodeScanner}
-                options={{
-                  headerShown: false,
-                  presentation: "modal",
-                }}
-              />
+                <Stack.Screen
+                  name="NewTransfer"
+                  component={NewTransfer}
+                  options={{
+                    headerShown: false,
+                    presentation: "modal",
+                  }}
+                />
+                <Stack.Screen
+                  name="WalletDetails"
+                  component={WalletDetails}
+                  options={{
+                    headerShown: false,
+                    presentation: "modal",
+                  }}
+                />
+                <Stack.Screen
+                  name="BarCodeScanner"
+                  component={BarCodeScanner}
+                  options={{
+                    headerShown: false,
+                    presentation: "modal",
+                  }}
+                />
 
-              <Stack.Screen
-                name="KeyRotation"
-                component={KeyRotation}
-                options={{
-                  headerShown: false,
-                }}
-              />
+                <Stack.Screen
+                  name="KeyRotation"
+                  component={KeyRotation}
+                  options={{
+                    headerShown: false,
+                  }}
+                />
 
-              <Stack.Screen name="PrivateKeys" component={PrivateKeys} />
+                <Stack.Screen name="PrivateKeys" component={PrivateKeys} />
 
-              <Stack.Screen
-                name="PrivateKey"
-                component={PrivateKey}
-                options={{
-                  headerShown: false,
-                }}
-              />
+                <Stack.Screen
+                  name="PrivateKey"
+                  component={PrivateKey}
+                  options={{
+                    headerShown: false,
+                  }}
+                />
 
-              <Stack.Screen
-                name="Transactions"
-                component={Transactions}
-                options={{
-                  headerShown: false,
-                }}
-              />
+                <Stack.Screen
+                  name="Transactions"
+                  component={Transactions}
+                  options={{
+                    headerShown: false,
+                  }}
+                />
 
-              <Stack.Screen
-                name="Transaction"
-                component={Transaction}
-                options={{
-                  headerShown: false,
-                  presentation: "modal",
-                }}
-              />
+                <Stack.Screen
+                  name="Transaction"
+                  component={Transaction}
+                  options={{
+                    headerShown: false,
+                    presentation: "modal",
+                  }}
+                />
 
-              <Stack.Screen
-                name="Settings"
-                component={Settings}
-                options={{
-                  headerShown: false,
-                }}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </GestureHandlerRootView>
-      </ApolloProvider>
-    </View>
+                <Stack.Screen
+                  name="Settings"
+                  component={Settings}
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </GestureHandlerRootView>
+        </ApolloProvider>
+      </View>
+    </SafeAreaProvider>
   );
 };
 

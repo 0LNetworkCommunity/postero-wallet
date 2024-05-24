@@ -1,103 +1,134 @@
-import { forwardRef } from "react";
-import { TextInput as RNTextInput, TextInputProps, TextStyle } from "react-native";
+import React, {
+  ReactNode,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
+import {
+  TouchableOpacity,
+  View,
+  TextInput as RNTextInput,
+  StyleProp,
+  ViewStyle,
+  TextInputProps,
+} from "react-native";
+import Text from "../Text";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import styled from "@emotion/native";
+import { IconProps } from "../../icons/types";
+
+const Container = styled.View({
+  borderRadius: 6,
+  borderWidth: 1,
+  borderStyle: "solid",
+  borderColor: "#D6D6D6",
+  backgroundColor: "#FFFFFF",
+  shadowColor: "#141414",
+  shadowRadius: 0,
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.05,
+  flexDirection: "row",
+  paddingHorizontal: 8,
+});
+
+const IconsContainer = styled.View({
+  flexDirection: "row",
+});
+
+const IconContainer = styled.View({
+  paddingVertical: 16,
+  paddingHorizontal: 8,
+});
+
+const StyledTextInput = styled.TextInput({
+  fontSize: 16,
+  padding: 16,
+  flexBasis: 0,
+  flexGrow: 1,
+  paddingVertical: 16,
+  paddingHorizontal: 8,
+});
 
 interface Props {
-  display?: boolean;
-  text?: boolean;
+  label?: string;
 
-  xs?: boolean;
-  sm?: boolean;
-  md?: boolean;
-  lg?: boolean;
-  xl?: boolean;
-  xxl?: boolean;
+  icons?: {
+    icon: (props: IconProps) => ReactNode;
+    onPress: () => void;
+  }[];
 
-  regular?: boolean;
-  medium?: boolean;
-  semibold?: boolean;
-  bold?: boolean;
-
-  secondary?: boolean;
-  quarterary?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 
-export const TextInput = forwardRef<RNTextInput, TextInputProps & Props>(function TextInput(props, ref) {
-  let {
-    // display,
-    // text,
-    // xs,
-    // sm,
-    // md,
-    // lg,
-    // xl,
-    // xxl,
-    // regular,
-    // medium,
-    // semibold,
-    // bold,
+interface TextInputRef {
+  focus: () => void;
+  blur: () => void;
+  clear: () => void;
+  isFocused: () => boolean;
+}
 
-    // secondary,
-    // quarterary,
+export const TextInput = forwardRef<
+  TextInputRef,
+  Props & Omit<TextInputProps, "style">
+>(function TextInput({ label, icons, style, ...props }, ref) {
+  const textInputRef = useRef<RNTextInput>(null);
+  const [focused, setFocused] = useState(false);
 
-    style,
-    ...rnTextInputProps
-  } = props;
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      textInputRef.current?.focus();
+    },
+    blur: () => {
+      textInputRef.current?.blur();
+    },
+    clear: () => {
+      textInputRef.current?.clear();
+    },
+    isFocused: (): boolean => {
+      return textInputRef.current?.isFocused() ?? false;
+    },
+  }));
 
-  const textInputStyle: TextStyle = {
-    borderRadius: 6,
-    fontSize: 16,
-
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#D6D6D6',
-    backgroundColor: '#FFFFFF',
-    shadowColor: 'rgba(20, 20, 20, 0.05)',
-    shadowRadius: 0,
-    shadowOffset: { width: 0, height: 1 },
-
-    paddingHorizontal: 14,
-    paddingVertical: 16,
-  };
-
-  // if (xs) {
-  //   textStyle.fontSize = 24;
-  //   textStyle.lineHeight = 32;
-  // } else if (md) {
-  //   textStyle.fontSize = 16;
-  //   textStyle.lineHeight = 24;
-  // } else if (lg) {
-  //   textStyle.fontSize = 18;
-  //   textStyle.lineHeight = 28;
-  // } else if (xl) {
-  //   textStyle.fontSize = 60;
-  //   textStyle.lineHeight = 72;
-  //   textStyle.letterSpacing = -1.2;
-  // } else if (xxl) {
-  //   textStyle.fontSize = 72;
-  //   textStyle.lineHeight = 90;
-  //   textStyle.letterSpacing = -1.44;
-  // }
-
-  // if (display || text) {
-  //   if (regular) {
-  //     textStyle.fontFamily = fonts.primary[400];
-  //   } else if (medium) {
-  //     textStyle.fontFamily = fonts.primary[500];
-  //   } else if (semibold) {
-  //     textStyle.fontFamily = fonts.primary[600];
-  //   } else if (bold) {
-  //     textStyle.fontFamily = fonts.primary[700];
-  //   }
-  // }
-
-  // if (secondary) {
-  //   textStyle.color = '#424242';
-  // } else if (quarterary) {
-  //   textStyle.color = '#737373';
-  // } else {
-  //   // primary
-  //   textStyle.color = '#141414';
-  // }
-
-  return <RNTextInput style={[textInputStyle, style]} {...rnTextInputProps} ref={ref} />;
+  return (
+    <View style={style}>
+      {label && (
+        <TouchableWithoutFeedback
+          onPress={() => {
+            textInputRef.current?.focus();
+          }}
+        >
+          <Text text sm medium style={{ marginBottom: 6 }}>
+            {label}
+          </Text>
+        </TouchableWithoutFeedback>
+      )}
+      <Container style={[focused && { borderColor: "#CD3B42" }]}>
+        <StyledTextInput
+          selectionColor="#141414"
+          {...props}
+          ref={textInputRef}
+          onFocus={(event) => {
+            setFocused(true);
+            props.onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setFocused(false);
+            props.onBlur?.(event);
+          }}
+        />
+        {icons && icons.length > 0 && (
+          <IconsContainer>
+            {icons.map((icon, index) => (
+              <TouchableOpacity key={index} onPress={icon.onPress}>
+                <IconContainer>
+                  {icon.icon({ size: 16, color: "#141414" })}
+                </IconContainer>
+              </TouchableOpacity>
+            ))}
+          </IconsContainer>
+        )}
+      </Container>
+    </View>
+  );
 });

@@ -13,7 +13,6 @@ import { fonts } from "../../theme";
 const amountText = {
   fontFamily: fonts.primary[400],
   fontSize: 36,
-  lineHeight: 44,
 };
 
 const Symbol = styled.Text({
@@ -168,7 +167,6 @@ function AmountInputInner({
       <Symbol
         style={{
           position: "absolute",
-          top: 0,
           right: (containerWidth - inputTextWidth) / 2 - (symbolWidth ?? 0) / 2,
         }}
         onLayout={
@@ -180,7 +178,7 @@ function AmountInputInner({
         {" Ƚ"}
       </Symbol>
 
-      <View style={{ flexDirection: "row", justifyContent: "center" }}>
+      <View>
         <TextInput
           ref={textInput}
           autoFocus
@@ -192,8 +190,6 @@ function AmountInputInner({
           style={{
             paddingRight:
               (containerWidth - inputTextWidth) / 2 + (symbolWidth ?? 0) / 2,
-            paddingLeft:
-              (containerWidth - inputTextWidth) / 2 - (symbolWidth ?? 0) / 2,
             width: containerWidth,
           }}
           inputMode={containsDecimalSeparator ? "numeric" : "decimal"}

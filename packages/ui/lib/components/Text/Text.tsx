@@ -19,6 +19,7 @@ interface Props {
   bold?: boolean;
 
   secondary?: boolean;
+  tertiary?: boolean;
   quarterary?: boolean;
 }
 
@@ -38,6 +39,7 @@ const Text = forwardRef<RNText, TextProps & Props>(function Text(props, ref) {
     bold,
 
     secondary,
+    tertiary,
     quarterary,
 
     style,
@@ -79,6 +81,8 @@ const Text = forwardRef<RNText, TextProps & Props>(function Text(props, ref) {
 
   if (secondary) {
     textStyle.color = '#424242';
+  } else if (tertiary) {
+    textStyle.color = '#525252';
   } else if (quarterary) {
     textStyle.color = '#737373';
   } else {

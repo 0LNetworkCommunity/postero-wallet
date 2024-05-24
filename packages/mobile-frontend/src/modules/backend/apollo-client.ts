@@ -24,6 +24,16 @@ export const getApolloClient = (backend: Backend) => {
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
     link: splitLink,
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: 'no-cache',
+        errorPolicy: 'ignore',
+      },
+      query: {
+        fetchPolicy: 'no-cache',
+        errorPolicy: 'all',
+      },
+    }
   });
 
   return apolloClient;

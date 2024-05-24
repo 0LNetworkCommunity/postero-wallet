@@ -1,29 +1,34 @@
 import { FC, useState } from "react";
-import { View, Text, TextInput, Button } from "react-native";
+import { View, Animated } from "react-native";
 import { gql, useApolloClient } from "@apollo/client";
-import tw from "twrnc";
 import { StackScreenProps } from "@react-navigation/stack";
-import { AmountInput } from "@postero/ui";
+import { NewTransfer } from "@postero/ui";
 import { ModalStackParams } from "../params";
+import { useKeyboardHeight } from "../../../utils/keyboard";
 
 const NEW_TRANSFER = gql`
   mutation NewTransfer(
-    $walletAddress: Bytes!,
-    $recipient: Bytes!,
+    $walletAddress: Bytes!
+    $recipient: Bytes!
     $amount: Int!
   ) {
     newTransfer(
-      walletAddress: $walletAddress,
-      recipient: $recipient,
+      walletAddress: $walletAddress
+      recipient: $recipient
       amount: $amount
     )
   }
 `;
 
-const NewTransfer: FC<StackScreenProps<ModalStackParams, "NewTransfer">> = ({ route, navigation }) => {
+const NewTransferScreen: FC<
+  StackScreenProps<ModalStackParams, "NewTransfer">
+> = ({ route, navigation }) => {
   const apolloClient = useApolloClient();
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
+
+  // const insets = useSafeAreaInsets();
+  const keyboardHeight = useKeyboardHeight();
 
   const onConfirm = async () => {
     try {
@@ -40,40 +45,33 @@ const NewTransfer: FC<StackScreenProps<ModalStackParams, "NewTransfer">> = ({ ro
     }
   };
 
-  const onCancel = async () => {
-    navigation.pop();
-  };
-
   return (
-    <View style={tw.style("flex-1 p-2")}>
-      <Text style={tw.style("font-medium text-lg")}>New Transfer</Text>
-
-      <AmountInput
-        value={amount}
-        onChange={setAmount}
-      />
-
-      <TextInput
-        style={tw.style("border p-1")}
-        value={recipient}
-        onChangeText={setRecipient}
-        placeholder="Recipient"
-      />
-
-      <Button onPress={onConfirm} title="Send" />
-      <Button onPress={onCancel} title="Cancel" />
-      <Button
-        onPress={() => {
+    <View
+      style={{
+        backgroundColor: "#ffffff",
+        flex: 1,
+      }}
+    >
+      <NewTransfer
+        onBack={() => navigation.pop()}
+        onConfirm={(details) => {
+          console.log(details);
+        }}
+        onScan={() => {
           navigation.navigate("BarCodeScanner", {
             onScan: (data) => {
               setRecipient(data);
             },
           });
         }}
-        title="Scan"
+        amount={amount}
+        onChangeAmount={setAmount}
+        recipient={recipient}
+        onChangeRecipient={setRecipient}
       />
+      <Animated.View style={{ height: keyboardHeight }} />
     </View>
   );
 };
 
-export default NewTransfer;
+export default NewTransferScreen;
