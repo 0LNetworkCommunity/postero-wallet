@@ -101,7 +101,7 @@ class TransfersResolver {
 
     // const chainId = 1; // await this.aptosClient.getChainId();
 
-    const timeout = 10;
+    const timeout = 60 * 5; // 5 minutes
     const expirationTimestamp = BigInt(Math.floor(Date.now() / 1_000) + timeout);
 
     // const account = await this.aptosClient.getAccount(

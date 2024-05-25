@@ -156,52 +156,51 @@ class PendingTransactionsService implements IPendingTransactionsService {
       expirationTimestamp
     );
 
-    // console.log('getAccount', sender);
-    // const account = await this.aptosClient.getAccount(
-    //   Buffer.from(sender).toString('hex'),
-    // );
-    // console.log('account', account);
+    const account = await this.aptosClient.getAccount(
+      Buffer.from(sender).toString('hex'),
+    );
+    console.log('account', account);
 
-    // const deserializer = new BCS.Deserializer(transactionPayload);
-    // const txPayload = TransactionPayload.deserialize(deserializer);
+    const deserializer = new BCS.Deserializer(transactionPayload);
+    const txPayload = TransactionPayload.deserialize(deserializer);
 
-    // console.log('new RawTransaction');
+    const rawTxn = new RawTransaction(
+      new AccountAddress(sender),
+      BigInt(account.sequence_number),
+      txPayload,
+      maxGasUnit,
+      gasPrice,
+      expirationTimestamp,
+      new ChainId(await this.aptosClient.getChainId()),
+    );
+    console.log('rawTxn', rawTxn);
 
-    // const rawTxn = new RawTransaction(
-    //   new AccountAddress(sender32),
-    //   BigInt(account.sequence_number),
-    //   txPayload,
-    //   maxGasUnit,
-    //   gasPrice,
-    //   expirationTimestamp,
-    //   new ChainId(await this.aptosClient.getChainId()),
-    // );
-    // console.log('rawTxn', rawTxn);
+    const privateKey = await this.keychainService.getWalletPrivateKey(sender);
+    const signer = new AptosAccount(privateKey!);
 
-    // const privateKey = await this.keychainService.getWalletPrivateKey(sender);
-    // const signer = new AptosAccount(privateKey!);
+    const hash = sha3Hash.create();
+    hash.update("DIEM::RawTransaction");
 
-    // const hash = sha3Hash.create();
-    // hash.update("DIEM::RawTransaction");
+    const prefix = hash.digest();
+    const body = BCS.bcsToBytes(rawTxn);
+    const mergedArray = new Uint8Array(prefix.length + body.length);
+    mergedArray.set(prefix);
+    mergedArray.set(body, prefix.length);
 
-    // const prefix = hash.digest();
-    // const body = BCS.bcsToBytes(rawTxn);
-    // const mergedArray = new Uint8Array(prefix.length + body.length);
-    // mergedArray.set(prefix);
-    // mergedArray.set(body, prefix.length);
+    const signingMessage = mergedArray;
 
-    // const signingMessage = mergedArray;
+    const signature = signer.signBuffer(signingMessage);
+    const sig = new Ed25519Signature(signature.toUint8Array());
 
-    // const signature = signer.signBuffer(signingMessage);
-    // const sig = new Ed25519Signature(signature.toUint8Array());
+    const authenticator = new TransactionAuthenticatorEd25519(
+      new Ed25519PublicKey(signer.pubKey().toUint8Array()),
+      sig
+    );
+    const signedTx = new SignedTransaction(rawTxn, authenticator);
 
-    // const authenticator = new TransactionAuthenticatorEd25519(
-    //   new Ed25519PublicKey(signer.pubKey().toUint8Array()),
-    //   sig
-    // );
-    // const signedTx = new SignedTransaction(rawTxn, authenticator);
+    const bcsTxn = BCS.bcsToBytes(signedTx);
 
-    // const bcsTxn = BCS.bcsToBytes(signedTx);
+    console.log('bcsTxn', Buffer.from(bcsTxn).toString('hex'));
 
     // try {
     //   const res = await axios<{
