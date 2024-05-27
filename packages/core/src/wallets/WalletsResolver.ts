@@ -96,8 +96,7 @@ class WalletsResolver {
 
   @Query((returns) => [GraphQLWallet])
   public async wallets() {
-    const wallets = await this.walletRepository.getWallets();
-    return Promise.all(wallets.map((wallet) => this.walletMapper(wallet)));
+    return this.walletService.getWallets();
   }
 
   @Mutation((returns) => Boolean)

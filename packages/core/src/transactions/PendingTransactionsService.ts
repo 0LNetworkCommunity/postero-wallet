@@ -1,5 +1,5 @@
 import Emittery, { UnsubscribeFn } from "emittery";
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import { sha3_256 as sha3Hash } from "@noble/hashes/sha3";
 import axios, { AxiosError } from "axios";
 import { AptosAccount, AptosClient, BCS, TxnBuilderTypes } from "aptos";
@@ -7,9 +7,10 @@ import { GraphQLError } from "graphql";
 
 import { IPendingTransaction, IPendingTransactionsRepository, IPendingTransactionsService, ITransactionsRepository, PendingTransactionsServiceEvent, RawPendingTransactionPayload, RawPendingTransactionPayloadType } from "./interfaces";
 import { Types } from "../types";
-import { IWalletService } from "../wallets/interfaces";
+import { IWalletService, IWalletsWatcherService, WalletsWatcherServiceEvent } from "../wallets/interfaces";
 import { IDApp } from "../dapps/interfaces";
 import { IKeychainService } from "../keychain/interfaces";
+import { parseHexString } from "../utils";
 // import AccountAddress from "../crypto/AccountAddress";
 
 const {
@@ -26,7 +27,9 @@ const {
 } = TxnBuilderTypes;
 
 @Injectable()
-class PendingTransactionsService implements IPendingTransactionsService {
+class PendingTransactionsService
+  implements OnModuleInit, IPendingTransactionsService
+{
   @Inject(Types.IWalletService)
   private readonly walletService!: IWalletService;
 
@@ -36,9 +39,21 @@ class PendingTransactionsService implements IPendingTransactionsService {
   @Inject(Types.IKeychainService)
   private readonly keychainService!: IKeychainService;
 
-  private aptosClient = new AptosClient("https://rpc.0l.fyi");
+  @Inject(Types.IWalletsWatcherService)
+  private readonly walletsWatcherService: IWalletsWatcherService;
+
+  private aptosClient = new AptosClient('https://rpc.0l.fyi');
 
   private eventEmitter = new Emittery();
+
+  public onModuleInit() {
+    this.walletsWatcherService.on(
+      WalletsWatcherServiceEvent.PendingTransaction,
+      async (data) => {
+        await this.onPendingTransaction(data);
+      },
+    );
+  }
 
   public async sendPendingTransaction(
     pendingTransactionId: string,
@@ -47,13 +62,15 @@ class PendingTransactionsService implements IPendingTransactionsService {
     maxGasUnit: number,
     timeout: number,
   ): Promise<Uint8Array | null> {
-    const pendingTransaction = await this.getPendingTransaction(pendingTransactionId);
+    const pendingTransaction =
+      await this.getPendingTransaction(pendingTransactionId);
     if (!pendingTransaction) {
       return null;
     }
 
     const wallet = await this.walletService.getWallet(walletAddress);
-    const privateKey = await this.walletService.getWalletPrivateKey(walletAddress);
+    const privateKey =
+      await this.walletService.getWalletPrivateKey(walletAddress);
 
     const chainId = await this.aptosClient.getChainId();
 
@@ -85,7 +102,7 @@ class PendingTransactionsService implements IPendingTransactionsService {
     const signer = new AptosAccount(privateKey!);
 
     const hash = sha3Hash.create();
-    hash.update("DIEM::RawTransaction");
+    hash.update('DIEM::RawTransaction');
 
     const prefix = hash.digest();
     const body = BCS.bcsToBytes(rawTxn);
@@ -100,7 +117,7 @@ class PendingTransactionsService implements IPendingTransactionsService {
 
     const authenticator = new TransactionAuthenticatorEd25519(
       new Ed25519PublicKey(signer.pubKey().toUint8Array()),
-      sig
+      sig,
     );
     const signedTx = new SignedTransaction(rawTxn, authenticator);
 
@@ -114,13 +131,13 @@ class PendingTransactionsService implements IPendingTransactionsService {
         method: 'POST',
         url: 'https://rpc.0l.fyi/v1/transactions',
         headers: {
-          "content-type": "application/x.diem.signed_transaction+bcs",
+          'content-type': 'application/x.diem.signed_transaction+bcs',
         },
         data: bcsTxn,
       });
 
       if (res.status === 202) {
-        return new Uint8Array(Buffer.from(res.data.hash.substring(2), "hex"));
+        return new Uint8Array(Buffer.from(res.data.hash.substring(2), 'hex'));
       }
     } catch (error) {
       console.error(error);
@@ -146,18 +163,29 @@ class PendingTransactionsService implements IPendingTransactionsService {
     transactionPayload: Uint8Array,
     maxGasUnit: bigint,
     gasPrice: bigint,
-    expirationTimestamp: bigint
+    expirationTimestamp: bigint,
   ): Promise<string> {
-    const id = await this.pendingTransactionsRepository.createPendingTransaction(
-      sender,
-      transactionPayload,
-      maxGasUnit,
-      gasPrice,
-      expirationTimestamp
-    );
+    const id =
+      await this.pendingTransactionsRepository.createPendingTransaction(
+        sender,
+        transactionPayload,
+        maxGasUnit,
+        gasPrice,
+        expirationTimestamp,
+      );
 
+    let sender32: Uint8Array;
+    if (sender.length === 32) {
+      sender32 = sender;
+    } else if (sender.length === 16) {
+      sender32 = new Uint8Array(Buffer.concat([Buffer.alloc(16), sender]));
+    } else {
+      throw new Error('invalid sender length');
+    }
+
+    console.log('getAccount');
     const account = await this.aptosClient.getAccount(
-      Buffer.from(sender).toString('hex'),
+      Buffer.from(sender32).toString('hex'),
     );
     console.log('account', account);
 
@@ -165,7 +193,7 @@ class PendingTransactionsService implements IPendingTransactionsService {
     const txPayload = TransactionPayload.deserialize(deserializer);
 
     const rawTxn = new RawTransaction(
-      new AccountAddress(sender),
+      new AccountAddress(sender32),
       BigInt(account.sequence_number),
       txPayload,
       maxGasUnit,
@@ -173,13 +201,12 @@ class PendingTransactionsService implements IPendingTransactionsService {
       expirationTimestamp,
       new ChainId(await this.aptosClient.getChainId()),
     );
-    console.log('rawTxn', rawTxn);
 
     const privateKey = await this.keychainService.getWalletPrivateKey(sender);
     const signer = new AptosAccount(privateKey!);
 
     const hash = sha3Hash.create();
-    hash.update("DIEM::RawTransaction");
+    hash.update('DIEM::RawTransaction');
 
     const prefix = hash.digest();
     const body = BCS.bcsToBytes(rawTxn);
@@ -194,35 +221,47 @@ class PendingTransactionsService implements IPendingTransactionsService {
 
     const authenticator = new TransactionAuthenticatorEd25519(
       new Ed25519PublicKey(signer.pubKey().toUint8Array()),
-      sig
+      sig,
     );
     const signedTx = new SignedTransaction(rawTxn, authenticator);
-
     const bcsTxn = BCS.bcsToBytes(signedTx);
 
-    console.log('bcsTxn', Buffer.from(bcsTxn).toString('hex'));
+    const res = await axios<{
+      data?: {
+        newTransaction: {
+          hash: string;
+          status: string;
+        };
+      };
+    }>({
+      method: 'POST',
+      url: 'https://api.0l.fyi/graphql',
+      // url: 'http://localhost:3000/graphql',
+      validateStatus: () => true,
+      data: {
+        operationName: 'NewTransaction',
+        variables: {
+          signedTransaction: Buffer.from(bcsTxn).toString('hex'),
+        },
+        query: `
+          mutation NewTransaction($signedTransaction: Bytes!) {
+            newTransaction(signedTransaction: $signedTransaction) {
+              hash
+              status
+            }
+          }
+        `,
+      },
+    });
 
-    // try {
-    //   const res = await axios<{
-    //     hash: string;
-    //   }>({
-    //     method: 'POST',
-    //     url: 'https://rpc.0l.fyi/v1/transactions',
-    //     headers: {
-    //       "content-type": "application/x.diem.signed_transaction+bcs",
-    //     },
-    //     data: bcsTxn,
-    //   });
-    //   console.log(res.status);
+    console.log('res', res);
 
-    //   if (res.status === 202) {
-    //     console.log(res.data);
-    //     // console.log(`tx hash = ${res.data.hash}`);
-    //     // return new Uint8Array(Buffer.from(res.data.hash.substring(2), "hex"));
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    // }
+    if (res.data.data) {
+      await this.pendingTransactionsRepository.setPendingTransactionHash(
+        id,
+        parseHexString(res.data.data.newTransaction.hash),
+      );
+    }
 
     return id;
   }
@@ -261,7 +300,9 @@ class PendingTransactionsService implements IPendingTransactionsService {
     throw new Error(`unsupported transaction type: ${transaction.type}`);
   }
 
-  public async getPendingTransaction(id: string): Promise<IPendingTransaction | null> {
+  public async getPendingTransaction(
+    id: string,
+  ): Promise<IPendingTransaction | null> {
     return this.pendingTransactionsRepository.getPendingTransaction(id);
   }
 
@@ -282,6 +323,32 @@ class PendingTransactionsService implements IPendingTransactionsService {
     listener: (eventData: any) => void,
   ): UnsubscribeFn {
     return this.eventEmitter.on(event, listener);
+  }
+
+  private async onPendingTransaction({
+    status,
+    hash,
+  }: {
+    status: string;
+    address: Uint8Array;
+    hash: Uint8Array;
+  }) {
+    const pendingTransaction =
+      await this.pendingTransactionsRepository.getPendingTransactionByHash(
+        hash,
+      );
+    if (pendingTransaction) {
+      await this.pendingTransactionsRepository.setPendingTransactionStatus(
+        pendingTransaction.id,
+        status,
+      );
+      await this.eventEmitter.emit(
+        PendingTransactionsServiceEvent.PendingTransactionUpdated,
+        await this.pendingTransactionsRepository.getPendingTransaction(
+          pendingTransaction.id,
+        ),
+      );
+    }
   }
 }
 

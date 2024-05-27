@@ -1,15 +1,16 @@
-import { Field, ID, ObjectType } from "@nestjs/graphql";
-import { IPendingTransaction } from "./interfaces";
-import DApp from "../dapps/DApp";
-import { IDApp } from "../dapps/interfaces";
+import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { IPendingTransaction, PendingTransactionArgs, PendingTransactionStatus } from './interfaces';
 
-@ObjectType("PendingTransaction")
+@ObjectType('PendingTransaction')
 class PendingTransaction implements IPendingTransaction {
   @Field((type) => ID)
   public id: string;
 
-  @Field((type) => DApp)
-  dApp: IDApp;
+  @Field((type) => Buffer, { nullable: true })
+  public hash?: Uint8Array;
+
+  @Field((type) => PendingTransactionStatus)
+  public status: PendingTransactionStatus;
 
   @Field((type) => String)
   type: string;
@@ -20,18 +21,17 @@ class PendingTransaction implements IPendingTransaction {
   @Field((type) => Date)
   createdAt: Date;
 
-  public init(
-    id: string,
-    dApp: IDApp,
-    type: string,
-    payload: Buffer,
-    createdAt: Date,
-  ) {
-    this.id = id;
-    this.dApp = dApp;
-    this.type = type;
-    this.payload = payload;
-    this.createdAt = createdAt;
+  @Field((type) => Number)
+  expirationTimestamp: number;
+
+  public init(args: PendingTransactionArgs) {
+    this.id = args.id;
+    this.type = args.type;
+    this.payload = args.payload;
+    this.createdAt = args.createdAt;
+    this.hash = args.hash;
+    this.status = args.status;
+    this.expirationTimestamp = args.expirationTimestamp;
   }
 }
 

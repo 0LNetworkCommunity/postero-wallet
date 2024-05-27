@@ -37,6 +37,7 @@ export interface IWalletService {
   setSlow(address: Uint8Array): Promise<void>;
 
   getWalletsFromAuthKey(authKey: Uint8Array): Promise<IGraphQLWallet[]>;
+  getWallets(): Promise<IGraphQLWallet[]>;
 
   on(
     eventName: WalletServiceEvent,
@@ -82,4 +83,42 @@ export interface ISlowWallet {
   transferred: string;
   unlocked: string;
   init(transferred: string, unlocked: string): void;
+}
+
+export enum WalletsWatcherServiceEvent {
+  PendingTransaction = "PendingTransaction",
+}
+
+export interface IWalletsWatcherService {
+  on(
+    event: WalletsWatcherServiceEvent.PendingTransaction,
+    listener: (data: {
+      address: Uint8Array;
+      status: string;
+      hash: Uint8Array;
+    }) => void | Promise<void>,
+  ): UnsubscribeFn;
+}
+
+export interface IWalletWatcher {
+  address: Uint8Array;
+
+  init(address: Uint8Array): void;
+  destroy(): Promise<void>;
+
+  on(
+    event: WalletWatcherEvent.PendingTransaction,
+    listener: (data: {
+      status: string;
+      hash: Uint8Array;
+    }) => void | Promise<void>,
+  ): UnsubscribeFn;
+}
+
+export interface IWalletWatcherFactory {
+  getWatcher(address: Uint8Array): Promise<IWalletWatcher>;
+}
+
+export enum WalletWatcherEvent {
+  PendingTransaction = "PendingTransaction",
 }

@@ -24,7 +24,7 @@ class PendingTransactionsResolver {
 
   @Query((returns) => PendingTransaction)
   public async pendingTransaction(
-    @Args("id", { type: () => ID })
+    @Args('id', { type: () => ID })
     id: string,
   ) {
     const pendingTransaction =
@@ -39,7 +39,7 @@ class PendingTransactionsResolver {
 
   @Mutation((returns) => Boolean)
   public async sendPendingTransaction(
-    @Args("id", { type: () => String })
+    @Args('id', { type: () => String })
     id: string,
 
     // @Args("walletAddress", { type: () => String })
@@ -84,7 +84,7 @@ class PendingTransactionsResolver {
 
   @Mutation((returns) => Boolean)
   public async removePendingTransaction(
-    @Args("pendingTransactionId", { type: () => ID })
+    @Args('pendingTransactionId', { type: () => ID })
     pendingTransactionId: string,
   ) {
     await this.pendingTransactionsService.removePendingTransaction(
@@ -120,6 +120,28 @@ class PendingTransactionsResolver {
           });
         },
       );
+      await stop;
+      release();
+    });
+  }
+
+  @Subscription((returns) => PendingTransaction, { name: 'pendingTransaction' })
+  public pendingTransactionSubscription(
+    @Args({ name: "id", type: () => ID })
+    id: string,
+  ) {
+    return new Repeater(async (push, stop) => {
+      const release = this.pendingTransactionsService.on(
+        PendingTransactionsServiceEvent.PendingTransactionUpdated,
+        (pendingTransaction) => {
+          if (pendingTransaction.id === id) {
+            push({
+              pendingTransaction,
+            });
+          }
+        },
+      );
+
       await stop;
       release();
     });

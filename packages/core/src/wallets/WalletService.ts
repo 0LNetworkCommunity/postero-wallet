@@ -1,14 +1,15 @@
-import Emittery, { UnsubscribeFn } from "emittery";
+import Emittery, { UnsubscribeFn } from 'emittery';
 import { Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
-import _, { add } from 'lodash';
-import { AptosAccount, AptosClient, BCS, TxnBuilderTypes } from "aptos";
-import { sha3_256 as sha3Hash } from "@noble/hashes/sha3";
+import _ from 'lodash';
+import { AptosAccount, AptosClient, BCS, TxnBuilderTypes } from 'aptos';
+import { sha3_256 as sha3Hash } from '@noble/hashes/sha3';
 
 import {
   IBalance,
   IBalanceRepository,
   IGraphQLWallet,
+  IGraphQLWalletFactory,
   ISlowWallet,
   ISlowWalletFactory,
   IWalletRepository,
@@ -16,16 +17,16 @@ import {
   WalletServiceEvent,
 } from './interfaces';
 import { Types } from '../types';
-import Wallet from "../crypto/Wallet";
-import { IDbService } from "../db/interfaces";
-import { IOpenLibraService } from "../open-libra/interfaces";
-import { ICoinRepository } from "../coin/interfaces";
-import { GetAccountMovementsRes } from "./gql-types";
-import { PlatformTypes } from "../platform/platform-types";
-import { PlatformEncryptedStoreService } from "../platform/interfaces";
-import { Knex } from "knex";
-import { IKeychainService } from "../keychain/interfaces";
-import { GraphQLWallet } from "./GraphQLWallet";
+import Wallet from '../crypto/Wallet';
+import { IDbService } from '../db/interfaces';
+import { IOpenLibraService } from '../open-libra/interfaces';
+import { ICoinRepository } from '../coin/interfaces';
+import { GetAccountMovementsRes } from './gql-types';
+import { PlatformTypes } from '../platform/platform-types';
+import { PlatformEncryptedStoreService } from '../platform/interfaces';
+import { Knex } from 'knex';
+import { IKeychainService } from '../keychain/interfaces';
+import { GraphQLWallet } from './GraphQLWallet';
 
 const {
   EntryFunction,
@@ -131,6 +132,9 @@ class WalletService implements IWalletService {
 
   @Inject(Types.ISlowWalletFactory)
   private readonly slowWalletFactory: ISlowWalletFactory;
+
+  @Inject(Types.IGraphQLWalletFactory)
+  private readonly graphQLWalletFactory!: IGraphQLWalletFactory;
 
   @Inject(PlatformTypes.EncryptedStoreService)
   private readonly platformEncryptedStoreService: PlatformEncryptedStoreService;
@@ -498,12 +502,28 @@ class WalletService implements IWalletService {
     return this.walletRepository.getWalletsFromAuthKey(authKey);
   }
 
-  public async setWalletLabel(address: Uint8Array, label: string): Promise<void> {
+  public async setWalletLabel(
+    address: Uint8Array,
+    label: string,
+  ): Promise<void> {
     await this.walletRepository.setWalletLabel(address, label);
     this.eventEmitter.emit(WalletServiceEvent.WalletUpdated, {
       label,
       address,
     });
+  }
+
+  public async getWallets(): Promise<IGraphQLWallet[]> {
+    const wallets = await this.walletRepository.getWallets();
+
+    return Promise.all(
+      wallets.map((wallet) =>
+        this.graphQLWalletFactory.getGraphQLWallet(
+          wallet.label,
+          wallet.address,
+        ),
+      ),
+    );
   }
 }
 

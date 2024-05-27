@@ -1,4 +1,3 @@
-import { v4 as uuid } from "uuid";
 import { Inject, Injectable } from "@nestjs/common";
 import Bluebird from "bluebird";
 
@@ -6,11 +5,11 @@ import {
   IPendingTransaction,
   IPendingTransactionFactory,
   IPendingTransactionsRepository,
+  PendingTransactionStatus,
   RawPendingTransactionPayloadType,
 } from "./interfaces";
 import { Types } from "../types";
 import { IDbService } from "../db/interfaces";
-import { IDApp, IDAppService } from "../dapps/interfaces";
 import { PlatformTypes } from "../platform/platform-types";
 import { PlatformCryptoService } from "../platform/interfaces";
 
@@ -22,9 +21,6 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
   @Inject(Types.IPendingTransactionFactory)
   private pendingTransactionFactory: IPendingTransactionFactory;
 
-  @Inject(Types.IDAppService)
-  private dAppService: IDAppService;
-
   @Inject(PlatformTypes.CryptoService)
   private readonly platformCryptoService: PlatformCryptoService;
 
@@ -33,12 +29,12 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
     transactionPayload: Uint8Array,
     maxGasUnit: bigint,
     gasPrice: bigint,
-    expirationTimestamp: bigint
+    expirationTimestamp: bigint,
   ): Promise<string> {
     const id = this.platformCryptoService.randomUUID();
     const createdAt = new Date();
 
-    await this.dbService.db("pendingTransactions").insert({
+    await this.dbService.db('pendingTransactions').insert({
       id,
       sender: this.dbService.raw(sender),
       payload: this.dbService.raw(transactionPayload),
@@ -46,68 +42,98 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
       gasPrice: gasPrice.toString(10),
       expirationTimestamp: expirationTimestamp.toString(10),
       createdAt: createdAt.toISOString(),
+      status: PendingTransactionStatus.Unknown,
     });
 
     return id;
-
-    // return {} as IPendingTransaction;
-
-    // const pendingTransaction =
-    //   await this.pendingTransactionFactory.getPendingTransaction(
-    //     id,
-    //     dApp,
-    //     type,
-    //     payload,
-    //     createdAt,
-    //   );
-
-    // return pendingTransaction;
   }
 
   public async getPendingTransaction(
     id: string,
   ): Promise<IPendingTransaction | null> {
     const row = await this.dbService
-      .db("pendingTransactions")
-      .where("id", id)
+      .db('pendingTransactions')
+      .where('id', id)
       .first();
     if (!row) {
       return null;
     }
 
-    const dApp = await this.dAppService.getDApp(row.dAppId);
-    return this.pendingTransactionFactory.getPendingTransaction(
-      row.id,
-      dApp!,
-      row.type as RawPendingTransactionPayloadType,
-      row.payload,
-      new Date(row.createdAt),
-    );
+    return this.pendingTransactionFactory.getPendingTransaction({
+      id: row.id,
+      hash: row.hash,
+      status: row.status,
+      type: row.type as RawPendingTransactionPayloadType,
+      payload: row.payload,
+      createdAt: new Date(row.createdAt),
+      expirationTimestamp: row.expirationTimestamp,
+    });
+  }
+
+  public async getPendingTransactionByHash(
+    hash: Uint8Array,
+  ): Promise<IPendingTransaction | null> {
+    const row = await this.dbService
+      .db('pendingTransactions')
+      .where('hash', hash)
+      .first();
+    if (!row) {
+      return null;
+    }
+
+    return this.pendingTransactionFactory.getPendingTransaction({
+      id: row.id,
+      hash: row.hash,
+      status: row.status,
+      type: row.type as RawPendingTransactionPayloadType,
+      payload: row.payload,
+      createdAt: new Date(row.createdAt),
+      expirationTimestamp: row.expirationTimestamp,
+    });
   }
 
   public async getPendingTransactions(): Promise<IPendingTransaction[]> {
-    const rows = await this.dbService.db("pendingTransactions");
-    const dAppIds = rows.map((row) => row.dAppId);
-    const dApps = await this.dAppService.getDAppsById(dAppIds);
+    const rows = await this.dbService.db('pendingTransactions');
 
     return Bluebird.map(rows, async (row) => {
-      const dApp = dApps.find((it) => it.id === row.dAppId)!;
-
-      return this.pendingTransactionFactory.getPendingTransaction(
-        row.id,
-        dApp,
-        row.type as RawPendingTransactionPayloadType,
-        row.payload,
-        new Date(row.createdAt),
-      );
+      return this.pendingTransactionFactory.getPendingTransaction({
+        id: row.id,
+        hash: row.hash,
+        status: row.status,
+        type: row.type as RawPendingTransactionPayloadType,
+        payload: row.payload,
+        createdAt: new Date(row.createdAt),
+        expirationTimestamp: row.expirationTimestamp,
+      });
     });
   }
 
   public async removePendingTransaction(id: string): Promise<void> {
+    await this.dbService.db('pendingTransactions').where('id', id).del();
+  }
+
+  public async setPendingTransactionHash(
+    id: string,
+    hash: Uint8Array,
+  ): Promise<void> {
     await this.dbService
-      .db("pendingTransactions")
-      .where("id", id)
-      .del();
+      .db('pendingTransactions')
+      .update({
+        hash,
+      })
+      .where('id', id);
+  }
+
+  public async setPendingTransactionStatus(
+    id: string,
+    status: string,
+  ): Promise<void> {
+    await this.dbService
+      .db('pendingTransactions')
+      .update({
+        status,
+      })
+      .where('id', id);
   }
 }
 

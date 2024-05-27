@@ -1,42 +1,53 @@
+import { useEffect, useState } from "react";
+import { gql, useApolloClient } from "@apollo/client";
 import { StackScreenProps } from "@react-navigation/stack";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import tw from "twrnc";
 
 import { ModalStackParams } from "../params";
 import NavBar from "../../../ui/NavBar";
 import ChevronLeftIcon from "../../icons/ChevronLeftIcon";
-import { Button } from "@postero/ui";
-import { gql, useApolloClient } from "@apollo/client";
+import { PendingTransactionState } from "./PendingTransactionState";
+import { PendingTransaction } from "./types";
 
-const SEND_PENDING_TRANSACTION = gql`
-   mutation SendPendingTransaction(
-    $id: String!
-  ) {
-    sendPendingTransaction(id: $id)
+const GET_PENDING_TRANSACTION = gql`
+  query GetPendingTransaction($id: ID!) {
+    pendingTransaction(id: $id) {
+      id
+      hash
+      status
+    }
   }
 `;
 
-function PendingTransaction({
+function PendingTransactionView({
   route,
   navigation,
 }: StackScreenProps<ModalStackParams, "PendingTransaction">) {
   const apolloClient = useApolloClient();
+  const [transaction, setTransaction] = useState<PendingTransaction | null>(
+    null
+  );
 
-  const onSend = async () => {
-    try {
-      const res = await apolloClient.mutate<{
-        newTransfer: string;
-      }>({
-        mutation: SEND_PENDING_TRANSACTION,
-        variables: {
-          id: route.params.id,
-        },
-      });
-      console.log('res', res);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await apolloClient.mutate<{
+          pendingTransaction: PendingTransaction;
+        }>({
+          mutation: GET_PENDING_TRANSACTION,
+          variables: {
+            id: route.params.id,
+          },
+        });
+        setTransaction(res.data?.pendingTransaction ?? null);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    load();
+  }, [route.params.id]);
 
   return (
     <View
@@ -57,13 +68,9 @@ function PendingTransaction({
         }
       />
 
-      <Text>{route.params.id}</Text>
-
-      <Button title="Send transaction" onPress={onSend} />
+      {transaction && <PendingTransactionState id={transaction.id} />}
     </View>
   );
-
 }
 
-export default PendingTransaction;
-
+export default PendingTransactionView;

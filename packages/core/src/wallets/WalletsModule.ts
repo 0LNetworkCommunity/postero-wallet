@@ -17,6 +17,10 @@ import SlowWalletFactory from './SlowWalletFactory';
 import { SlowWallet } from './SlowWallet';
 import KeychainModule from '../keychain/KeychainModule';
 import WalletResolver from './WalletResolver';
+import { WalletsWatcherService } from './WalletsWatcherService';
+import { WalletWatcherFactory } from "./WalletWatcherFactory";
+import { WalletWatcher } from './WalletWatcher';
+import { OlFyiModule } from '../ol-fyi/OlFyiModule';
 
 @Module({
   imports: [
@@ -24,6 +28,7 @@ import WalletResolver from './WalletResolver';
     CryptoModule,
     CoinModule,
     OpenLibraModule,
+    OlFyiModule,
     forwardRef(() => KeychainModule),
   ],
   providers: [
@@ -57,6 +62,10 @@ import WalletResolver from './WalletResolver';
       useClass: WalletService,
     },
     {
+      provide: Types.IWalletsWatcherService,
+      useClass: WalletsWatcherService,
+    },
+    {
       provide: Types.IBalanceRepository,
       useClass: BalanceRepository,
     },
@@ -69,8 +78,22 @@ import WalletResolver from './WalletResolver';
       useClass: Balance,
       scope: Scope.TRANSIENT,
     },
+
+    {
+      provide: Types.IWalletWatcherFactory,
+      useClass: WalletWatcherFactory,
+    },
+    {
+      provide: Types.IWalletWatcher,
+      useClass: WalletWatcher,
+      scope: Scope.TRANSIENT,
+    },
   ],
-  exports: [Types.IWalletService, Types.IWalletRepository],
+  exports: [
+    Types.IWalletService,
+    Types.IWalletRepository,
+    Types.IWalletsWatcherService,
+  ],
 })
 class WalletsModule {}
 
