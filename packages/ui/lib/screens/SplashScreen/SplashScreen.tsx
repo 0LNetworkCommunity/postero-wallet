@@ -1,6 +1,7 @@
 import { View } from "react-native";
 import styled from '@emotion/native';
-import Text from '../../components/Text';
+
+import { Text } from "../../components/Text";
 import { Button, ButtonSize, ButtonVariation, Logo } from "../../components";
 
 const Container = styled.SafeAreaView((props) => ({

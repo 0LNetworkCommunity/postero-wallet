@@ -8,7 +8,7 @@ import {
   IBrowserBridge,
   SerializedWallet,
 } from "./interfaces";
-import { IPendingTransactionsService, RawPendingTransactionPayload } from "../transactions/interfaces";
+import { IPendingTransactionsService, RawPendingTransactionPayload } from "../wallets/transactions/interfaces";
 import Wallet from "../crypto/Wallet";
 import { Types } from "../types";
 import { IConnectionRequest, IDApp, IDAppService } from "../dapps/interfaces";

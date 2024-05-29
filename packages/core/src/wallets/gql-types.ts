@@ -15,6 +15,7 @@ export interface GqlUserTransaction extends GqlAbstractTransaction {
   functionName: string;
   success: boolean;
   sender: string;
+  hash: string;
   arguments: string;
   timestamp: string;
 }

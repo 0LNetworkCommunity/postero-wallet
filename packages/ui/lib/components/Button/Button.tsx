@@ -7,7 +7,7 @@ import {
   View,
   RegisteredStyle,
 } from "react-native";
-import Text from "../Text";
+import { Text } from "../Text";
 
 type Falsy = undefined | null | false;
 interface RecursiveArray<T>

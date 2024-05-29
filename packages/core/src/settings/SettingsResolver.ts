@@ -25,8 +25,6 @@ class SettingsResolver {
     @Args('value', { type: () => String })
     value: string,
   ): Promise<Settings> {
-    console.log('>', key, value);
-
     const settings = new Settings();
     settings.init({
       rpcUrl: 'https://rpc.0l.fyi/',

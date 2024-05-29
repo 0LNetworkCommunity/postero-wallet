@@ -7,15 +7,16 @@ import React, {
 } from "react";
 import {
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
   TextInput as RNTextInput,
   StyleProp,
   ViewStyle,
   TextInputProps,
 } from "react-native";
-import Text from "../Text";
-import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import styled from "@emotion/native";
+
+import { Text } from "../Text";
 import { IconProps } from "../../icons/types";
 
 const Container = styled.View({

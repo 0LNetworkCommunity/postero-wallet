@@ -1,8 +1,9 @@
 import { gql, useQuery, useSubscription } from "@apollo/client";
-import { View, Text } from "react-native";
+import { View, Text, Linking } from "react-native";
 import { PendingTransaction, PendingTransactionStatus } from "./types";
 import { useState } from "react";
 import { Countdown } from "../../../ui/Countdown";
+import { Button } from "@postero/ui";
 
 const PENDING_TRANSACTION_SUBSCRIPTION = gql`
   subscription PendingTransaction($id: ID!) {
@@ -11,6 +12,22 @@ const PENDING_TRANSACTION_SUBSCRIPTION = gql`
       hash
       status
       expirationTimestamp
+
+      transaction {
+        __typename
+        version
+
+        ... on UserTransaction {
+          success
+          moduleName
+          moduleAddress
+          functionName
+          sender
+          hash
+          arguments
+          timestamp
+        }
+      }
     }
   }
 `;
@@ -22,6 +39,22 @@ const GET_PENDING_TRANSACTION = gql`
       hash
       status
       expirationTimestamp
+
+      transaction {
+        __typename
+        version
+
+        ... on UserTransaction {
+          success
+          moduleName
+          moduleAddress
+          functionName
+          sender
+          hash
+          arguments
+          timestamp
+        }
+      }
     }
   }
 `;
@@ -30,15 +63,15 @@ interface Props {
   id: string;
 }
 
-
 export function PendingTransactionState({ id }: Props) {
-  const [pendingTransaction, setPendingTransaction] = useState<PendingTransaction>();
+  const [pendingTransaction, setPendingTransaction] =
+    useState<PendingTransaction>();
 
   useSubscription<{
     pendingTransaction: PendingTransaction;
   }>(PENDING_TRANSACTION_SUBSCRIPTION, {
     onData: (res) => {
-      console.log('>>>', res);
+      console.log('FE', res);
 
       if (!res.data.data) {
         return;
@@ -68,22 +101,41 @@ export function PendingTransactionState({ id }: Props) {
     },
   });
 
+  if (!pendingTransaction) {
+    return null;
+  }
+
   return (
     <View>
-      {pendingTransaction && (
+      <Text>
+        {`hash = `}
+        <Text selectable>{pendingTransaction.hash}</Text>
+      </Text>
+      <Text>{`status = ${pendingTransaction.status}`}</Text>
+      {pendingTransaction.status === PendingTransactionStatus.Unknown && (
+        <Text>
+          {`expires in = `}
+          <Countdown
+            date={new Date(pendingTransaction.expirationTimestamp * 1e3)}
+          />
+        </Text>
+      )}
+
+      {pendingTransaction.transaction && (
         <>
-          <Text>
-            {`hash = `}
-            <Text selectable>{pendingTransaction.hash}</Text>
-          </Text>
-          <Text>{`status = ${pendingTransaction.status}`}</Text>
-          {pendingTransaction.status === PendingTransactionStatus.Unknown && (
-            <Text>
-              {`expires in = `}
-              <Countdown
-                date={new Date(pendingTransaction.expirationTimestamp * 1e3)}
+          {pendingTransaction.transaction.__typename === "UserTransaction" && (
+            <View>
+              <Text>{`func = ${pendingTransaction.transaction.moduleAddress}::${pendingTransaction.transaction.moduleName}::${pendingTransaction.transaction.functionName}`}</Text>
+              <Text>{`version = ${pendingTransaction.transaction.version}`}</Text>
+              <Button
+                title="View in explorer"
+                onPress={() => {
+                  Linking.openURL(
+                    `https://0l.fyi/transactions/${pendingTransaction.transaction!.version}`
+                  );
+                }}
               />
-            </Text>
+            </View>
           )}
         </>
       )}

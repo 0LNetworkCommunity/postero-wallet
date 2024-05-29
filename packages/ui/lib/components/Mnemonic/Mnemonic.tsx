@@ -3,7 +3,7 @@ import { View } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import * as Clipboard from 'expo-clipboard';
 
-import Text from "../Text";
+import { Text } from "../Text";
 import { Button, ButtonSize, ButtonVariation } from "../Button";
 import { Copy03Icon } from "../../icons/Copy03Icon";
 import { EyeIcon } from "../../icons/EyeIcon";

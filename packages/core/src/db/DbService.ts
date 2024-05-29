@@ -130,9 +130,10 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
     await this.db.raw(`
       CREATE TABLE IF NOT EXISTS "userTransaction" (
         "version" TEXT PRIMARY KEY,
-        "success" INTEGER,
-        "sender" TEXT NOT NULL,
-        "moduleAddress" TEXT NOT NULL,
+        "success" INTEGER NOT NULL,
+        "sender" BLOB NOT NULL,
+        "hash" BLOB NOT NULL,
+        "moduleAddress" BLOB NOT NULL,
         "moduleName" TEXT NOT NULL,
         "functionName" TEXT NOT NULL,
         "arguments" TEXT NOT NULL,
@@ -144,7 +145,7 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
       CREATE TABLE IF NOT EXISTS "scriptUserTransaction" (
         "version" TEXT PRIMARY KEY,
         "success" INTEGER,
-        "sender" TEXT NOT NULL,
+        "sender" BLOB NOT NULL,
         "timestamp" INTEGER NOT NULL
       )
     `);

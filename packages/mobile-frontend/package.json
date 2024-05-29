@@ -62,17 +62,17 @@
     "path": "^0.12.7",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "react-native": "0.73.6",
+    "react-native": "0.74.1",
     "react-native-gesture-handler": "2.16.2",
     "react-native-paper": "^5.12.3",
     "react-native-qrcode-svg": "^6.3.1",
-    "react-native-reanimated": "3.10.1",
+    "react-native-reanimated": "3.11.0",
     "react-native-reanimated-carousel": "^3.5.1",
     "react-native-safe-area-context": "4.10.1",
     "react-native-screens": "~3.31.1",
     "react-native-svg": "15.3.0",
     "react-native-tab-view": "^3.5.2",
-    "react-native-web": "0.19.11",
+    "react-native-web": "0.19.12",
     "readable-stream": "^4.5.2",
     "reflect-metadata": "0.2.2",
     "stream-browserify": "^3.0.0",
@@ -81,11 +81,11 @@
     "util": "^0.12.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.24.5",
+    "@babel/core": "^7.24.6",
     "@types/color": "^3.0.6",
     "@types/d3": "^7.4.3",
     "@types/lodash": "^4.17.4",
-    "@types/react": "~18.3.2",
+    "@types/react": "~18.3.3",
     "typescript": "^5.4.5"
   }
 }

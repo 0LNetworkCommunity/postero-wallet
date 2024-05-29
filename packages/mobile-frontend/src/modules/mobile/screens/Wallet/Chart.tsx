@@ -15,8 +15,6 @@ const BaseChart: FC<{ width: number; height: number } & Props> = ({
   height,
   data,
 }) => {
-  console.log("data", data);
-
   const rightMargin = 50;
 
   const xExt = d3.extent(data, (it) => it.date.getTime()) as [number, number]
@@ -24,11 +22,8 @@ const BaseChart: FC<{ width: number; height: number } & Props> = ({
   const yExt = d3.extent(data, (it) => it.value) as [number, number]
   yExt[1] = yExt[1] + yExt[1] * 0.001;
 
-  console.log('xExt', xExt, yExt[0], yExt[1]);
-
   const x = d3.scaleUtc(xExt, [0, width - rightMargin]);
 
-  console.log("yExt", yExt);
   // Declare the y (vertical position) scale.
   const y = d3.scaleLinear(yExt, [height, 0]);
 

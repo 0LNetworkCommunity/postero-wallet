@@ -5,8 +5,8 @@ import { SlowWallet } from './SlowWallet';
 import { Balance } from './Balance';
 import { ISlowWallet, IWalletService } from './interfaces';
 import { Types } from '../types';
-import WalletKey from '../keychain/WalletKey';
-import { IWalletKey } from '../keychain/interfaces';
+import WalletKey from './keychain/WalletKey';
+import { IWalletKey } from './keychain/interfaces';
 
 @Resolver(GraphQLWallet)
 class WalletResolver {

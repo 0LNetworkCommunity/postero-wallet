@@ -2,7 +2,7 @@ import styled from "@emotion/native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 import { ArrowNarrowLeftIcon } from "../../icons/ArrowNarrowLeftIcon";
-import Text from "../Text";
+import { Text } from "../Text";
 
 const Container = styled.View({
   flexDirection: "row",

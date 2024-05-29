@@ -25,8 +25,8 @@ import { GetAccountMovementsRes } from './gql-types';
 import { PlatformTypes } from '../platform/platform-types';
 import { PlatformEncryptedStoreService } from '../platform/interfaces';
 import { Knex } from 'knex';
-import { IKeychainService } from '../keychain/interfaces';
-import { GraphQLWallet } from './GraphQLWallet';
+import { IKeychainService } from '../wallets/keychain/interfaces';
+import { ITransactionsService } from './transactions/interfaces';
 
 const {
   EntryFunction,
@@ -84,6 +84,7 @@ export const GET_MOVEMENTS = `
                 moduleAddress
                 functionName
                 sender
+                hash
                 arguments
                 timestamp
               }
@@ -104,8 +105,37 @@ export const GET_MOVEMENTS = `
 class WalletService implements IWalletService {
   private readonly aptosClient = new AptosClient('https://rpc.0l.fyi');
 
-  @Inject(Types.IBalanceRepository)
-  private readonly balanceRepository: IBalanceRepository;
+  public constructor(
+    @Inject(Types.IBalanceRepository)
+    private readonly balanceRepository: IBalanceRepository,
+
+    @Inject(Types.IDbService)
+    private readonly dbService: IDbService,
+
+    @Inject(Types.IOpenLibraService)
+    private readonly openLibraService: IOpenLibraService,
+
+    @Inject(Types.IKeychainService)
+    private readonly keychainService: IKeychainService,
+
+    @Inject(Types.ICoinRepository)
+    private readonly coinRepository: ICoinRepository,
+
+    @Inject(Types.IWalletRepository)
+    private readonly walletRepository: IWalletRepository,
+
+    @Inject(Types.ISlowWalletFactory)
+    private readonly slowWalletFactory: ISlowWalletFactory,
+
+    @Inject(Types.IGraphQLWalletFactory)
+    private readonly graphQLWalletFactory: IGraphQLWalletFactory,
+
+    @Inject(Types.ITransactionsService)
+    private readonly transactionsService: ITransactionsService,
+
+    @Inject(PlatformTypes.EncryptedStoreService)
+    private readonly platformEncryptedStoreService: PlatformEncryptedStoreService,
+  ) {}
 
   getWallet(walletAddress: Uint8Array): Promise<Wallet> {
     throw new Error('Method not implemented.');
@@ -114,30 +144,6 @@ class WalletService implements IWalletService {
   getWalletPrivateKey(walletAddress: Uint8Array): Promise<Uint8Array> {
     throw new Error('Method not implemented.');
   }
-
-  @Inject(Types.IDbService)
-  private readonly dbService: IDbService;
-
-  @Inject(Types.IOpenLibraService)
-  private readonly openLibraService: IOpenLibraService;
-
-  @Inject(Types.IKeychainService)
-  private readonly keychainService: IKeychainService;
-
-  @Inject(Types.ICoinRepository)
-  private readonly coinRepository: ICoinRepository;
-
-  @Inject(Types.IWalletRepository)
-  private readonly walletRepository: IWalletRepository;
-
-  @Inject(Types.ISlowWalletFactory)
-  private readonly slowWalletFactory: ISlowWalletFactory;
-
-  @Inject(Types.IGraphQLWalletFactory)
-  private readonly graphQLWalletFactory!: IGraphQLWalletFactory;
-
-  @Inject(PlatformTypes.EncryptedStoreService)
-  private readonly platformEncryptedStoreService: PlatformEncryptedStoreService;
 
   private eventEmitter = new Emittery();
 
@@ -185,8 +191,9 @@ class WalletService implements IWalletService {
         version: string;
         timestamp: string;
         success: boolean;
-        sender: string;
-        moduleAddress: string;
+        sender: Uint8Array;
+        hash: Uint8Array;
+        moduleAddress: Uint8Array;
         moduleName: string;
         functionName: string;
         arguments: string;
@@ -196,7 +203,7 @@ class WalletService implements IWalletService {
         version: string;
         timestamp: string;
         success: boolean;
-        sender: string;
+        sender: Knex.Raw<unknown>; // Uint8Array;
       }> = [];
 
       const blockMetadataTransactionRows: Array<{
@@ -236,8 +243,9 @@ class WalletService implements IWalletService {
             userTransactionRows.push({
               version: transaction.version,
               success: transaction.success,
-              sender: transaction.sender,
-              moduleAddress: transaction.moduleAddress,
+              hash: Buffer.from(transaction.hash, 'hex'),
+              sender: Buffer.from(transaction.sender, 'hex'),
+              moduleAddress: Buffer.from(transaction.moduleAddress, 'hex'),
               moduleName: transaction.moduleName,
               functionName: transaction.functionName,
               arguments: transaction.arguments,
@@ -249,7 +257,9 @@ class WalletService implements IWalletService {
             scriptUserTransactionRows.push({
               version: transaction.version,
               success: transaction.success,
-              sender: transaction.sender,
+              sender: this.dbService.raw(
+                Buffer.from(transaction.sender, 'hex'),
+              ),
               timestamp: transaction.timestamp,
             });
             break;
@@ -279,13 +289,9 @@ class WalletService implements IWalletService {
             .ignore();
         }
 
-        if (userTransactionRows.length) {
-          await this.dbService
-            .db('userTransaction')
-            .insert(userTransactionRows)
-            .onConflict('version')
-            .ignore();
-        }
+        await this.transactionsService.createUserTransactions(
+          userTransactionRows,
+        );
 
         if (scriptUserTransactionRows.length) {
           await this.dbService
@@ -468,8 +474,6 @@ class WalletService implements IWalletService {
     const signedTx = new SignedTransaction(rawTxn, authenticator);
 
     const bcsTxn = BCS.bcsToBytes(signedTx);
-
-    console.log('sending...');
 
     try {
       const res = await axios<{

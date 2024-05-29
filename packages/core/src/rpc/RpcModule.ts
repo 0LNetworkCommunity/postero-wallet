@@ -4,12 +4,12 @@ import RpcService from "./RpcService";
 import BrowserTabService from "./BrowserTabService";
 import BrowserTabFactory from "./BrowserTabFactory";
 import BrowserTab from "./BrowserTab";
-import TransactionsModule from "../transactions/TransactionsModule";
 import { Types } from "../types";
 import DAppsModule from "../dapps/DAppsModule";
+import WalletsModule from "../wallets/WalletsModule";
 
 @Module({
-  imports: [DAppsModule, TransactionsModule],
+  imports: [DAppsModule, WalletsModule],
   providers: [
     {
       provide: Types.IRpcService,

@@ -26,18 +26,13 @@ import { Types } from './types';
 import WalletsModule from './wallets/WalletsModule';
 import { GraphQLModule } from './graphql/graphql.module';
 import { PlatformModule } from './platform/PlatformModule';
-import TransfersModule from './transfers/TransfersModule';
 import { DocumentNode } from 'graphql';
-import MovementsModule from './movements/MovementsModule';
 import IpcModule from './ipc/ipc.module';
 import { IWindow } from './window-manager/interfaces';
 import DAppsModule from './dapps/DAppsModule';
-import TransactionsModule from './transactions/TransactionsModule';
 import { WindowManagerModule } from './window-manager/WindowManagerModule';
 import RpcModule from './rpc/RpcModule';
 import SettingsModule from './settings/SettingsModule';
-import KeychainModule from './keychain/KeychainModule';
-import KeyRotationModule from './key-rotation/KeyRotationModule';
 
 export * from './platform/platform-types';
 export * from './platform/interfaces';
@@ -76,14 +71,9 @@ export class Backend {
         GraphQLModule,
         DAppsModule,
         WalletsModule,
-        TransfersModule,
-        MovementsModule,
-        TransactionsModule,
         WindowManagerModule,
         SettingsModule,
         RpcModule,
-        KeychainModule,
-        KeyRotationModule,
         ...(imports ?? []),
       ],
       providers: [],

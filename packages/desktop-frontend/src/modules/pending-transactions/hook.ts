@@ -95,7 +95,6 @@ export const usePendingTransactions = (): PendingTransaction[] => {
         if (!res.data.data) {
           return;
         }
-        console.log('>', res.data.data);
         const pendingTransactionId = res.data.data.pendingTransactionRemoved;
         setPendingTransactions((prev) => {
           return prev.filter((it) => it.id !== pendingTransactionId);

@@ -1,8 +1,9 @@
 import { forwardRef, useMemo, useCallback, useImperativeHandle, useRef } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import { Button } from "@postero/ui";
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export interface ContextMenuHandle {
   open: () => void;
@@ -14,9 +15,10 @@ interface Props {
 
 const ContextMenu = forwardRef<ContextMenuHandle, Props>(({}, ref) => {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
-	const snapPoints = useMemo(() => ["20%"], []);
+	const snapPoints = useMemo(() => [200 + insets.bottom], []);
 
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
@@ -75,6 +77,13 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({}, ref) => {
           onPress={() => {
             bottomSheetRef.current?.close();
             navigation.navigate("Transactions");
+          }}
+        />
+        <Button
+          title="Pending Transactions"
+          onPress={() => {
+            bottomSheetRef.current?.close();
+            navigation.navigate("PendingTransactions");
           }}
         />
       </BottomSheetView>

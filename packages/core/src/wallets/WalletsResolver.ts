@@ -60,7 +60,6 @@ class WalletsResolver {
     address: string,
   ) {
     // await this.walletService.importWallet(mnemonic);
-    console.log('>>', address);
     return true;
   }
 
@@ -101,10 +100,10 @@ class WalletsResolver {
 
   @Mutation((returns) => Boolean)
   public async syncWallet(
-    @Args('address', { type: () => String })
-    address: string,
+    @Args('address', { type: () => Buffer })
+    address: Uint8Array,
   ) {
-    await this.walletService.syncWallet(Buffer.from(address, 'hex'));
+    await this.walletService.syncWallet(address);
     return true;
   }
 
@@ -141,7 +140,6 @@ class WalletsResolver {
         WalletServiceEvent.NewWallet,
         async (wallet: Wallet) => {
           const graphqlWallet = await this.walletMapper(wallet);
-          console.log('walletAdded',graphqlWallet);
           push({
             walletAdded: graphqlWallet,
           });
@@ -159,7 +157,6 @@ class WalletsResolver {
         WalletServiceEvent.WalletUpdated,
         async (wallet: Wallet) => {
           const graphqlWallet = await this.walletMapper(wallet);
-          console.log('walletUpdated',graphqlWallet);
           push({
             walletUpdated: graphqlWallet,
           });

@@ -6,7 +6,7 @@ import {
   TextInput as RNTextInput,
   Keyboard,
 } from "react-native";
-import { getLocales } from 'expo-localization';
+import { getLocales } from "expo-localization";
 import _ from "lodash";
 import { fonts } from "../../theme";
 
@@ -27,9 +27,9 @@ const InputContextSizeHelper = styled.Text({
   ...amountText,
 });
 
-const decimalSeparator = getLocales()[0].decimalSeparator || '.';
-const ZERO_ASCII = '0'.charCodeAt(0);
-const NINE_ASCII = '9'.charCodeAt(0);
+const decimalSeparator = getLocales()[0].decimalSeparator || ".";
+const ZERO_ASCII = "0".charCodeAt(0);
+const NINE_ASCII = "9".charCodeAt(0);
 
 function cleanDecimalInput(input: string): string {
   let out = "";
@@ -124,12 +124,13 @@ function AmountInputInner({
         ++i;
       }
 
-      if (i > 0 && value[i] === ' ') {
+      if (i > 0 && value[i] === " ") {
         const currentRemaning = value.slice(i + 1);
         const newRemaining = newValue.slice(i);
         if (currentRemaning === newRemaining) {
-
-          onChange(cleanDecimalInput(`${newValue.slice(0, i - 1)}${newRemaining}`));
+          onChange(
+            cleanDecimalInput(`${newValue.slice(0, i - 1)}${newRemaining}`)
+          );
           return;
         }
       }
@@ -142,9 +143,9 @@ function AmountInputInner({
   return (
     <View style={{ width: "100%" }}>
       {/**
-        * Hidden element containning a copy of the input text used to
-        * determine the width of the text in the text input
-        */}
+       * Hidden element containning a copy of the input text used to
+       * determine the width of the text in the text input
+       */}
       <View
         style={{
           flexDirection: "row",

@@ -1,7 +1,7 @@
 import { TouchableOpacity, View } from "react-native";
 import { ReactNode } from "react";
 
-import Text from "../../components/Text";
+import { Text } from "../../components/Text";
 import { AmountInput } from "../../components/AmountInput";
 import { TextInput } from "../../components/TextInput";
 import { XCloseIcon } from "../../icons/XCloseIcon";

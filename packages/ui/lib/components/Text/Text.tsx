@@ -23,7 +23,7 @@ interface Props {
   quarterary?: boolean;
 }
 
-const Text = forwardRef<RNText, TextProps & Props>(function Text(props, ref) {
+export const Text = forwardRef<RNText, TextProps & Props>(function Text(props, ref) {
   let {
     display,
     text,
@@ -92,5 +92,3 @@ const Text = forwardRef<RNText, TextProps & Props>(function Text(props, ref) {
 
   return <RNText style={[textStyle, style]} {...rnTextProps} ref={ref} />;
 });
-
-export default Text;

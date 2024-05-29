@@ -30,6 +30,7 @@ import PrivateKey from "./screens/PrivateKey";
 import Transactions from "./screens/Transactions";
 import Transaction from "./screens/Transaction";
 import PendingTransaction from "./screens/PendingTransaction";
+import { PendingTransactions } from "./screens/PendingTransactions";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -162,6 +163,14 @@ const App: FC = () => {
                   options={{
                     headerShown: false,
                     presentation: "modal",
+                  }}
+                />
+
+                <Stack.Screen
+                  name="PendingTransactions"
+                  component={PendingTransactions}
+                  options={{
+                    headerShown: false,
                   }}
                 />
 

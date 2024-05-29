@@ -28,10 +28,12 @@ export const useMovements = (
             walletAddress,
           },
         });
-        const { movements } = res.data;
-        setMovements(
-          movements.edges.map((edge) => gqlMovementMapper(edge.node))
-        );
+        if (res.data) {
+          const { movements } = res.data;
+          setMovements(
+            movements.edges.map((edge) => gqlMovementMapper(edge.node))
+          );
+        }
       } finally {
         setLoading(false);
       }

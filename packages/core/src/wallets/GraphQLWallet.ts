@@ -1,4 +1,4 @@
-import { Field, ObjectType } from "@nestjs/graphql";
+import { Field, ObjectType } from '@nestjs/graphql';
 
 import {
   IBalance,
@@ -6,9 +6,9 @@ import {
   ISlowWallet,
   IWalletService,
 } from './interfaces';
-import { Inject } from "@nestjs/common";
-import { Types } from "../types";
-import { IKeychainService, IWalletKey } from "../keychain/interfaces";
+import { Inject } from '@nestjs/common';
+import { Types } from '../types';
+import { IKeychainService, IWalletKey } from './keychain/interfaces';
 
 @ObjectType('Wallet')
 export class GraphQLWallet implements IGraphQLWallet {
@@ -24,10 +24,7 @@ export class GraphQLWallet implements IGraphQLWallet {
   @Inject(Types.IKeychainService)
   private readonly keychainService: IKeychainService;
 
-  public init(
-    label: string,
-    address: Uint8Array,
-  ) {
+  public init(label: string, address: Uint8Array) {
     this.label = label;
     this.address = address;
   }

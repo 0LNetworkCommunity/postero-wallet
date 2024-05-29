@@ -8,9 +8,10 @@ export enum Types {
 
   IWalletService = "IWalletService",
   IWalletRepository = "IWalletRepository",
-  IWalletsWatcherService = "IWalletsWatcherService",
-  IWalletWatcher = "IWalletWatcher",
-  IWalletWatcherFactory = "IWalletWatcherFactory",
+
+  ITransactionsWatcherService = "ITransactionsWatcherService",
+  ITransactionWatcher = "ITransactionWatcher",
+  ITransactionWatcherFactory = "ITransactionWatcherFactory",
 
   ICoin = "ICoin",
   ICoinRepository = "ICoinRepository",
@@ -60,6 +61,8 @@ export enum Types {
   ITransaction = "ITransaction",
   ITransactionsService = "ITransactionsService",
   ITransactionsRepository = "ITransactionsRepository",
+  ITransactionFactory = "ITransactionFactory",
+  IUserTransaction = "IUserTransaction",
   IPendingTransactionsService = "IPendingTransactionsService",
   IPendingTransaction = "IPendingTransaction",
   IPendingTransactionFactory = "IPendingTransactionFactory",

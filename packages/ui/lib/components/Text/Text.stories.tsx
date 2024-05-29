@@ -1,5 +1,5 @@
 import { ScrollView, View } from "react-native";
-import Text from "./Text";
+import { Text } from "./Text";
 
 function TextStory() {
   return (
