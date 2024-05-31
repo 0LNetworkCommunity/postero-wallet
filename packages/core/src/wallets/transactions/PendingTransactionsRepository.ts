@@ -72,25 +72,11 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
   public async getPendingTransactionByHash(
     hash: Uint8Array,
   ): Promise<IPendingTransaction | null> {
-    /**
-     * This throws an exception:
-     * Exception in HostFunction: unordered_map::at: key not found
-     * Using a raw query for lack of a better solution
-     */
-    // const row = await this.dbService
-    //   .db('pendingTransactions')
-    //   .where('hash', hash)
-    //   .first();
+    const row = await this.dbService
+      .db('pendingTransactions')
+      .where('hash', this.dbService.raw(hash))
+      .first();
 
-    const rows = await this.dbService.raw(`
-      SELECT *
-      FROM "pendingTransactions"
-      WHERE
-        "hash" = X'${Buffer.from(hash).toString('hex')}'
-      LIMIT 1
-    `);
-
-    const row = rows[0];
     if (!row) {
       return null;
     }
@@ -107,7 +93,9 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
   }
 
   public async getPendingTransactions(): Promise<IPendingTransaction[]> {
-    const rows = await this.dbService.db('pendingTransactions');
+    const rows = await this.dbService
+      .db('pendingTransactions')
+      .orderBy('createdAt', 'desc');
 
     return Promise.all(
       rows.map((row) =>
