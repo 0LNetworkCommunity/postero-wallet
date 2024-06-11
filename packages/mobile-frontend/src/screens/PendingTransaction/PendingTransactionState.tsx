@@ -1,4 +1,4 @@
-import { gql, useQuery, useSubscription } from "@apollo/client";
+import { gql, useApolloClient, useQuery, useSubscription } from "@apollo/client";
 import { View, Text, Linking } from "react-native";
 import { PendingTransaction, PendingTransactionStatus } from "./types";
 import { useState } from "react";
@@ -12,6 +12,8 @@ const PENDING_TRANSACTION_SUBSCRIPTION = gql`
       hash
       status
       expirationTimestamp
+      updating
+      createdAt
 
       transaction {
         __typename
@@ -39,6 +41,8 @@ const GET_PENDING_TRANSACTION = gql`
       hash
       status
       expirationTimestamp
+      updating
+      createdAt
 
       transaction {
         __typename
@@ -59,11 +63,18 @@ const GET_PENDING_TRANSACTION = gql`
   }
 `;
 
+const UPDATE_PENDING_TRANSACTION = gql`
+  mutation UpdatePendingTransaction($id: ID!) {
+    updatePendingTransaction(id: $id)
+  }
+`;
+
 interface Props {
   id: string;
 }
 
 export function PendingTransactionState({ id }: Props) {
+  const apolloClient = useApolloClient();
   const [pendingTransaction, setPendingTransaction] =
     useState<PendingTransaction>();
 
@@ -71,8 +82,6 @@ export function PendingTransactionState({ id }: Props) {
     pendingTransaction: PendingTransaction;
   }>(PENDING_TRANSACTION_SUBSCRIPTION, {
     onData: (res) => {
-      console.log('FE', res);
-
       if (!res.data.data) {
         return;
       }
@@ -121,6 +130,8 @@ export function PendingTransactionState({ id }: Props) {
         </Text>
       )}
 
+      <Text>{`updating = ${pendingTransaction.updating}`}</Text>
+
       {pendingTransaction.transaction && (
         <>
           {pendingTransaction.transaction.__typename === "UserTransaction" && (
@@ -139,6 +150,19 @@ export function PendingTransactionState({ id }: Props) {
           )}
         </>
       )}
+
+      <Button
+        title="Refresh"
+        onPress={async () => {
+          await apolloClient.mutate({
+            mutation: UPDATE_PENDING_TRANSACTION,
+            variables: {
+              id: pendingTransaction.id,
+            },
+          });
+        }}
+      />
+
     </View>
   );
 }

@@ -43,6 +43,7 @@ import MovementFactory from './movements/MovementFactory';
 import MovementsRepository from './movements/MovementsRepository';
 import MovementsService from './movements/MovementsService';
 import { TransactionWatcherFactory } from './transactions/TransactionWatcherFactory';
+import { PendingTransactionsUpdaterService } from './transactions/PendingTransactionsUpdaterService';
 
 @Module({
   imports: [
@@ -153,6 +154,10 @@ import { TransactionWatcherFactory } from './transactions/TransactionWatcherFact
     {
       provide: Types.IPendingTransactionsService,
       useClass: PendingTransactionsService,
+    },
+    {
+      provide: Types.IPendingTransactionsUpdaterService,
+      useClass: PendingTransactionsUpdaterService,
     },
     {
       provide: Types.IPendingTransaction,

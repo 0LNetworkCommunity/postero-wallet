@@ -22,6 +22,8 @@ export interface PendingTransaction {
   hash: string | null;
   status: PendingTransactionStatus;
   expirationTimestamp: number;
+  updating: boolean;
+  createdAt: number;
 
   transaction: null | UserTransaction;
 }

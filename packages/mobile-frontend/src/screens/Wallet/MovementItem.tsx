@@ -12,7 +12,7 @@ import {
 } from "../../movements";
 import LibraAmount from "../../ui/LibraAmount";
 
-const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
+const dateTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
   year: "numeric",
   month: "numeric",
   day: "numeric",

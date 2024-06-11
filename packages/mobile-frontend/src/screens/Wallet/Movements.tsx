@@ -6,35 +6,72 @@ import {
   TouchableOpacity,
 } from "react-native";
 import tw from "twrnc";
-import MovementItem from "./MovementItem";
-import { Movement } from "../../../movements";
 import { useNavigation } from "@react-navigation/native";
 
+import MovementItem from "./MovementItem";
+import { Movement } from "../../movements";
+import { PendingTransaction } from "../../pending-transactions";
+import { PendingTransactionItem } from "./PendingTransactionItem";
+
 interface Props {
-  movements: Movement[];
+  movements: (Movement | PendingTransaction)[];
 }
 
 const Movements: FC<Props> = ({ movements }) => {
   const navigation = useNavigation<any>();
 
+  console.log('render Movements', movements);
+
   return (
     <View style={tw.style("flex-1")}>
       <View style={tw.style("flex-1")}>
-        <VirtualizedList<Movement>
+        <VirtualizedList<Movement | PendingTransaction>
           data={movements}
-          initialNumToRender={20}
-          renderItem={({ item: movement }) => (
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("Transaction");
-              }}
-            >
-              <MovementItem movement={movement} />
-            </TouchableOpacity>
-          )}
-          keyExtractor={(movement) => movement.version.toString()}
-          getItemCount={(movements: Movement[]) => movements.length}
-          getItem={(movements: Movement[], index) => movements[index]}
+          initialNumToRender={2}
+          renderItem={({ item }) => {
+            if (item instanceof Movement) {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("Transaction");
+                  }}
+                >
+                  <MovementItem movement={item} />
+                </TouchableOpacity>
+              );
+            }
+
+            if (item instanceof PendingTransaction) {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("PendingTransaction", {
+                      id: item.id,
+                    });
+                  }}
+                >
+                  <PendingTransactionItem id={item.id} />
+                </TouchableOpacity>
+              );
+            }
+
+            return <View />;
+          }}
+          keyExtractor={(item) => {
+            if (item instanceof Movement) {
+              return `movement-${item.version}`;
+            }
+            if (item instanceof PendingTransaction) {
+              return `pending-transaction-${item.id}`;
+            }
+            return "";
+          }}
+          getItemCount={(items: (Movement | PendingTransaction)[]) =>
+            items.length
+          }
+          getItem={(items: (PendingTransaction | Movement)[], index) =>
+            items[index]
+          }
           ItemSeparatorComponent={() => (
             <View
               style={tw.style("w-full bg-gray-300", {

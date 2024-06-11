@@ -1,33 +1,37 @@
-// import { shell } from "electron";
 import {
   Args,
   ID,
-  Int,
   Mutation,
   Parent,
   Query,
   ResolveField,
   Resolver,
   Subscription,
-} from "@nestjs/graphql";
-import { Repeater } from "@repeaterjs/repeater";
-import { Inject } from "@nestjs/common";
-import PendingTransaction from "./PendingTransaction";
-import { Types } from "../../types";
+} from '@nestjs/graphql';
+import { Repeater } from '@repeaterjs/repeater';
+import { Inject } from '@nestjs/common';
+import PendingTransaction from './PendingTransaction';
+import { Types } from '../../types';
 import {
   IPendingTransactionsService,
+  IPendingTransactionsUpdaterService,
   ITransactionsRepository,
   PendingTransactionsServiceEvent,
-} from "./interfaces";
-import { AbstractTransaction } from "./AbstractTransaction";
+} from './interfaces';
+import { AbstractTransaction } from './AbstractTransaction';
 
 @Resolver(PendingTransaction)
 class PendingTransactionsResolver {
-  @Inject(Types.IPendingTransactionsService)
-  private readonly pendingTransactionsService: IPendingTransactionsService;
+  public constructor(
+    @Inject(Types.IPendingTransactionsService)
+    private readonly pendingTransactionsService: IPendingTransactionsService,
 
-  @Inject(Types.ITransactionsRepository)
-  private readonly transactionsRepository: ITransactionsRepository;
+    @Inject(Types.ITransactionsRepository)
+    private readonly transactionsRepository: ITransactionsRepository,
+
+    @Inject(Types.IPendingTransactionsUpdaterService)
+    private readonly pendingTransactionsUpdaterService: IPendingTransactionsUpdaterService,
+  ) {}
 
   @Query((returns) => PendingTransaction)
   public async pendingTransaction(
@@ -42,6 +46,16 @@ class PendingTransactionsResolver {
   @Query((returns) => [PendingTransaction])
   public pendingTransactions() {
     return this.pendingTransactionsService.getPendingTransactions();
+  }
+
+  @Query((returns) => [PendingTransaction])
+  public async walletPendingTransactions(
+    @Args('address', { type: () => Buffer })
+    address: Uint8Array,
+  ) {
+    return this.pendingTransactionsService.getWalletPendingTransactions(
+      address,
+    );
   }
 
   @Mutation((returns) => Boolean)
@@ -100,12 +114,32 @@ class PendingTransactionsResolver {
     return true;
   }
 
+  @Mutation((returns) => Boolean)
+  public async updatePendingTransaction(
+    @Args('id', { type: () => ID })
+    pendingTransactionId: string,
+  ) {
+    const pendingTransaction =
+      await this.pendingTransactionsService.getPendingTransaction(
+        pendingTransactionId,
+      );
+    if (pendingTransaction) {
+      await this.pendingTransactionsUpdaterService.updateTransaction(
+        pendingTransaction,
+      );
+      return true;
+    }
+    return false;
+  }
+
   @Subscription((returns) => PendingTransaction)
   public newPendingTransaction() {
     return new Repeater(async (push, stop) => {
       const release = this.pendingTransactionsService.on(
         PendingTransactionsServiceEvent.NewPendingTransaction,
         async (pendingTrasaction) => {
+          console.log('NewPendingTransaction', pendingTrasaction);
+
           push({
             newPendingTransaction: pendingTrasaction,
           });
@@ -140,10 +174,13 @@ class PendingTransactionsResolver {
     return new Repeater(async (push, stop) => {
       const release = this.pendingTransactionsService.on(
         PendingTransactionsServiceEvent.PendingTransactionUpdated,
-        (pendingTransaction) => {
+        async (pendingTransaction) => {
           if (pendingTransaction.id === id) {
             push({
-              pendingTransaction,
+              pendingTransaction:
+                await this.pendingTransactionsService.getPendingTransaction(
+                  pendingTransaction.id,
+                ),
             });
           }
         },
@@ -164,6 +201,13 @@ class PendingTransactionsResolver {
     const tx = await this.transactionsRepository.getTransactionByHash(hash);
     console.log('tx', tx);
     return tx;
+  }
+
+  @ResolveField(() => Boolean)
+  public async updating(@Parent() pendingTransaction: PendingTransaction) {
+    return this.pendingTransactionsUpdaterService.transactionUpdating(
+      pendingTransaction,
+    );
   }
 }
 

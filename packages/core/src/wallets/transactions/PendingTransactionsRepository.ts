@@ -92,6 +92,29 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
     });
   }
 
+  public async getWalletPendingTransactions(
+    address: Uint8Array,
+  ): Promise<IPendingTransaction[]> {
+    const rows = await this.dbService
+      .db('pendingTransactions')
+      .where('sender', this.dbService.raw(address))
+      .orderBy('createdAt', 'desc');
+
+    return Promise.all(
+      rows.map((row) =>
+        this.pendingTransactionFactory.getPendingTransaction({
+          id: row.id,
+          hash: row.hash,
+          status: row.status,
+          type: row.type as RawPendingTransactionPayloadType,
+          payload: row.payload,
+          createdAt: new Date(row.createdAt),
+          expirationTimestamp: row.expirationTimestamp,
+        }),
+      ),
+    );
+  }
+
   public async getPendingTransactions(): Promise<IPendingTransaction[]> {
     const rows = await this.dbService
       .db('pendingTransactions')

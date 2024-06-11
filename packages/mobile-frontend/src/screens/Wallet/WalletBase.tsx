@@ -9,6 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 import {
   gql,
   useApolloClient,
+  useSubscription,
 } from "@apollo/client";
 import tw from "twrnc";
 import BN from "bn.js"
@@ -23,6 +24,7 @@ import {
 import Movements from "./Movements";
 import {
   BlockMetadataTransaction,
+  Movement,
   ScriptUserTransaction,
   TransactionType,
   UserTransaction,
@@ -34,6 +36,29 @@ import ChevronLeftIcon from "../../icons/ChevronLeftIcon";
 import NavBar from "../../ui/NavBar";
 import RefreshIcon from "../../icons/RefreshIcon";
 import AdjustmentsHorizontalIcon from "../../icons/AdjustmentsHorizontalIcon";
+import { PendingTransaction } from "../../pending-transactions";
+
+const NEW_PENDING_TRANSACTION_SUBSCRIPTION = gql`
+  subscription NewPendingTransaction {
+    newPendingTransaction {
+      id
+      hash
+      status
+      createdAt
+    }
+  }
+`;
+
+const GET_WALLET_PENDING_TRANSACTIONS = gql`
+  query GetWalletPendingTransactions($address: Bytes!) {
+    walletPendingTransactions(address: $address) {
+      id
+      hash
+      status
+      createdAt
+    }
+  }
+`;
 
 const GET_WALLET = gql`
   query GetWallet($address: Bytes!) {
@@ -75,7 +100,54 @@ interface Props {
 function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
   const navigation = useNavigation<any>();
   const apolloClient = useApolloClient();
+
   const { movements } = useMovements(walletAddress);
+  const [pendingTransactions, setPendingTransactions] = useState<
+    PendingTransaction[]
+  >([]);
+
+  const movementsAndPendingTransactions = useMemo(() => {
+    console.log('movementsAndPendingTransactions memo');
+    return [
+      ...(movements ?? []),
+      ...pendingTransactions
+    ].sort((a, b) => {
+      let aTimestamp: BN;
+      let bTimestamp: BN;
+
+      if (a instanceof Movement) {
+        if (a.transaction.type === TransactionType.Genesis) {
+          return 1;
+        }
+        aTimestamp = (
+          a.transaction as BlockMetadataTransaction | UserTransaction
+        ).timestamp.div(new BN(1e3));
+      } else {
+        aTimestamp = new BN(a.createdAt.getTime());
+      }
+
+      if (b instanceof Movement) {
+        if (b.transaction.type === TransactionType.Genesis) {
+          return -1;
+        }
+        bTimestamp = (
+          b.transaction as BlockMetadataTransaction | UserTransaction
+        ).timestamp.div(new BN(1e3));
+      } else {
+        bTimestamp = new BN(b.createdAt.getTime());
+      }
+
+      if (aTimestamp.gt(bTimestamp)) {
+        return -1;
+      }
+      if (aTimestamp.lt(bTimestamp)) {
+        return 1;
+      }
+
+      return 0;
+    });
+  }, [movements, pendingTransactions]);
+
 
   const [loading, setLoading] = useState(false);
 
@@ -159,8 +231,53 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
       }
     };
     load();
-
   }, [walletAddress]);
+
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await apolloClient.query<{
+        walletPendingTransactions: {
+          id: string;
+          status: string;
+          createdAt: number;
+        }[];
+      }>({
+        query: GET_WALLET_PENDING_TRANSACTIONS,
+        variables: {
+          address: walletAddress,
+        },
+      });
+
+      setPendingTransactions(
+        data.walletPendingTransactions.map((it) => new PendingTransaction(it))
+      );
+    };
+    load();
+  }, [walletAddress]);
+
+  useSubscription<{
+    newPendingTransaction: {
+      id: string;
+      status: string;
+      createdAt: number;
+    };
+  }>(NEW_PENDING_TRANSACTION_SUBSCRIPTION, {
+    onData: (res) => {
+      console.log(">>>", res);
+
+      if (!res.data.data) {
+        return;
+      }
+
+      setPendingTransactions([
+        new PendingTransaction(res.data.data.newPendingTransaction),
+        ...pendingTransactions,
+      ]);
+    },
+    onError(error) {
+      console.error(error);
+    },
+  });
 
   const onRefresh = async () => {
     await apolloClient.mutate({
@@ -335,7 +452,7 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
           </View>
         </View>
 
-        <Movements movements={movements ?? []} />
+        <Movements movements={movementsAndPendingTransactions} />
       </View>
     );
   }

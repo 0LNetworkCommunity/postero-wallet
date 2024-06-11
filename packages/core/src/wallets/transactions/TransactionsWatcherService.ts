@@ -57,12 +57,10 @@ export class TransactionsWatcherService
 
     for (const watcher of watchers) {
       watcher.on(TransactionWatcherEvent.PendingTransaction, (data) => {
-        console.log('TransactionWatcherEvent.PendingTransaction', data);
         this.onPendingTransaction(watcher, data);
       });
 
       watcher.on(TransactionWatcherEvent.Transaction, (transaction) => {
-        console.log('TransactionWatcherEvent.Transaction', transaction);
         try {
           this.onTransaction(watcher, transaction);
         } catch (error) {

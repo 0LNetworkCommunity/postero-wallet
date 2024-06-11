@@ -67,6 +67,7 @@ export enum Types {
   IPendingTransaction = "IPendingTransaction",
   IPendingTransactionFactory = "IPendingTransactionFactory",
   IPendingTransactionsRepository = "IPendingTransactionsRepository",
+  IPendingTransactionsUpdaterService = "IPendingTransactionsUpdaterService",
 
   IBalance = "IBalance",
   IBalanceFactory = "IBalanceFactory",

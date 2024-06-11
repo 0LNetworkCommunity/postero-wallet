@@ -5,7 +5,19 @@ import axios, { AxiosError } from "axios";
 import { AptosAccount, AptosClient, BCS, TxnBuilderTypes } from "aptos";
 import { GraphQLError } from "graphql";
 
-import { IPendingTransaction, IPendingTransactionsRepository, IPendingTransactionsService, ITransactionsRepository, ITransactionsWatcherService, PendingTransactionStatus, PendingTransactionsServiceEvent, RawPendingTransactionPayload, RawPendingTransactionPayloadType, TransactionsWatcherServiceEvent } from "./interfaces";
+import {
+  IPendingTransaction,
+  IPendingTransactionsRepository,
+  IPendingTransactionsService,
+  IPendingTransactionsUpdaterService,
+  ITransactionsWatcherService,
+  PendingTransactionStatus,
+  PendingTransactionsServiceEvent,
+  PendingTransactionsUpdaterServiceEvent,
+  RawPendingTransactionPayload,
+  RawPendingTransactionPayloadType,
+  TransactionsWatcherServiceEvent,
+} from './interfaces';
 import { Types } from "../../types";
 import { IWalletService } from "../interfaces";
 import { IDApp } from "../../dapps/interfaces";
@@ -30,21 +42,26 @@ const {
 class PendingTransactionsService
   implements OnModuleInit, IPendingTransactionsService
 {
-  @Inject(Types.IWalletService)
-  private readonly walletService!: IWalletService;
-
-  @Inject(Types.IPendingTransactionsRepository)
-  private readonly pendingTransactionsRepository!: IPendingTransactionsRepository;
-
-  @Inject(Types.IKeychainService)
-  private readonly keychainService!: IKeychainService;
-
-  @Inject(Types.ITransactionsWatcherService)
-  private readonly walletsWatcherService: ITransactionsWatcherService;
-
   private aptosClient = new AptosClient('https://rpc.0l.fyi');
 
   private eventEmitter = new Emittery();
+
+  public constructor(
+    @Inject(Types.IWalletService)
+    private readonly walletService: IWalletService,
+
+    @Inject(Types.IPendingTransactionsRepository)
+    private readonly pendingTransactionsRepository: IPendingTransactionsRepository,
+
+    @Inject(Types.IKeychainService)
+    private readonly keychainService: IKeychainService,
+
+    @Inject(Types.ITransactionsWatcherService)
+    private readonly walletsWatcherService: ITransactionsWatcherService,
+
+    @Inject(Types.IPendingTransactionsUpdaterService)
+    private readonly pendingTransactionsUpdaterService: IPendingTransactionsUpdaterService,
+  ) {}
 
   public onModuleInit() {
     this.walletsWatcherService.on(
@@ -54,19 +71,25 @@ class PendingTransactionsService
       },
     );
 
-    const tick = () => {
-      this.checkDanglingTransactions()
-        .catch((error) => console.error(error))
-        .finally(() => {
-          setTimeout(() => {
-            tick();
-          }, 10_000);
-        });
-    };
+    this.pendingTransactionsUpdaterService.on(
+      PendingTransactionsUpdaterServiceEvent.TransactionUpdated,
+      (pendingTransaction) => {
+        this.eventEmitter.emit(
+          PendingTransactionsServiceEvent.PendingTransactionUpdated,
+          pendingTransaction,
+        );
+      },
+    );
 
-    setTimeout(() => {
-      tick();
-    }, 10_000);
+    this.pendingTransactionsUpdaterService.on(
+      PendingTransactionsUpdaterServiceEvent.UpdatingTransaction,
+      (pendingTransaction) => {
+        this.eventEmitter.emit(
+          PendingTransactionsServiceEvent.PendingTransactionUpdated,
+          pendingTransaction,
+        );
+      },
+    );
   }
 
   public async sendPendingTransaction(
@@ -272,6 +295,14 @@ class PendingTransactionsService
       );
     }
 
+    const pendingTransaction = await this.getPendingTransaction(id);
+    console.log('pendingTransaction', pendingTransaction);
+
+    this.eventEmitter.emit(
+      PendingTransactionsServiceEvent.NewPendingTransaction,
+      pendingTransaction,
+    );
+
     return id;
   }
 
@@ -344,6 +375,11 @@ class PendingTransactionsService
       );
 
     if (pendingTransaction) {
+      await this.pendingTransactionsRepository.setPendingTransactionStatus(
+        pendingTransaction.id,
+        status,
+      );
+
       await this.eventEmitter.emit(
         PendingTransactionsServiceEvent.PendingTransactionUpdated,
         await this.pendingTransactionsRepository.getPendingTransaction(
@@ -351,6 +387,14 @@ class PendingTransactionsService
         ),
       );
     }
+  }
+
+  public async getWalletPendingTransactions(
+    address: Uint8Array,
+  ): Promise<IPendingTransaction[]> {
+    return this.pendingTransactionsRepository.getWalletPendingTransactions(
+      address,
+    );
   }
 
   private async onPendingTransaction({
@@ -362,55 +406,6 @@ class PendingTransactionsService
     hash: Uint8Array;
   }) {
     await this.setPendingTransactionStatus(hash, status);
-  }
-
-  private async checkDanglingTransactions() {
-    const transactions =
-      await this.pendingTransactionsRepository.getTransactionsExpiredAfter(
-        Math.floor(Date.now() / 1e3),
-        10,
-      );
-
-    for (const transaction of transactions) {
-      if (!transaction.hash) {
-        continue;
-      }
-
-      const res = await axios<{
-        data?: {
-          transaction: {
-            hash: string;
-            status: PendingTransactionStatus;
-          };
-        };
-      }>({
-        // url: 'http://localhost:3000/graphql',
-        url: 'https://api.0l.fyi/graphql',
-        method: 'POST',
-        data: {
-          operationName: 'GetTransaction',
-          variables: {
-            hash: Buffer.from(transaction.hash).toString('hex'),
-          },
-          query: `
-            query GetTransaction($hash: Bytes!) {
-              transaction(hash: $hash) {
-                hash
-                status
-              }
-            }
-          `,
-        },
-      });
-
-      if (res.data.data) {
-        const { hash, status } = res.data.data.transaction;
-        await this.setPendingTransactionStatus(
-          Buffer.from(hash, 'hex'),
-          status,
-        );
-      }
-    }
   }
 }
 

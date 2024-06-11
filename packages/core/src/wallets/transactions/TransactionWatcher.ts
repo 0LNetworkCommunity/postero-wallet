@@ -113,8 +113,6 @@ export class TransactionWatcher implements ITransactionWatcher {
       walletTransactionSubscription,
       this.destroyPromise,
     ])) {
-      console.log('>>>>', value);
-
       if (!value) {
         return;
       }

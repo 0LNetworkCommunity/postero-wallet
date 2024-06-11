@@ -64,6 +64,9 @@ export interface IPendingTransactionsService {
     dApp: IDApp,
     transaction: RawPendingTransactionPayload,
   ): Promise<IPendingTransaction>;
+  getWalletPendingTransactions(
+    address: Uint8Array,
+  ): Promise<IPendingTransaction[]>;
   getPendingTransaction(id: string): Promise<IPendingTransaction | null>;
   getPendingTransactions(): Promise<IPendingTransaction[]>;
   sendPendingTransaction(
@@ -141,6 +144,9 @@ export interface IPendingTransactionsRepository {
     hash: Uint8Array,
   ): Promise<IPendingTransaction | null>;
   getPendingTransactions(): Promise<IPendingTransaction[]>;
+  getWalletPendingTransactions(
+    address: Uint8Array,
+  ): Promise<IPendingTransaction[]>;
   removePendingTransaction(id: string): Promise<void>;
   setPendingTransactionHash(id: string, hash: Uint8Array): Promise<void>;
   setPendingTransactionStatus(
@@ -223,4 +229,23 @@ export interface ITransactionWatcherFactory {
 export enum TransactionWatcherEvent {
   PendingTransaction = "PendingTransaction",
   Transaction = "Transaction",
+}
+
+export enum PendingTransactionsUpdaterServiceEvent {
+  UpdatingTransaction = "UpdatingTransaction",
+  TransactionUpdated = "TransactionUpdated",
+}
+
+export interface IPendingTransactionsUpdaterService {
+  transactionUpdating(pendingTransaction: IPendingTransaction): boolean;
+  updateTransaction(transaction: IPendingTransaction): Promise<void>;
+
+  on(
+    event: PendingTransactionsUpdaterServiceEvent.UpdatingTransaction,
+    listener: (pendingTransaction: IPendingTransaction) => void | Promise<void>,
+  ): UnsubscribeFn;
+  on(
+    event: PendingTransactionsUpdaterServiceEvent.TransactionUpdated,
+    listener: (pendingTransaction: IPendingTransaction) => void | Promise<void>,
+  ): UnsubscribeFn;
 }
