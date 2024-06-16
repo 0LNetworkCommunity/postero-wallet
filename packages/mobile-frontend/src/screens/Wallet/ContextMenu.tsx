@@ -27,10 +27,6 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({ walletAddress }, ref
   const bottomSheetRef = useRef<BottomSheet>(null);
 	const snapPoints = useMemo(() => [250], []);
 
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-  }, []);
-
   const renderBackdrop = useCallback(
     (props: any) => (
       <BottomSheetBackdrop
@@ -41,8 +37,6 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({ walletAddress }, ref
     ),
     []
   );
-
-  const handleClosePress = () => bottomSheetRef.current?.close();
 
   useImperativeHandle(ref, () => {
     return {
@@ -83,7 +77,6 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({ walletAddress }, ref
     <BottomSheet
       ref={bottomSheetRef}
       index={-1}
-      onChange={handleSheetChanges}
       enablePanDownToClose
       snapPoints={snapPoints}
       backdropComponent={renderBackdrop}
@@ -115,16 +108,6 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({ walletAddress }, ref
           onPress={() => {
             bottomSheetRef.current?.close();
             navigation.navigate("WalletPrivateKeys", {
-              walletAddress,
-            });
-          }}
-        />
-
-        <Button
-          title="Transactions"
-          onPress={() => {
-            bottomSheetRef.current?.close();
-            navigation.navigate("WalletTransactions", {
               walletAddress,
             });
           }}

@@ -28,15 +28,6 @@ function Root({ navigation }: StackScreenProps<NewWalletStackParams, "Root">) {
             navigation.navigate("PrivateKeyImport");
           }}
         />
-        <Button
-          title="Import address"
-          variation={ButtonVariation.Secondary}
-          onPress={() => {
-            navigation.navigate("AddressImport", {
-              redirectTo: "Main",
-            });
-          }}
-        />
       </View>
     </SafeAreaView>
   );

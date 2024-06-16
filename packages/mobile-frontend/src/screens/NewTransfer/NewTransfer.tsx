@@ -1,15 +1,15 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { View, Animated } from "react-native";
 import { gql, useApolloClient } from "@apollo/client";
 import { StackScreenProps } from "@react-navigation/stack";
-import { getLocales } from 'expo-localization';
+import { getLocales } from "expo-localization";
 
 import { NewTransfer } from "@postero/ui";
 
 import { ModalStackParams } from "../params";
 import { useKeyboardHeight } from "../../utils/keyboard";
 
-const decimalSeparator = getLocales()[0].decimalSeparator || '.';
+const decimalSeparator = getLocales()[0].decimalSeparator || ".";
 
 const NEW_TRANSFER = gql`
   mutation NewTransfer(
@@ -25,11 +25,11 @@ const NEW_TRANSFER = gql`
   }
 `;
 
-const ZERO_ASCII = '0'.charCodeAt(0);
-const NINE_ASCII = '9'.charCodeAt(0);
+const ZERO_ASCII = "0".charCodeAt(0);
+const NINE_ASCII = "9".charCodeAt(0);
 
 function filterDigits(input: string): string {
-  let out = '';
+  let out = "";
   for (let i = 0; i < input.length; ++i) {
     const code = input.charCodeAt(i);
     if (code >= ZERO_ASCII && code <= NINE_ASCII) {
@@ -47,6 +47,12 @@ const NewTransferScreen: FC<
   const [amount, setAmount] = useState("");
 
   const keyboardHeight = useKeyboardHeight();
+
+  useEffect(() => {
+    if (route.params.barCodeResult) {
+      setRecipient(route.params.barCodeResult);
+    }
+  }, [route.params.barCodeResult]);
 
   const onConfirm = async ({
     amount,
@@ -103,9 +109,7 @@ const NewTransferScreen: FC<
         onConfirm={onConfirm}
         onScan={() => {
           navigation.navigate("BarCodeScanner", {
-            onScan: (data) => {
-              setRecipient(data);
-            },
+            redirect: "NewTransfer",
           });
         }}
         amount={amount}

@@ -1,9 +1,8 @@
 import Emittery, { UnsubscribeFn } from "emittery";
 import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import { sha3_256 as sha3Hash } from "@noble/hashes/sha3";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { AptosAccount, AptosClient, BCS, TxnBuilderTypes } from "aptos";
-import { GraphQLError } from "graphql";
 
 import {
   IPendingTransaction,
@@ -20,10 +19,8 @@ import {
 } from './interfaces';
 import { Types } from "../../types";
 import { IWalletService } from "../interfaces";
-import { IDApp } from "../../dapps/interfaces";
 import { IKeychainService } from '../keychain/interfaces';
 import { parseHexString } from "../../utils";
-// import AccountAddress from "../crypto/AccountAddress";
 
 const {
   AccountAddress,
@@ -90,108 +87,6 @@ class PendingTransactionsService
         );
       },
     );
-  }
-
-  public async sendPendingTransaction(
-    pendingTransactionId: string,
-    walletAddress: Uint8Array,
-    gasPrice: number,
-    maxGasUnit: number,
-    timeout: number,
-  ): Promise<Uint8Array | null> {
-    const pendingTransaction =
-      await this.getPendingTransaction(pendingTransactionId);
-    if (!pendingTransaction) {
-      return null;
-    }
-
-    const wallet = await this.walletService.getWallet(walletAddress);
-    const privateKey =
-      await this.walletService.getWalletPrivateKey(walletAddress);
-
-    const chainId = await this.aptosClient.getChainId();
-
-    const account = await this.aptosClient.getAccount(
-      Buffer.from(wallet!.address).toString('hex').toUpperCase(),
-    );
-
-    const deserializer = new BCS.Deserializer(pendingTransaction.payload);
-
-    const entryFunctionPayload = new TransactionPayloadEntryFunction(
-      EntryFunction.deserialize(deserializer),
-    );
-
-    const rawTxn = new RawTransaction(
-      // Transaction sender account address
-      new AccountAddress(wallet!.address),
-
-      BigInt(account.sequence_number),
-      entryFunctionPayload,
-      // Max gas unit to spend
-      BigInt(maxGasUnit),
-      // Gas price per unit
-      BigInt(gasPrice),
-      // Expiration timestamp. Transaction is discarded if it is not executed within 10 seconds from now.
-      BigInt(Math.floor(Date.now() / 1_000) + timeout),
-      new ChainId(chainId),
-    );
-
-    const signer = new AptosAccount(privateKey!);
-
-    const hash = sha3Hash.create();
-    hash.update('DIEM::RawTransaction');
-
-    const prefix = hash.digest();
-    const body = BCS.bcsToBytes(rawTxn);
-    const mergedArray = new Uint8Array(prefix.length + body.length);
-    mergedArray.set(prefix);
-    mergedArray.set(body, prefix.length);
-
-    const signingMessage = mergedArray;
-
-    const signature = signer.signBuffer(signingMessage);
-    const sig = new Ed25519Signature(signature.toUint8Array());
-
-    const authenticator = new TransactionAuthenticatorEd25519(
-      new Ed25519PublicKey(signer.pubKey().toUint8Array()),
-      sig,
-    );
-    const signedTx = new SignedTransaction(rawTxn, authenticator);
-
-    const bcsTxn = BCS.bcsToBytes(signedTx);
-
-    try {
-      const res = await axios<{
-        hash: string;
-      }>({
-        method: 'POST',
-        url: 'https://rpc.0l.fyi/v1/transactions',
-        headers: {
-          'content-type': 'application/x.diem.signed_transaction+bcs',
-        },
-        data: bcsTxn,
-      });
-
-      if (res.status === 202) {
-        return new Uint8Array(Buffer.from(res.data.hash.substring(2), 'hex'));
-      }
-    } catch (error) {
-      console.error(error);
-
-      if (error.isAxiosError) {
-        const axiosError = error as AxiosError;
-        if (axiosError.response) {
-          console.log(axiosError.response?.data);
-          if ((axiosError.response?.data as any).message) {
-            throw new GraphQLError((axiosError.response?.data as any).message);
-          }
-        }
-      }
-
-      throw error;
-    }
-
-    return null;
   }
 
   public async newPendingTransaction(
@@ -296,7 +191,6 @@ class PendingTransactionsService
     }
 
     const pendingTransaction = await this.getPendingTransaction(id);
-    console.log('pendingTransaction', pendingTransaction);
 
     this.eventEmitter.emit(
       PendingTransactionsServiceEvent.NewPendingTransaction,
@@ -307,7 +201,6 @@ class PendingTransactionsService
   }
 
   public async newTransaction(
-    dApp: IDApp,
     transaction: RawPendingTransactionPayload,
   ): Promise<IPendingTransaction> {
     switch (transaction.type) {

@@ -1,11 +1,12 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable } from '@nestjs/common';
 import _ from 'lodash';
-import { IGraphQLWallet, IGraphQLWalletFactory, IWalletRepository } from "./interfaces";
-import { Types } from "../types";
-import { IDbService } from "../db/interfaces";
-import { PlatformTypes } from "../platform/platform-types";
-import Wallet from "../crypto/Wallet";
-import { PlatformEncryptedStoreService, PlatformCryptoService } from "../platform/interfaces";
+import {
+  IGraphQLWallet,
+  IGraphQLWalletFactory,
+  IWalletRepository,
+} from './interfaces';
+import { Types } from '../types';
+import { IDbService } from '../db/interfaces';
 
 class WalletsFromAuthKeysQueue {
   private timeout: NodeJS.Timeout | undefined = undefined;
@@ -90,8 +91,9 @@ class WalletsFromAuthKeysQueue {
           keys.map((key) => {
             return this.dbService.db.raw(`X'${key}'`);
           }),
-        ).toSQL();
-        console.log(q.sql);
+        )
+        .toSQL();
+      console.log(q.sql);
 
       const rows = await this.dbService
         .db<{
@@ -141,14 +143,6 @@ class WalletsFromAuthKeysQueue {
 class WalletRepository implements IWalletRepository {
   private readonly walletsFromAuthKeysQueue: WalletsFromAuthKeysQueue;
 
-  deleteWallet(address: Uint8Array): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-
-  getWalletPrivateKey(address: Uint8Array): Promise<Uint8Array> {
-    throw new Error('Method not implemented.');
-  }
-
   public constructor(
     @Inject(Types.IDbService)
     private readonly dbService: IDbService,
@@ -162,7 +156,7 @@ class WalletRepository implements IWalletRepository {
   public async saveWallet(
     address: Uint8Array,
     authKey: Uint8Array,
-  ): Promise<Wallet> {
+  ): Promise<IGraphQLWallet> {
     const [{ total }] = await this.dbService
       .db('wallets')
       .count('*', { as: 'total' });
@@ -197,10 +191,10 @@ class WalletRepository implements IWalletRepository {
       .where('address', addressLit)
       .first();
 
-    return {
-      label: wallet!.label,
-      address: new Uint8Array(wallet!.address),
-    };
+    return this.graphQLWalletFactory.getGraphQLWallet(
+      wallet!.label,
+      new Uint8Array(wallet!.address),
+    );
   }
 
   public async saveWalletAuthKey(
@@ -217,21 +211,28 @@ class WalletRepository implements IWalletRepository {
       .ignore();
   }
 
-  public async getWallets(): Promise<Wallet[]> {
-    const rows = await this.dbService.db!('wallets').select('*');
-    return rows.map((row) => this.walletMapper(row));
+  public async getWallets(): Promise<IGraphQLWallet[]> {
+    const rows =
+      await this.dbService.db!('wallets').select<
+        { label: string; address: Uint8Array }[]
+      >('*');
+    return Promise.all(
+      rows.map((row) =>
+        this.graphQLWalletFactory.getGraphQLWallet(row.label, row.address),
+      ),
+    );
   }
 
-  public async getWallet(address: Uint8Array): Promise<Wallet | null> {
+  public async getWallet(address: Uint8Array): Promise<IGraphQLWallet | null> {
     const row = await this.dbService
-      .db('wallets')
+      .db<{ label: string; address: Uint8Array }>('wallets')
       .where('address', this.dbService.raw(address))
       .first();
 
     if (!row) {
       return null;
     }
-    return this.walletMapper(row);
+    return this.graphQLWalletFactory.getGraphQLWallet(row.label, row.address);
   }
 
   public async setWalletLabel(
@@ -242,13 +243,6 @@ class WalletRepository implements IWalletRepository {
       .db('wallets')
       .where('address', this.dbService.raw(address))
       .update('label', label);
-  }
-
-  private walletMapper(entity: { label: string; address: Uint8Array }): Wallet {
-    return {
-      label: entity.label,
-      address: entity.address,
-    };
   }
 
   public async getWalletsFromAuthKey(

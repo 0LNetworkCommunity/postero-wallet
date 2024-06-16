@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { Text, View, StyleSheet, Button } from "react-native";
+import { Text, View, Button } from "react-native";
 import { CameraView, Camera, BarcodeScanningResult } from "expo-camera";
 import { StackScreenProps } from "@react-navigation/stack";
 import tw from "twrnc";
@@ -9,8 +9,6 @@ import { ModalStackParams } from "../params";
 const BarCodeScanner: FC<
   StackScreenProps<ModalStackParams, "BarCodeScanner">
 > = ({ route, navigation }) => {
-  const { onScan } = route.params;
-
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
 
@@ -27,8 +25,14 @@ const BarCodeScanner: FC<
     if (scanned) {
       return;
     }
-    onScan(scanningResult.data);
-    navigation.pop();
+
+    navigation.navigate({
+      name: route.params.redirect,
+      params: {
+        barCodeResult: scanningResult.data,
+      },
+      merge: true,
+    });
   };
 
   if (hasPermission === null) {
@@ -51,18 +55,17 @@ const BarCodeScanner: FC<
         }}
       />
       {scanned && (
-        <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
+        <Button title="Tap to Scan Again" onPress={() => setScanned(false)} />
       )}
+
+      <Button
+        title="Back"
+        onPress={() => {
+          navigation.pop();
+        }}
+      />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "center",
-  },
-});
 
 export default BarCodeScanner;

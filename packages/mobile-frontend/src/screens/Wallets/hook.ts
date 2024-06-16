@@ -82,7 +82,7 @@ const WALLET_UPDATED = gql`
 
 export const useWallets = () => {
   const apolloClient = useApolloClient();
-  const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [wallets, setWallets] = useState<Wallet[]>();
 
   useSubscription<{ walletAdded: Wallet }>(NEW_WALLET_SUBSCRIPTION, {
     onData: (res) => {
@@ -91,7 +91,7 @@ export const useWallets = () => {
       }
       const newWallet = res.data.data.walletAdded;
       if (newWallet) {
-        setWallets((prev) => [...prev, newWallet]);
+        setWallets((prev) => [...(prev ?? []), newWallet]);
       }
     },
   });
@@ -104,7 +104,7 @@ export const useWallets = () => {
       const walletAddress = res.data.data.walletRemoved;
       if (walletAddress !== undefined) {
         setWallets((wallets) =>
-          wallets.filter((wallet) => wallet.address !== walletAddress)
+          wallets?.filter((wallet) => wallet.address !== walletAddress)
         );
       }
     },
@@ -117,13 +117,13 @@ export const useWallets = () => {
       }
       const wallet = res.data.data.walletUpdated;
       setWallets((wallets) => {
-        const index = wallets.findIndex((it) => it.address === wallet.address);
+        const index = wallets?.findIndex((it) => it.address === wallet.address) ?? -1;
         if (index === -1) {
-          return [...wallets, wallet];
+          return [...(wallets ?? []), wallet];
         }
 
-        if (!_.isEqual(wallets[index], wallet)) {
-          const newWallets = [...wallets];
+        if (!_.isEqual(wallets![index], wallet)) {
+          const newWallets = [...wallets!];
           newWallets[index] = wallet;
           return newWallets;
         }

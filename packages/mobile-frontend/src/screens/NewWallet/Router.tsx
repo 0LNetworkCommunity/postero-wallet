@@ -7,7 +7,6 @@ import SafetyWarning from "./screens/SafetyWarning";
 import NewMnemonic from "./screens/NewMnemonic";
 import MnemonicImport from "./screens/MnemonicImport";
 import PrivateKeyImport from "./screens/PrivateKeyImport";
-import AddressImport from "./screens/AddressImport";
 
 const Stack = createNativeStackNavigator<NewWalletStackParams>();
 
@@ -34,7 +33,6 @@ function NewWalletRouter() {
       />
       <Stack.Screen name="MnemonicImport" component={MnemonicImport} />
       <Stack.Screen name="PrivateKeyImport" component={PrivateKeyImport} />
-      <Stack.Screen name="AddressImport" component={AddressImport} />
     </Stack.Navigator>
   );
 }

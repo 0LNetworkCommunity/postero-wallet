@@ -27,12 +27,8 @@ import WalletsModule from './wallets/WalletsModule';
 import { GraphQLModule } from './graphql/graphql.module';
 import { PlatformModule } from './platform/PlatformModule';
 import { DocumentNode } from 'graphql';
-import IpcModule from './ipc/ipc.module';
+
 import { IWindow } from './window-manager/interfaces';
-import DAppsModule from './dapps/DAppsModule';
-import { WindowManagerModule } from './window-manager/WindowManagerModule';
-import RpcModule from './rpc/RpcModule';
-import SettingsModule from './settings/SettingsModule';
 
 export * from './platform/platform-types';
 export * from './platform/interfaces';
@@ -43,8 +39,6 @@ export * from './window-manager/AbstractWindow';
 export * from './window-manager/types';
 export * from './graphql/interfaces';
 export * from './wallets/interfaces';
-export * from './rpc/methods';
-export * from './rpc/interfaces';
 
 export enum BackendEvent {
   SubscriptionData = 'SubscriptionData',
@@ -67,13 +61,8 @@ export class Backend {
     @Module({
       imports: [
         PlatformModule.forRoot(platformServices),
-        IpcModule,
-        GraphQLModule,
-        DAppsModule,
         WalletsModule,
-        WindowManagerModule,
-        SettingsModule,
-        RpcModule,
+        GraphQLModule,
         ...(imports ?? []),
       ],
       providers: [],

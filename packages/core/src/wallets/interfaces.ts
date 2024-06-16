@@ -1,10 +1,8 @@
 import { UnsubscribeFn } from "emittery";
 
-import Wallet from "../crypto/Wallet";
 import { Balance } from "./Balance";
 import Coin from "../coin/Coin";
 import { ICoin } from "../coin/interfaces";
-import { PendingTransactionStatus } from "./transactions/interfaces";
 
 export enum WalletServiceEvent {
   NewWallet = "NewWallet",
@@ -13,26 +11,25 @@ export enum WalletServiceEvent {
 }
 
 export interface IWalletRepository {
-  getWallet(address: Uint8Array): Promise<Wallet | null>;
-  deleteWallet(address: Uint8Array): Promise<void>;
-  getWallets(): Promise<Wallet[]>;
-  saveWallet(address: Uint8Array, authKey: Uint8Array): Promise<Wallet>;
-  saveWalletAuthKey(address: Uint8Array, authKey: Uint8Array): Promise<void>;
+  getWallet(address: Uint8Array): Promise<IGraphQLWallet | null>;
+  getWallets(): Promise<IGraphQLWallet[]>;
+  saveWallet(address: Uint8Array, authKey: Uint8Array): Promise<IGraphQLWallet>;
+  saveWalletAuthKey(
+    address: Uint8Array,
+    authKey: Uint8Array,
+  ): Promise<void>;
   setWalletLabel(address: Uint8Array, label: string): Promise<void>;
-  getWalletPrivateKey(address: Uint8Array): Promise<Uint8Array | null>;
   getWalletsFromAuthKey(authKey: Uint8Array): Promise<IGraphQLWallet[]>;
 }
 
 export interface IWalletService {
   syncWallet(address: Uint8Array): Promise<void>;
 
-  importMnemonic(mnemonic: string): Promise<Wallet>;
-  importPrivateKey(privateKey: Uint8Array): Promise<Wallet>;
+  importMnemonic(mnemonic: string): Promise<IGraphQLWallet>;
+  importPrivateKey(privateKey: Uint8Array): Promise<IGraphQLWallet>;
 
   deleteWallet(walletAddress: Uint8Array): Promise<void>;
   setWalletLabel(walletAddress: Uint8Array, label: string): Promise<void>;
-  getWallet(address: Uint8Array): Promise<Wallet | null>;
-  getWalletPrivateKey(walletAddress: Uint8Array): Promise<Uint8Array | null>;
   getWalletBalances(walletAddress: Uint8Array): Promise<Balance[]>;
   getSlowWallet(walletAddress: Uint8Array): Promise<ISlowWallet | undefined>;
   setSlow(address: Uint8Array): Promise<void>;

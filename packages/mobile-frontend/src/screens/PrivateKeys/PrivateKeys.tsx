@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { SafeAreaView, ScrollView, Text, View } from "react-native";
+import { FlatList, SafeAreaView, Text, View, StyleSheet } from "react-native";
 import { gql, useApolloClient } from "@apollo/client";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 
 const GET_PRIVATE_KEYS = gql`
   query GetPrivateKeys {
@@ -20,13 +20,15 @@ const GET_PRIVATE_KEYS = gql`
 function PrivateKeys() {
   const navigation = useNavigation<any>();
   const apolloClient = useApolloClient();
-  const [keys, setKeys] = useState<{
-    publicKey: string;
-    wallets: {
-      label: string;
-      address: string;
-    }[];
-   }[]>([]);
+  const [keys, setKeys] = useState<
+    {
+      publicKey: string;
+      wallets: {
+        label: string;
+        address: string;
+      }[];
+    }[]
+  >([]);
 
   useEffect(() => {
     const getWallets = async () => {
@@ -48,48 +50,55 @@ function PrivateKeys() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View>
-        <Text>Private keys</Text>
-      </View>
-      <ScrollView style={{ flex: 1 }}>
-        {keys.map((key) => (
-          <View key={key.publicKey} style={{}}>
-            <View style={{ flex: 1, borderBottomWidth: 1 }} />
+      <FlatList
+        data={keys}
+        keyExtractor={(item) => item.publicKey}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        renderItem={({ item: key }) => {
+          return (
+            <View style={styles.listItemContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("PrivateKey", {
+                    publicKey: key.publicKey,
+                  });
+                }}
+              >
+                <Text>{`Public key = ${key.publicKey}`}</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("PrivateKey", {
-                  publicKey: key.publicKey,
-                });
-              }}
-            >
-              <Text>{`Public key = ${key.publicKey}`}</Text>
-            </TouchableOpacity>
-
-            <View>
-              {key.wallets.map((wallet) => (
-                <TouchableOpacity
-                  key={wallet.address}
-                  onPress={() => {
-                    navigation.navigate("Wallet", {
-                      walletAddress: wallet.address,
-                    });
-                  }}
-                >
-                  <View>
-                    <Text>{`label = ${wallet.label}`}</Text>
-                    <Text>{`addr = ${wallet.address}`}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
+              <View>
+                {key.wallets.map((wallet) => (
+                  <TouchableOpacity
+                    key={wallet.address}
+                    onPress={() => {
+                      navigation.navigate("Wallet", {
+                        walletAddress: wallet.address,
+                      });
+                    }}
+                  >
+                    <View>
+                      <Text>{`label = ${wallet.label}`}</Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
-
-            <View style={{ flex: 1, borderBottomWidth: 1 }} />
-          </View>
-        ))}
-      </ScrollView>
+          );
+        }}
+      />
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  separator: {
+    backgroundColor: "rgb(200, 199, 204)",
+    height: StyleSheet.hairlineWidth,
+  },
+  listItemContainer: {
+    padding: 10,
+  },
+});
 
 export default PrivateKeys;

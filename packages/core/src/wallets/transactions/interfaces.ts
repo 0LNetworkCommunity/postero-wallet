@@ -1,6 +1,5 @@
 import { registerEnumType } from "@nestjs/graphql";
 import { UnsubscribeFn } from "emittery";
-import { IDApp } from "../../dapps/interfaces";
 import BN from "bn.js";
 import { AbstractTransaction, AbstractTransactionInput } from "./AbstractTransaction";
 
@@ -61,7 +60,6 @@ export enum PendingTransactionsServiceEvent {
 
 export interface IPendingTransactionsService {
   newTransaction(
-    dApp: IDApp,
     transaction: RawPendingTransactionPayload,
   ): Promise<IPendingTransaction>;
   getWalletPendingTransactions(
@@ -69,13 +67,6 @@ export interface IPendingTransactionsService {
   ): Promise<IPendingTransaction[]>;
   getPendingTransaction(id: string): Promise<IPendingTransaction | null>;
   getPendingTransactions(): Promise<IPendingTransaction[]>;
-  sendPendingTransaction(
-    pendingTransactionId: string,
-    walletAddress: Uint8Array,
-    gasPrice: number,
-    maxGasUnit: number,
-    timeout: number,
-  ): Promise<Uint8Array | null>;
   removePendingTransaction(id: string): Promise<void>;
   on(
     event: PendingTransactionsServiceEvent.NewPendingTransaction,

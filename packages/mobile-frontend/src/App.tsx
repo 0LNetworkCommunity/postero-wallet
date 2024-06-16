@@ -23,14 +23,11 @@ import NewTransfer from "./screens/NewTransfer";
 import WalletDetails from "./screens/WalletDetails";
 import BarCodeScanner from "./screens/BarCodeScanner";
 import WalletPrivateKeys from "./screens/WalletPrivateKeys";
-import Settings from "./screens/Settings";
 import KeyRotation from "./screens/KeyRotation";
 import PrivateKeys from "./screens/PrivateKeys";
 import PrivateKey from "./screens/PrivateKey";
-import { WalletTransactions } from "./screens/WalletTransactions";
 import Transaction from "./screens/Transaction";
 import PendingTransaction from "./screens/PendingTransaction";
-import { PendingTransactions } from "./screens/PendingTransactions";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -150,14 +147,6 @@ const App: FC = () => {
                 />
 
                 <Stack.Screen
-                  name="WalletTransactions"
-                  component={WalletTransactions}
-                  options={{
-                    headerShown: false,
-                  }}
-                />
-
-                <Stack.Screen
                   name="Transaction"
                   component={Transaction}
                   options={{
@@ -167,27 +156,11 @@ const App: FC = () => {
                 />
 
                 <Stack.Screen
-                  name="PendingTransactions"
-                  component={PendingTransactions}
-                  options={{
-                    headerShown: false,
-                  }}
-                />
-
-                <Stack.Screen
                   name="PendingTransaction"
                   component={PendingTransaction}
                   options={{
                     headerShown: false,
                     presentation: "modal",
-                  }}
-                />
-
-                <Stack.Screen
-                  name="Settings"
-                  component={Settings}
-                  options={{
-                    headerShown: false,
                   }}
                 />
               </Stack.Navigator>

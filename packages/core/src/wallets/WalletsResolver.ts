@@ -1,12 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  Query,
-  Resolver,
-  Mutation,
-  Subscription,
-  ID,
-  Args,
-} from '@nestjs/graphql';
+import { Query, Resolver, Mutation, Subscription, Args } from '@nestjs/graphql';
 import { Repeater } from '@repeaterjs/repeater';
 
 import { Types } from '../types';
@@ -17,11 +10,9 @@ import {
   IGraphQLWalletFactory,
   WalletServiceEvent,
 } from './interfaces';
-import Wallet from '../crypto/Wallet';
 import { GraphQLWallet } from './GraphQLWallet';
 import { PlatformTypes } from '../platform/platform-types';
 import { LocalAuthenticationService } from '../platform/interfaces';
-import { normalizeHexString } from '../utils';
 
 @Resolver()
 class WalletsResolver {
@@ -37,39 +28,24 @@ class WalletsResolver {
   @Inject(PlatformTypes.LocalAuthenticationService)
   private readonly localAuthenticationService!: LocalAuthenticationService;
 
-  @Mutation((returns) => Boolean)
-  public async importPrivateKey(
-    @Args('privateKey', { type: () => String })
-    privateKey: string,
+  @Mutation((returns) => GraphQLWallet)
+  public importPrivateKey(
+    @Args('privateKey', { type: () => Buffer })
+    privateKey: Uint8Array,
   ) {
-    const privateKeyHex = normalizeHexString(privateKey.trim());
-    if (privateKeyHex.length !== 64) {
-      throw new Error('Invalid private key length. Must be 64 characters long');
+    if (privateKey.length !== 32) {
+      throw new Error('Invalid private key length. Must be 32 characters long');
     }
 
-    await this.walletService.importPrivateKey(
-      Buffer.from(privateKeyHex, 'hex'),
-    );
-
-    return true;
+    return this.walletService.importPrivateKey(privateKey);
   }
 
-  @Mutation((returns) => Boolean)
-  public async importAddress(
-    @Args('address', { type: () => String })
-    address: string,
-  ) {
-    // await this.walletService.importWallet(mnemonic);
-    return true;
-  }
-
-  @Mutation((returns) => Boolean)
-  public async importMnemonic(
+  @Mutation((returns) => GraphQLWallet)
+  public importMnemonic(
     @Args('mnemonic', { type: () => String })
     mnemonic: string,
   ) {
-    await this.walletService.importMnemonic(mnemonic);
-    return true;
+    return this.walletService.importMnemonic(mnemonic);
   }
 
   @Mutation((returns) => Boolean)
@@ -86,11 +62,7 @@ class WalletsResolver {
     @Args('address', { type: () => Buffer })
     address: Uint8Array,
   ): Promise<IGraphQLWallet | null> {
-    const wallet = await this.walletRepository.getWallet(address);
-    if (!wallet) {
-      return null;
-    }
-    return this.walletMapper(wallet);
+    return this.walletRepository.getWallet(address);
   }
 
   @Query((returns) => [GraphQLWallet])
@@ -109,12 +81,12 @@ class WalletsResolver {
 
   @Mutation((returns) => Boolean)
   public async deleteWallet(
-    @Args('address', { type: () => String })
-    address: string,
+    @Args('address', { type: () => Buffer })
+    address: Uint8Array,
   ) {
     const success = await this.localAuthenticationService.authenticate();
     if (success) {
-      await this.walletService.deleteWallet(Buffer.from(address, 'hex'));
+      await this.walletService.deleteWallet(address);
       return true;
     }
     return false;
@@ -138,10 +110,9 @@ class WalletsResolver {
     return new Repeater(async (push, stop) => {
       const release = this.walletService.on(
         WalletServiceEvent.NewWallet,
-        async (wallet: Wallet) => {
-          const graphqlWallet = await this.walletMapper(wallet);
+        async (wallet: IGraphQLWallet) => {
           push({
-            walletAdded: graphqlWallet,
+            walletAdded: wallet,
           });
         },
       );
@@ -155,10 +126,9 @@ class WalletsResolver {
     return new Repeater(async (push, stop) => {
       const release = this.walletService.on(
         WalletServiceEvent.WalletUpdated,
-        async (wallet: Wallet) => {
-          const graphqlWallet = await this.walletMapper(wallet);
+        async (wallet: GraphQLWallet) => {
           push({
-            walletUpdated: graphqlWallet,
+            walletUpdated: wallet,
           });
         },
       );
@@ -167,27 +137,20 @@ class WalletsResolver {
     });
   }
 
-  @Subscription(() => ID)
+  @Subscription(() => Buffer)
   public walletRemoved() {
     return new Repeater(async (push, stop) => {
       const release = this.walletService.on(
         WalletServiceEvent.WalletRemoved,
-        (walletId: string) => {
+        (address: Uint8Array) => {
           push({
-            walletRemoved: walletId,
+            walletRemoved: address,
           });
         },
       );
       await stop;
       release();
     });
-  }
-
-  private walletMapper(wallet: Wallet): Promise<IGraphQLWallet> {
-    return this.graphQLWalletFactory.getGraphQLWallet(
-      wallet.label,
-      wallet.address,
-    );
   }
 }
 

@@ -65,7 +65,7 @@ const MovementItem: FC<Props> = ({ movement }) => {
         return null;
       })()}
 
-      <View>
+      <View style={{ flexDirection: 'row' }}>
         <LibraAmount
           style={tw.style(
             "font-mono",

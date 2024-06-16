@@ -1,28 +1,32 @@
-import { forwardRef, useMemo, useCallback, useImperativeHandle, useRef } from 'react';
-import { StyleSheet, View } from 'react-native';
-import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import {
+  forwardRef,
+  useMemo,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+} from "react";
+import { StyleSheet } from "react-native";
+import BottomSheet, {
+  BottomSheetView,
+  BottomSheetBackdrop,
+} from "@gorhom/bottom-sheet";
 import { Button } from "@postero/ui";
-import { useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export interface ContextMenuHandle {
   open: () => void;
   close: () => void;
 }
 
-interface Props {
-}
+interface Props {}
 
 const ContextMenu = forwardRef<ContextMenuHandle, Props>(({}, ref) => {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
-	const snapPoints = useMemo(() => [200 + insets.bottom], []);
-
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-  }, []);
+  const snapPoints = useMemo(() => [200 + insets.bottom], []);
 
   const renderBackdrop = useCallback(
     (props: any) => (
@@ -34,8 +38,6 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({}, ref) => {
     ),
     []
   );
-
-  const handleClosePress = () => bottomSheetRef.current?.close();
 
   useImperativeHandle(ref, () => {
     return {
@@ -52,7 +54,6 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({}, ref) => {
     <BottomSheet
       ref={bottomSheetRef}
       index={-1}
-      onChange={handleSheetChanges}
       enablePanDownToClose
       snapPoints={snapPoints}
       backdropComponent={renderBackdrop}
@@ -65,25 +66,12 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({}, ref) => {
             navigation.navigate("PrivateKeys");
           }}
         />
+
         <Button
-          title="App settings"
+          title="Add Wallet"
           onPress={() => {
             bottomSheetRef.current?.close();
-            navigation.navigate("Settings");
-          }}
-        />
-        <Button
-          title="Transactions"
-          onPress={() => {
-            bottomSheetRef.current?.close();
-            navigation.navigate("Transactions");
-          }}
-        />
-        <Button
-          title="Pending Transactions"
-          onPress={() => {
-            bottomSheetRef.current?.close();
-            navigation.navigate("PendingTransactions");
+            navigation.navigate("NewWallet");
           }}
         />
       </BottomSheetView>
@@ -95,7 +83,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-    backgroundColor: 'grey',
+    backgroundColor: "grey",
   },
   contentContainer: {
     flex: 1,

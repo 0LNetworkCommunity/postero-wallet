@@ -17,7 +17,6 @@ import {
   WalletServiceEvent,
 } from './interfaces';
 import { Types } from '../types';
-import Wallet from '../crypto/Wallet';
 import { IDbService } from '../db/interfaces';
 import { IOpenLibraService } from '../open-libra/interfaces';
 import { ICoinRepository } from '../coin/interfaces';
@@ -136,14 +135,6 @@ class WalletService implements IWalletService {
     @Inject(PlatformTypes.EncryptedStoreService)
     private readonly platformEncryptedStoreService: PlatformEncryptedStoreService,
   ) {}
-
-  getWallet(walletAddress: Uint8Array): Promise<Wallet> {
-    throw new Error('Method not implemented.');
-  }
-
-  getWalletPrivateKey(walletAddress: Uint8Array): Promise<Uint8Array> {
-    throw new Error('Method not implemented.');
-  }
 
   private eventEmitter = new Emittery();
 
@@ -372,18 +363,22 @@ class WalletService implements IWalletService {
     return this.balanceRepository.getBalances(walletAddress);
   }
 
-  public async importPrivateKey(privateKey: Uint8Array): Promise<Wallet> {
+  public async importPrivateKey(
+    privateKey: Uint8Array,
+  ): Promise<IGraphQLWallet> {
     const { authKey } =
       await this.keychainService.newKeyFromPrivateKey(privateKey);
     return this.newWalletFromAuthKey(authKey);
   }
 
-  public async importMnemonic(mnemonic: string): Promise<Wallet> {
+  public async importMnemonic(mnemonic: string): Promise<IGraphQLWallet> {
     const { authKey } = await this.keychainService.newKeyFromMnemonic(mnemonic);
     return this.newWalletFromAuthKey(authKey);
   }
 
-  private async newWalletFromAuthKey(authKey: Uint8Array): Promise<Wallet> {
+  private async newWalletFromAuthKey(
+    authKey: Uint8Array,
+  ): Promise<IGraphQLWallet> {
     const address = await this.openLibraService.getOriginatingAddress(authKey);
 
     const wallet = await this.walletRepository.saveWallet(address, authKey);
@@ -511,10 +506,8 @@ class WalletService implements IWalletService {
     label: string,
   ): Promise<void> {
     await this.walletRepository.setWalletLabel(address, label);
-    this.eventEmitter.emit(WalletServiceEvent.WalletUpdated, {
-      label,
-      address,
-    });
+    const wallet = await this.walletRepository.getWallet(address);
+    this.eventEmitter.emit(WalletServiceEvent.WalletUpdated, wallet);
   }
 
   public async getWallets(): Promise<IGraphQLWallet[]> {

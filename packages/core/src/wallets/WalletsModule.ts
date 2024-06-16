@@ -2,7 +2,6 @@ import { Module, Scope } from '@nestjs/common';
 
 import { Types } from '../types';
 import WalletService from './WalletService';
-import CryptoModule from '../crypto/CryptoModule';
 import CoinModule from '../coin/CoinModule';
 import OpenLibraModule from '../open-libra/OpenLibraModule';
 import DbModule from '../db/DbModule';
@@ -48,7 +47,6 @@ import { PendingTransactionsUpdaterService } from './transactions/PendingTransac
 @Module({
   imports: [
     DbModule,
-    CryptoModule,
     CoinModule,
     OpenLibraModule,
     OlFyiModule,

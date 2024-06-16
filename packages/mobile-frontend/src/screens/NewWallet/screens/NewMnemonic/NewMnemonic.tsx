@@ -8,7 +8,6 @@ import { WalletCreation } from "@postero/ui";
 
 import { NewWalletStackParams } from "../../params";
 import { CompositeScreenProps } from "@react-navigation/native";
-import { KeyRotationRoutes } from "../../../KeyRotation/Router";
 import { ModalStackParams } from "../../../params";
 
 const NEW_WALLET_FROM_MNEMONIC = gql`
@@ -58,8 +57,8 @@ function NewMnemonic({
         },
       });
 
-      console.log("res", res);
       if (res.data) {
+        navigation.getParent()?.goBack();
         navigation.navigate("Wallet", {
           walletAddress: res.data.newWalletFromMnemonic.address,
         });

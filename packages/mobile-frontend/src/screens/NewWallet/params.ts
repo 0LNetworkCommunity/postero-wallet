@@ -6,7 +6,4 @@ export type NewWalletStackParams = {
   NewMnemonic: undefined;
   MnemonicImport: undefined;
   PrivateKeyImport: undefined;
-  AddressImport: {
-    redirectTo: "Main";
-  };
 };

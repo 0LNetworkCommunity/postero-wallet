@@ -1,19 +1,29 @@
 import { useState } from "react";
-import { View, TextInput, ActivityIndicator, TouchableOpacity, SafeAreaView } from "react-native";
+import {
+  View,
+  TextInput,
+  ActivityIndicator,
+  TouchableOpacity,
+  SafeAreaView,
+} from "react-native";
 import tw from "twrnc";
 import { gql, useApolloClient } from "@apollo/client";
-import * as Clipboard from 'expo-clipboard';
+import * as Clipboard from "expo-clipboard";
 
-import { Button } from "@postero/ui";
 import { StackScreenProps } from "@react-navigation/stack";
 import { CompositeScreenProps } from "@react-navigation/native";
 
+import { Button } from "@postero/ui";
+
 import { NewWalletStackParams } from "../../params";
 import { ModalStackParams } from "../../../params";
+import ClipboardDocumentListIcon from "../../../../icons/ClipboardDocumentListIcon";
 
 const IMPORT_MNEMONIC = gql`
   mutation ImportMnemonic($mnemonic: String!) {
-    importMnemonic(mnemonic: $mnemonic)
+    importMnemonic(mnemonic: $mnemonic) {
+      address
+    }
   }
 `;
 
@@ -35,13 +45,24 @@ function MnemonicImport({
     setLoading(true);
     try {
       setMnemonic("");
-      await apolloClient.mutate({
+
+      const res = await apolloClient.mutate<{
+        importMnemonic: {
+          address: string;
+        };
+      }>({
         mutation: IMPORT_MNEMONIC,
         variables: {
           mnemonic,
         },
       });
-      navigation.navigate("Main");
+
+      navigation.getParent()?.goBack();
+      if (res.data) {
+        navigation.navigate("Wallet", {
+          walletAddress: res.data.importMnemonic.address,
+        });
+      }
     } finally {
       setLoading(false);
     }

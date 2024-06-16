@@ -12,8 +12,10 @@ import { ModalStackParams } from "../../../params";
 import ClipboardDocumentListIcon from "../../../../icons/ClipboardDocumentListIcon";
 
 const IMPORT_PRIVATE_KEY = gql`
-  mutation ImportPrivateKey($privateKey: String!) {
-    importPrivateKey(privateKey: $privateKey)
+  mutation ImportPrivateKey($privateKey: Bytes!) {
+    importPrivateKey(privateKey: $privateKey) {
+      address
+    }
   }
 `;
 
@@ -35,13 +37,22 @@ function PrivateKeyImport({
     setLoading(true);
     try {
       setPrivateKey("");
-      await apolloClient.mutate({
+      const res = await apolloClient.mutate<{
+        importPrivateKey: {
+          address: string;
+        };
+      }>({
         mutation: IMPORT_PRIVATE_KEY,
         variables: {
           privateKey,
         },
       });
-      navigation.navigate("Main");
+      navigation.getParent()?.goBack();
+      if (res.data) {
+        navigation.navigate("Wallet", {
+          walletAddress: res.data.importPrivateKey.address,
+        });
+      }
     } finally {
       setLoading(false);
     }
