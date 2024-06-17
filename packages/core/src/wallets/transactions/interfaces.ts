@@ -2,6 +2,10 @@ import { registerEnumType } from "@nestjs/graphql";
 import { UnsubscribeFn } from "emittery";
 import BN from "bn.js";
 import { AbstractTransaction, AbstractTransactionInput } from "./AbstractTransaction";
+import { IScriptUserTransaction, ScriptUserTransactionInput } from "./ScriptUserTransaction";
+import { GenesisTransactionInput, IGenesisTransaction } from "./GenesisTransaction";
+import { IUserTransaction, UserTransactionInput } from "./UserTransaction";
+import { BlockMetadataTransactionInput, IBlockMetadataTransaction } from "./BlockMetadataTransaction";
 
 export enum RawPendingTransactionPayloadType {
   EntryFunctionPayload = "entry_function_payload",
@@ -14,10 +18,11 @@ export interface RawPendingTransactionPayload {
 }
 
 export interface ITransactionsService {
-  getUserTransactionsByVersion(versions: string[]): Promise<IUserTransaction[]>;
+  getUserTransactionsByVersion(versions: BN[]): Promise<IUserTransaction[]>;
   createUserTransactions(
     rawTransactions: RawUserTransaction[],
   ): Promise<IUserTransaction[]>;
+  getTransactionsByVersions(versions: BN[]): Promise<AbstractTransaction[]>;
 }
 
 export interface RawUserTransaction {
@@ -33,11 +38,13 @@ export interface RawUserTransaction {
 }
 
 export interface ITransactionsRepository {
+  getTransactionByVersion(version: BN): Promise<AbstractTransaction | null>;
   getTransactionByHash(hash: Uint8Array): Promise<AbstractTransaction | null>;
-  getUserTransactionsByVersion(versions: string[]): Promise<IUserTransaction[]>;
+  getUserTransactionsByVersions(versions: BN[]): Promise<IUserTransaction[]>;
   createUserTransactions(
     rawTransactions: RawUserTransaction[],
   ): Promise<IUserTransaction[]>;
+  getTransactionsByVersions(versions: BN[]): Promise<AbstractTransaction[]>;
 }
 
 export interface ITransaction {
@@ -99,7 +106,7 @@ export interface PendingTransactionArgs {
   id: string;
   type: string;
   payload: Buffer;
-  hash?: Uint8Array;
+  hash: Uint8Array;
   status: PendingTransactionStatus;
   createdAt: Date;
   expirationTimestamp: number;
@@ -152,30 +159,15 @@ export interface IPendingTransactionsRepository {
 
 export interface ITransactionFactory {
   createUserTransaction(args: UserTransactionInput): Promise<IUserTransaction>;
-}
-
-export type UserTransactionInput = AbstractTransactionInput & {
-  sender: Uint8Array;
-  hash: Uint8Array;
-  success: boolean;
-  moduleAddress: Uint8Array;
-  moduleName: string;
-  functionName: string;
-  arguments: string;
-  timestamp: BN;
-};
-
-export interface IUserTransaction {
-  version: BN;
-  timestamp: BN;
-  success: boolean;
-  sender: Uint8Array;
-  moduleAddress: Uint8Array;
-  moduleName: string;
-  functionName: string;
-  arguments: string;
-
-  init(input: UserTransactionInput): void;
+  createGenesisTransaction(
+    input: GenesisTransactionInput,
+  ): Promise<IGenesisTransaction>;
+  createScriptUserTransaction(
+    input: ScriptUserTransactionInput,
+  ): Promise<IScriptUserTransaction>;
+  createBlockMetadataTransaction(
+    input: BlockMetadataTransactionInput,
+  ): Promise<IBlockMetadataTransaction>;
 }
 
 export enum TransactionsWatcherServiceEvent {

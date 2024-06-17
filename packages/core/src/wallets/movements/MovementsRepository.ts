@@ -1,18 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { Decimal } from 'decimal.js';
 
 import {
   IMovement,
   IMovementFactory,
   IMovementsRepository,
+  OnChainTransaction,
 } from './interfaces';
 import { IDbService } from '../../db/interfaces';
 import { Types } from '../../types';
-import { GenesisTransaction } from '../../wallets/transactions/GenesisTransaction';
-import { BlockMetadataTransaction } from '../../wallets/transactions/BlockMetadataTransaction';
-import { ScriptUserTransaction } from '../transactions/ScriptUserTransaction';
-import { ITransactionsService } from '../transactions/interfaces';
+import { ITransactionFactory, ITransactionsService } from '../transactions/interfaces';
 
 @Injectable()
 class MovementsRepository implements IMovementsRepository {
@@ -42,67 +40,28 @@ class MovementsRepository implements IMovementsRepository {
       return [];
     }
 
-    const versions = rows.map((row) => row.version);
-
-    const genesisTransactions = (
-      await this.dbService.db('genesisTransaction').whereIn('version', versions)
-    ).map(
-      (row) =>
-        new GenesisTransaction({
-          version: row.version,
-        }),
-    );
-
-    const userTransactions =
-      await this.transactionsService.getUserTransactionsByVersion(versions);
-
-    const scriptUserTransactions = (
-      await this.dbService
-        .db('scriptUserTransaction')
-        .whereIn('version', versions)
-    ).map(
-      (row) =>
-        new ScriptUserTransaction({
-          version: row.version,
-          timestamp: new BN(row.timestamp),
-          success: row.success,
-          sender: row.sender,
-        }),
-    );
-
-    const blockMetadataTransactions = (
-      await this.dbService
-        .db('blockMetadataTransaction')
-        .whereIn('version', versions)
-    ).map(
-      (row) =>
-        new BlockMetadataTransaction({
-          version: row.version,
-          timestamp: new BN(row.timestamp),
-          epoch: row.epoch,
-        }),
-    );
+    const versions = rows.map((row) => new BN(row.version));
+    const transactions = await this.transactionsService.getTransactionsByVersions(versions);
 
     const transactionsMap = new Map(
-      [
-        ...genesisTransactions,
-        ...userTransactions,
-        ...blockMetadataTransactions,
-        ...scriptUserTransactions,
-      ].map((transaction) => [transaction.version.toString(), transaction]),
+      transactions.map((transaction) => {
+        const tx = transaction as OnChainTransaction;
+        return [tx.version.toString(), transaction];
+      }),
     );
 
     const movements = await Promise.all(
-      rows.map((row) =>
-        this.movementFactory.createMovement({
+      rows.map(async (row) => {
+        const movement = await this.movementFactory.createMovement({
           version: new BN(row.version),
           transaction: transactionsMap.get(row.version)!,
           lockedAmount: new Decimal(row.lockedAmount),
           unlockedAmount: new Decimal(row.unlockedAmount),
           balance: new Decimal(row.balance),
           lockedBalance: new Decimal(row.lockedBalance),
-        }),
-      ),
+        });
+        return movement;
+      }),
     );
 
     movements.sort((a, b) => {

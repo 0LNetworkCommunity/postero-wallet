@@ -56,3 +56,10 @@ nvm use
 ## Mobile App
 
 Currently, exploration is underway to determine the optimal approach for integrating the server into the mobile app. Challenges exist in running the backend within a dedicated thread with a communication channel for the UI thread. One possibility is embedding the server within the Expo app to evaluate performance and responsiveness. Further investigation is ongoing to refine the mobile app experience.
+
+### Internal Testing
+
+The app is still in an early stage and is currently distributed to limited set of users for internal testing. If you need to get access, share your email address associated with your Google account (for Android) or with your Apple account (for iOS).
+
+You can install the Android app from the [Play Store](https://play.google.com/apps/internaltest/4701749236707025974).
+

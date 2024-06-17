@@ -1,10 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { ITransactionFactory, ITransactionsRepository, IUserTransaction } from './interfaces';
+import { ITransactionFactory, ITransactionsRepository } from './interfaces';
 import { IDbService } from '../../db/interfaces';
 import { Types } from '../../types';
 import { AbstractTransaction } from './AbstractTransaction';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
+import { IBlockMetadataTransaction } from './BlockMetadataTransaction';
+import { IGenesisTransaction } from './GenesisTransaction';
+import { IScriptUserTransaction } from './ScriptUserTransaction';
+import { IUserTransaction } from './UserTransaction';
 
 @Injectable()
 class TransactionsRepository implements ITransactionsRepository {
@@ -16,6 +20,12 @@ class TransactionsRepository implements ITransactionsRepository {
     private transactionFactory: ITransactionFactory,
   ) {}
 
+  public async getTransactionByVersion(
+    version: BN,
+  ): Promise<AbstractTransaction | null> {
+    return null;
+  }
+
   public async getTransactionByHash(
     hash: Uint8Array,
   ): Promise<AbstractTransaction | null> {
@@ -23,6 +33,9 @@ class TransactionsRepository implements ITransactionsRepository {
     if (userTransaction) {
       return userTransaction;
     }
+
+    const genesisTransaction = await this.getGenesisTransactionByHash(hash);
+
     return null;
   }
 
@@ -39,12 +52,13 @@ class TransactionsRepository implements ITransactionsRepository {
     return null;
   }
 
-  public async getUserTransactionsByVersion(
-    versions: string[],
+  public async getUserTransactionsByVersions(
+    versions: BN[],
   ): Promise<IUserTransaction[]> {
-    const rows = await this.dbService
-      .db('userTransaction')
-      .whereIn('version', versions);
+    const rows = await this.dbService.db('userTransaction').whereIn(
+      'version',
+      versions.map((version) => version.toString()),
+    );
 
     const userTransactions = await Promise.all(
       rows.map((row) => this.transactionFactory.createUserTransaction(row)),
@@ -115,6 +129,135 @@ class TransactionsRepository implements ITransactionsRepository {
         });
       }),
     );
+  }
+
+  private async getGenesisTransactionByHash(
+    hash: Uint8Array,
+  ): Promise<IGenesisTransaction | null> {
+    const genesisTransaction = await this.dbService
+      .db<{ version: string; hash: Uint8Array }>('genesisTransaction')
+      .where('hash', this.dbService.raw(hash))
+      .first();
+    if (genesisTransaction) {
+      return this.transactionFactory.createGenesisTransaction({
+        version: new BN(genesisTransaction.version),
+        hash: genesisTransaction.hash,
+      });
+    }
+    return null;
+  }
+
+  public async getGenesisTransactionByVersion(
+    version: BN,
+  ): Promise<IGenesisTransaction | null> {
+    const genesisTransaction = await this.dbService
+      .db('genesisTransaction')
+      .where('version', version.toString())
+      .first();
+
+    return null;
+  }
+
+  public async getGenesisTransactionsByVersions(
+    versions: BN[],
+  ): Promise<IGenesisTransaction[]> {
+    const rows = await this.dbService
+      .db<{
+        version: string;
+        hash: Uint8Array;
+      }>('genesisTransaction')
+      .whereIn(
+        'version',
+        versions.map((version) => version.toString()),
+      );
+    return Promise.all(
+      rows.map((row) =>
+        this.transactionFactory.createGenesisTransaction({
+          version: new BN(row.version),
+          hash: row.hash,
+        }),
+      ),
+    );
+  }
+
+  public async getScriptUserTransactionsByVersions(
+    versions: BN[],
+  ): Promise<IScriptUserTransaction[]> {
+    const rows = await this.dbService
+      .db<{
+        version: string;
+        hash: Uint8Array;
+        timestamp: string;
+        sender: Uint8Array;
+        success: number;
+      }>('scriptUserTransaction')
+      .whereIn(
+        'version',
+        versions.map((version) => version.toString()),
+      );
+
+    const scriptUserTransactions = await Promise.all(
+      rows.map((row) =>
+        this.transactionFactory.createScriptUserTransaction({
+          hash: row.hash,
+          version: new BN(row.version),
+          timestamp: new BN(row.timestamp),
+          success: row.success === 1,
+          sender: row.sender,
+        }),
+      ),
+    );
+
+    return scriptUserTransactions;
+  }
+
+  public async getBlockMetadataTransactionsByVersions(
+    versions: BN[],
+  ): Promise<IBlockMetadataTransaction[]> {
+    const rows = await this.dbService
+      .db<{
+        version: string;
+        timestamp: string;
+        epoch: number;
+        hash: Uint8Array;
+      }>('blockMetadataTransaction')
+      .whereIn(
+        'version',
+        versions.map((version) => version.toString()),
+      );
+    return Promise.all(
+      rows.map((row) =>
+        this.transactionFactory.createBlockMetadataTransaction({
+          version: new BN(row.version),
+          timestamp: new BN(row.timestamp),
+          epoch: new BN(row.epoch),
+          hash: row.hash,
+        }),
+      ),
+    );
+  }
+
+  public async getTransactionsByVersions(
+    versions: BN[],
+  ): Promise<AbstractTransaction[]> {
+    const [
+      genesisTransactions,
+      userTransactions,
+      scriptUserTransactions,
+      blockMetadataTransactions,
+    ] = await Promise.all([
+      this.getGenesisTransactionsByVersions(versions),
+      this.getUserTransactionsByVersions(versions),
+      this.getScriptUserTransactionsByVersions(versions),
+      this.getBlockMetadataTransactionsByVersions(versions),
+    ]);
+
+    return [
+      ...genesisTransactions,
+      ...userTransactions,
+      ...scriptUserTransactions,
+      ...blockMetadataTransactions,
+    ];
   }
 }
 

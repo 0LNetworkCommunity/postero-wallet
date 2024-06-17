@@ -9,11 +9,13 @@ export const gqlTransactionMapper = (gqlTransaction: GqlTransaction): Transactio
     case "GenesisTransaction":
       return new GenesisTransaction({
         version: new BN(gqlTransaction.version),
+        hash: Buffer.from(gqlTransaction.hash, 'hex'),
       });
 
     case "UserTransaction":
       return new UserTransaction({
         version: new BN(gqlTransaction.version),
+        hash: Buffer.from(gqlTransaction.hash, 'hex'),
         timestamp: new BN(gqlTransaction.timestamp),
         success: gqlTransaction.success,
         moduleAddress: Buffer.from(gqlTransaction.moduleAddress, "hex"),
@@ -26,6 +28,7 @@ export const gqlTransactionMapper = (gqlTransaction: GqlTransaction): Transactio
     case "ScriptUserTransaction":
       return new ScriptUserTransaction({
         version: new BN(gqlTransaction.version),
+        hash: Buffer.from(gqlTransaction.hash, 'hex'),
         timestamp: new BN(gqlTransaction.timestamp),
         success: gqlTransaction.success,
         sender: Buffer.from(gqlTransaction.sender, "hex"),
@@ -34,6 +37,7 @@ export const gqlTransactionMapper = (gqlTransaction: GqlTransaction): Transactio
     case "BlockMetadataTransaction":
       return new BlockMetadataTransaction({
         version: new BN(gqlTransaction.version),
+        hash: Buffer.from(gqlTransaction.hash, 'hex'),
         timestamp: new BN(gqlTransaction.timestamp),
         epoch: new BN(gqlTransaction.epoch),
       });

@@ -1,7 +1,35 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import BN from 'bn.js';
-import { AbstractTransaction } from './AbstractTransaction';
-import { IUserTransaction, UserTransactionInput } from './interfaces';
+import {
+  AbstractTransaction,
+  AbstractTransactionInput,
+} from './AbstractTransaction';
+
+export interface IUserTransaction {
+  version: BN;
+  hash: Uint8Array;
+  timestamp: BN;
+  success: boolean;
+  sender: Uint8Array;
+  moduleAddress: Uint8Array;
+  moduleName: string;
+  functionName: string;
+  arguments: string;
+
+  init(input: UserTransactionInput): void;
+}
+
+export type UserTransactionInput = AbstractTransactionInput & {
+  version: BN;
+  sender: Uint8Array;
+  hash: Uint8Array;
+  success: boolean;
+  moduleAddress: Uint8Array;
+  moduleName: string;
+  functionName: string;
+  arguments: string;
+  timestamp: BN;
+};
 
 @ObjectType('UserTransaction', {
   implements: () => [AbstractTransaction],

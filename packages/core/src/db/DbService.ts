@@ -116,6 +116,7 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
     await this.db.raw(`
       CREATE TABLE IF NOT EXISTS "blockMetadataTransaction" (
         "version" TEXT PRIMARY KEY,
+        "hash" BLOB NOT NULL,
         "epoch" TEXT NOT NULL,
         "timestamp" INTEGER NOT NULL
       )
@@ -123,7 +124,8 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
 
     await this.db.raw(`
       CREATE TABLE IF NOT EXISTS "genesisTransaction" (
-        "version" TEXT PRIMARY KEY
+        "version" TEXT PRIMARY KEY,
+        "hash" BLOB NOT NULL
       )
     `);
 
@@ -144,6 +146,7 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
     await this.db.raw(`
       CREATE TABLE IF NOT EXISTS "scriptUserTransaction" (
         "version" TEXT PRIMARY KEY,
+        "hash" BLOB NOT NULL,
         "success" INTEGER,
         "sender" BLOB NOT NULL,
         "timestamp" INTEGER NOT NULL

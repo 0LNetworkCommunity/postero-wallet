@@ -11,6 +11,7 @@ export enum TransactionType {
 
 export interface AbstractTransactionInput {
   version: BN;
+  hash: Uint8Array;
 }
 
 export class AbstractTransaction {
@@ -18,9 +19,12 @@ export class AbstractTransaction {
 
   public readonly version: BN;
 
+  public readonly hash: Uint8Array;
+
   public constructor(input: { type: TransactionType } & AbstractTransactionInput) {
     this.type = input.type;
     this.version = input.version;
+    this.hash = input.hash;
   }
 }
 

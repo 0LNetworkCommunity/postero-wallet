@@ -20,8 +20,6 @@ interface Props {
 const Movements: FC<Props> = ({ movements }) => {
   const navigation = useNavigation<any>();
 
-  console.log('render Movements', movements);
-
   return (
     <View style={tw.style("flex-1")}>
       <View style={tw.style("flex-1")}>
@@ -33,7 +31,14 @@ const Movements: FC<Props> = ({ movements }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate("Transaction");
+                    navigation.navigate({
+                      name: "Transaction",
+                      params: {
+                        hash: Buffer.from(item.transaction.hash).toString(
+                          "hex"
+                        ),
+                      },
+                    });
                   }}
                 >
                   <MovementItem movement={item} />

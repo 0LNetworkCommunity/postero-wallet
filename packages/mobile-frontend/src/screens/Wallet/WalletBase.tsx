@@ -107,7 +107,6 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
   >([]);
 
   const movementsAndPendingTransactions = useMemo(() => {
-    console.log('movementsAndPendingTransactions memo');
     return [
       ...(movements ?? []),
       ...pendingTransactions
@@ -263,8 +262,6 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
     };
   }>(NEW_PENDING_TRANSACTION_SUBSCRIPTION, {
     onData: (res) => {
-      console.log(">>>", res);
-
       if (!res.data.data) {
         return;
       }

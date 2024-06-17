@@ -73,6 +73,7 @@ export const GET_MOVEMENTS = `
             transaction {
               __typename
               version
+              hash
               ... on BlockMetadataTransaction {
                 epoch
                 timestamp
@@ -83,7 +84,6 @@ export const GET_MOVEMENTS = `
                 moduleAddress
                 functionName
                 sender
-                hash
                 arguments
                 timestamp
               }
@@ -141,8 +141,8 @@ class WalletService implements IWalletService {
   public async syncWallet(address: Uint8Array) {
     {
       const res = await axios<{ data: GetAccountMovementsRes }>({
-        url: 'https://api.0l.fyi/graphql',
         method: 'POST',
+        url: 'https://api.0l.fyi/graphql',
         data: {
           operationName: 'GetAccountMovements',
           query: GET_MOVEMENTS,
@@ -156,15 +156,6 @@ class WalletService implements IWalletService {
       if (!res.data.data.account) {
         return;
       }
-
-      // CREATE TABLE IF NOT EXISTS "movements" (
-      //   "version" TEXT NOT NULL,
-      //   "walletId" TEXT NOT NULL REFERENCES wallets(id) ON DELETE CASCADE,
-      //   "lockedBalance" TEXT NOT NULL,
-      //   "unlockedBalance" TEXT NOT NULL,
-      //   "timestamp" INTEGER,
-      //   PRIMARY KEY("version", "walletId")
-      // )
 
       const movements = res.data.data.account.movements.edges;
       const movementsLength = movements.length;
@@ -180,10 +171,10 @@ class WalletService implements IWalletService {
 
       const userTransactionRows: Array<{
         version: string;
+        hash: Uint8Array;
         timestamp: string;
         success: boolean;
         sender: Uint8Array;
-        hash: Uint8Array;
         moduleAddress: Uint8Array;
         moduleName: string;
         functionName: string;
@@ -192,6 +183,7 @@ class WalletService implements IWalletService {
 
       const scriptUserTransactionRows: Array<{
         version: string;
+        hash: Knex.Raw<unknown>; // Uint8Array;
         timestamp: string;
         success: boolean;
         sender: Knex.Raw<unknown>; // Uint8Array;
@@ -199,12 +191,14 @@ class WalletService implements IWalletService {
 
       const blockMetadataTransactionRows: Array<{
         version: string;
+        hash: Knex.Raw<unknown>; // Uint8Array;
         epoch: string;
         timestamp: string;
       }> = [];
 
       const genesisTransactionRows: Array<{
         version: string;
+        hash: Knex.Raw<unknown>; // Uint8Array;
       }> = [];
 
       for (let i = 0; i < movementsLength; ++i) {
@@ -227,14 +221,15 @@ class WalletService implements IWalletService {
           case 'GenesisTransaction':
             genesisTransactionRows.push({
               version: transaction.version,
+              hash: this.dbService.raw(Buffer.from(transaction.hash, 'hex')),
             });
             break;
 
           case 'UserTransaction':
             userTransactionRows.push({
               version: transaction.version,
-              success: transaction.success,
               hash: Buffer.from(transaction.hash, 'hex'),
+              success: transaction.success,
               sender: Buffer.from(transaction.sender, 'hex'),
               moduleAddress: Buffer.from(transaction.moduleAddress, 'hex'),
               moduleName: transaction.moduleName,
@@ -247,6 +242,7 @@ class WalletService implements IWalletService {
           case 'ScriptUserTransaction':
             scriptUserTransactionRows.push({
               version: transaction.version,
+              hash: this.dbService.raw(Buffer.from(transaction.hash, 'hex')),
               success: transaction.success,
               sender: this.dbService.raw(
                 Buffer.from(transaction.sender, 'hex'),
@@ -258,6 +254,7 @@ class WalletService implements IWalletService {
           case 'BlockMetadataTransaction':
             blockMetadataTransactionRows.push({
               version: transaction.version,
+              hash: this.dbService.raw(Buffer.from(transaction.hash, 'hex')),
               epoch: transaction.epoch,
               timestamp: transaction.timestamp,
             });

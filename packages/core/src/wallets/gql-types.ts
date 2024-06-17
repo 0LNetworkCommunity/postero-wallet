@@ -1,5 +1,6 @@
 export interface GqlAbstractTransaction {
   version: string;
+  hash: string;
 }
 
 export interface GqlBlockMetadataTransaction extends GqlAbstractTransaction {
@@ -15,7 +16,6 @@ export interface GqlUserTransaction extends GqlAbstractTransaction {
   functionName: string;
   success: boolean;
   sender: string;
-  hash: string;
   arguments: string;
   timestamp: string;
 }

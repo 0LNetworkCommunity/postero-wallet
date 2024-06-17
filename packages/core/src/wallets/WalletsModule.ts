@@ -43,6 +43,10 @@ import MovementsRepository from './movements/MovementsRepository';
 import MovementsService from './movements/MovementsService';
 import { TransactionWatcherFactory } from './transactions/TransactionWatcherFactory';
 import { PendingTransactionsUpdaterService } from './transactions/PendingTransactionsUpdaterService';
+import { TransactionsResolver } from './transactions/TransactionsResolver';
+import { GenesisTransaction } from './transactions/GenesisTransaction';
+import { ScriptUserTransaction } from './transactions/ScriptUserTransaction';
+import { BlockMetadataTransaction } from './transactions/BlockMetadataTransaction';
 
 @Module({
   imports: [
@@ -60,6 +64,7 @@ import { PendingTransactionsUpdaterService } from './transactions/PendingTransac
     TransfersResolver,
     PendingTransactionsResolver,
     MovementsResolver,
+    TransactionsResolver,
 
     {
       provide: Types.IGraphQLWalletFactory,
@@ -136,8 +141,23 @@ import { PendingTransactionsUpdaterService } from './transactions/PendingTransac
       useClass: TransactionFactory,
     },
     {
+      provide: Types.IScriptUserTransaction,
+      useClass: ScriptUserTransaction,
+      scope: Scope.TRANSIENT,
+    },
+    {
       provide: Types.IUserTransaction,
       useClass: UserTransaction,
+      scope: Scope.TRANSIENT,
+    },
+    {
+      provide: Types.IGenesisTransaction,
+      useClass: GenesisTransaction,
+      scope: Scope.TRANSIENT,
+    },
+    {
+      provide: Types.IBlockMetadataTransaction,
+      useClass: BlockMetadataTransaction,
       scope: Scope.TRANSIENT,
     },
 

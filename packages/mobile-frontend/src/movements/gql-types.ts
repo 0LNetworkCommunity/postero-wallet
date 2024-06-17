@@ -23,12 +23,14 @@ export const GET_MOVEMENTS = gql`
           lockedBalance
           transaction {
             __typename
-            version
+            hash
             ... on BlockMetadataTransaction {
+              version
               epoch
               timestamp
             }
             ... on UserTransaction {
+              version
               success
               moduleName
               moduleAddress
@@ -38,6 +40,7 @@ export const GET_MOVEMENTS = gql`
               timestamp
             }
             ... on ScriptUserTransaction {
+              version
               success
               sender
               timestamp
@@ -52,6 +55,7 @@ export const GET_MOVEMENTS = gql`
 
 export interface GqlAbstractTransaction {
   version: string;
+  hash: string;
 }
 
 export interface GqlBlockMetadataTransaction extends GqlAbstractTransaction {

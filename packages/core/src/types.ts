@@ -62,7 +62,12 @@ export enum Types {
   ITransactionsService = "ITransactionsService",
   ITransactionsRepository = "ITransactionsRepository",
   ITransactionFactory = "ITransactionFactory",
+
   IUserTransaction = "IUserTransaction",
+  IGenesisTransaction = "IGenesisTransaction",
+  IScriptUserTransaction = "IScriptUserTransaction",
+  IBlockMetadataTransaction = "IBlockMetadataTransaction",
+
   IPendingTransactionsService = "IPendingTransactionsService",
   IPendingTransaction = "IPendingTransaction",
   IPendingTransactionFactory = "IPendingTransactionFactory",

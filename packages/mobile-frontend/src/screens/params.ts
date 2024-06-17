@@ -16,7 +16,9 @@ export type ModalStackParams = {
   PrivateKey: {
     publicKey: string;
   };
-  Transaction: undefined;
+  Transaction: {
+    hash: string;
+  };
   PendingTransaction: {
     id: string;
   };

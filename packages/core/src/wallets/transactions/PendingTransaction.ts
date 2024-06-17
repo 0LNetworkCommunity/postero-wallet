@@ -6,14 +6,17 @@ import {
   PendingTransactionArgs,
   PendingTransactionStatus,
 } from './interfaces';
+import { AbstractTransaction } from './AbstractTransaction';
 
-@ObjectType('PendingTransaction')
-class PendingTransaction implements IPendingTransaction {
+@ObjectType('PendingTransaction', {
+  implements: () => [AbstractTransaction],
+})
+class PendingTransaction implements AbstractTransaction, IPendingTransaction {
   @Field((type) => ID)
   public id: string;
 
-  @Field((type) => Buffer, { nullable: true })
-  public hash?: Uint8Array;
+  @Field((type) => Buffer)
+  public hash: Uint8Array;
 
   @Field((type) => PendingTransactionStatus)
   public status: PendingTransactionStatus;

@@ -5,16 +5,31 @@ import {
   AbstractTransaction,
 } from './AbstractTransaction';
 
-export type BlockMetadataTransactionInput = AbstractTransactionInput;
+export type GenesisTransactionInput = AbstractTransactionInput & {
+  version: BN;
+};
+
+export interface IGenesisTransaction {
+  version: BN;
+  hash: Uint8Array;
+
+  init(input: GenesisTransactionInput): void;
+}
 
 @ObjectType('GenesisTransaction', {
   implements: () => [AbstractTransaction],
 })
-export class GenesisTransaction implements AbstractTransaction {
+export class GenesisTransaction
+  implements IGenesisTransaction, AbstractTransaction
+{
   @Field(() => BN)
   public version: BN;
 
-  public constructor(input: BlockMetadataTransactionInput) {
+  @Field(() => Buffer)
+  public hash: Uint8Array;
+
+  public init(input: GenesisTransactionInput) {
     this.version = input.version;
+    this.hash = input.hash;
   }
 }

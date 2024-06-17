@@ -14,7 +14,6 @@ class MovementsService implements IMovementsService {
   public async getWalletMovements(walletId: Uint8Array): Promise<IMovement[]> {
     const movements =
       await this.movementsRepository.getWalletMovements(walletId);
-
     return movements;
   }
 }

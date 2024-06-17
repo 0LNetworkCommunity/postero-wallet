@@ -3,6 +3,10 @@ import { Decimal } from 'decimal.js';
 
 import { AbstractTransaction } from '../transactions/AbstractTransaction';
 import { MovementInput } from './Movement';
+import { IUserTransaction } from '../transactions/UserTransaction';
+import { IScriptUserTransaction } from '../transactions/ScriptUserTransaction';
+import { IBlockMetadataTransaction } from '../transactions/BlockMetadataTransaction';
+import { IGenesisTransaction } from '../transactions/GenesisTransaction';
 
 export interface IMovement {
   version: BN;
@@ -28,3 +32,9 @@ export interface IMovementFactory {
 export interface IMovementsRepository {
   getWalletMovements(walletAddress: Uint8Array): Promise<IMovement[]>;
 }
+
+export type OnChainTransaction =
+  | IUserTransaction
+  | IScriptUserTransaction
+  | IBlockMetadataTransaction
+  | IGenesisTransaction;
