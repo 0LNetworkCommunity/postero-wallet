@@ -12,17 +12,11 @@ import { AbstractTransaction } from './AbstractTransaction';
   implements: () => [AbstractTransaction],
 })
 class PendingTransaction implements AbstractTransaction, IPendingTransaction {
-  @Field((type) => ID)
-  public id: string;
-
   @Field((type) => Buffer)
   public hash: Uint8Array;
 
   @Field((type) => PendingTransactionStatus)
   public status: PendingTransactionStatus;
-
-  @Field((type) => String)
-  type: string;
 
   @Field((type) => Buffer)
   payload: Buffer;
@@ -34,8 +28,6 @@ class PendingTransaction implements AbstractTransaction, IPendingTransaction {
   expirationTimestamp: number;
 
   public init(args: PendingTransactionArgs) {
-    this.id = args.id;
-    this.type = args.type;
     this.payload = args.payload;
     this.createdAt = args.createdAt;
     this.hash = args.hash;

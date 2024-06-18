@@ -35,7 +35,9 @@ export class PendingTransactionsUpdaterService
   }
 
   public transactionUpdating(transaction: IPendingTransaction): boolean {
-    return this.updatingTransactions.has(transaction.id);
+    return this.updatingTransactions.has(
+      Buffer.from(transaction.hash).toString('hex'),
+    );
   }
 
   public onModuleInit() {
@@ -67,7 +69,11 @@ export class PendingTransactionsUpdaterService
   }
 
   public async updateTransaction(transaction: IPendingTransaction) {
-    if (this.updatingTransactions.has(transaction.id)) {
+    if (
+      this.updatingTransactions.has(
+        Buffer.from(transaction.hash).toString('hex'),
+      )
+    ) {
       return;
     }
 
@@ -75,7 +81,9 @@ export class PendingTransactionsUpdaterService
       return;
     }
 
-    this.updatingTransactions.add(transaction.id);
+    this.updatingTransactions.add(
+      Buffer.from(transaction.hash).toString('hex'),
+    );
     this.eventEmitter.emit(
       PendingTransactionsUpdaterServiceEvent.UpdatingTransaction,
       transaction,
@@ -119,7 +127,9 @@ export class PendingTransactionsUpdaterService
     } finally {
       await new Promise((resolve) => setTimeout(resolve, 4_000));
 
-      this.updatingTransactions.delete(transaction.id);
+      this.updatingTransactions.delete(
+        Buffer.from(transaction.hash).toString('hex'),
+      );
 
       this.eventEmitter.emit(
         PendingTransactionsUpdaterServiceEvent.TransactionUpdated,

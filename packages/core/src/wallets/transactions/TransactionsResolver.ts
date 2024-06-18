@@ -16,6 +16,9 @@ export class TransactionsResolver {
     @Args('hash', { type: () => Buffer })
     hash: Uint8Array,
   ) {
-    return this.transactionsRepository.getTransactionByHash(hash);
+    const res = await this.transactionsRepository.getTransactionByHash(hash);
+    console.log('res', res);
+
+    return res;
   }
 }

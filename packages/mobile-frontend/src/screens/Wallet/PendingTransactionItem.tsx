@@ -3,13 +3,12 @@ import { ActivityIndicator, View } from "react-native";
 import { Text } from "@postero/ui";
 import tw from "twrnc";
 import { gql, useApolloClient, useQuery, useSubscription } from "@apollo/client";
-import { PendingTransaction, PendingTransactionStatus } from "../PendingTransaction/types";
+import { PendingTransaction, PendingTransactionStatus } from "../Transaction/types";
 import { Countdown } from "../../ui/Countdown";
 
 const GET_PENDING_TRANSACTION = gql`
-  query GetPendingTransaction($id: ID!) {
-    pendingTransaction(id: $id) {
-      id
+  query GetPendingTransaction($hash: Bytes!) {
+    pendingTransaction(hash: $hash) {
       hash
       status
       expirationTimestamp
@@ -18,9 +17,10 @@ const GET_PENDING_TRANSACTION = gql`
 
       transaction {
         __typename
-        version
+        hash
 
         ... on UserTransaction {
+          version
           success
           moduleName
           moduleAddress
@@ -36,9 +36,8 @@ const GET_PENDING_TRANSACTION = gql`
 `;
 
 const PENDING_TRANSACTION_SUBSCRIPTION = gql`
-  subscription PendingTransaction($id: ID!) {
-    pendingTransaction(id: $id) {
-      id
+  subscription PendingTransaction($hash: Bytes!) {
+    pendingTransaction(hash: $hash) {
       hash
       status
       expirationTimestamp
@@ -47,9 +46,10 @@ const PENDING_TRANSACTION_SUBSCRIPTION = gql`
 
       transaction {
         __typename
-        version
+        hash
 
         ... on UserTransaction {
+          version
           success
           moduleName
           moduleAddress
@@ -75,10 +75,10 @@ const dateTimeFormatter = new Intl.DateTimeFormat("fr-FR", {
 });
 
 interface Props {
-  id: string;
+  hash: Uint8Array;
 }
 
-export function PendingTransactionItem({ id }: Props) {
+export function PendingTransactionItem({ hash }: Props) {
   const [pendingTransaction, setPendingTransaction] =
     useState<PendingTransaction>();
 
@@ -92,7 +92,7 @@ export function PendingTransactionItem({ id }: Props) {
       console.error(error);
     },
     variables: {
-      id,
+      hash: Buffer.from(hash).toString("hex"),
     },
   });
 
@@ -110,7 +110,7 @@ export function PendingTransactionItem({ id }: Props) {
       console.error(error);
     },
     variables: {
-      id,
+      hash: Buffer.from(hash).toString("hex"),
     },
   });
 

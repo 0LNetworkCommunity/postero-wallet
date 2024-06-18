@@ -1,8 +1,8 @@
 import Emittery, { UnsubscribeFn } from "emittery";
 import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
-import { sha3_256 as sha3Hash } from "@noble/hashes/sha3";
 import axios from "axios";
 import { AptosAccount, AptosClient, BCS, TxnBuilderTypes } from "aptos";
+import { sha3_256 as sha3Hash } from "@noble/hashes/sha3";
 
 import {
   IPendingTransaction,
@@ -34,6 +34,7 @@ const {
   Ed25519Signature,
   SignedTransaction
 } = TxnBuilderTypes;
+
 
 @Injectable()
 class PendingTransactionsService
@@ -95,16 +96,7 @@ class PendingTransactionsService
     maxGasUnit: bigint,
     gasPrice: bigint,
     expirationTimestamp: bigint,
-  ): Promise<string> {
-    const id =
-      await this.pendingTransactionsRepository.createPendingTransaction(
-        sender,
-        transactionPayload,
-        maxGasUnit,
-        gasPrice,
-        expirationTimestamp,
-      );
-
+  ): Promise<Uint8Array> {
     let sender32: Uint8Array;
     if (sender.length === 32) {
       sender32 = sender;
@@ -155,6 +147,16 @@ class PendingTransactionsService
     const signedTx = new SignedTransaction(rawTxn, authenticator);
     const bcsTxn = BCS.bcsToBytes(signedTx);
 
+    const txHash = await this.pendingTransactionsRepository.createPendingTransaction(
+      sender,
+      bcsTxn,
+      maxGasUnit,
+      gasPrice,
+      expirationTimestamp,
+    );
+
+    console.log('txHash', Buffer.from(txHash).toString('hex').toUpperCase());
+
     const res = await axios<{
       data?: {
         newTransaction: {
@@ -183,21 +185,16 @@ class PendingTransactionsService
       },
     });
 
-    if (res.data.data) {
-      await this.pendingTransactionsRepository.setPendingTransactionHash(
-        id,
-        parseHexString(res.data.data.newTransaction.hash),
-      );
-    }
+    console.log('res', res.data.data?.newTransaction.hash);
 
-    const pendingTransaction = await this.getPendingTransaction(id);
+    const pendingTransaction = await this.getPendingTransaction(txHash);
 
     this.eventEmitter.emit(
       PendingTransactionsServiceEvent.NewPendingTransaction,
       pendingTransaction,
     );
 
-    return id;
+    return txHash;
   }
 
   public async newTransaction(
@@ -234,20 +231,20 @@ class PendingTransactionsService
   }
 
   public async getPendingTransaction(
-    id: string,
+    hash: Uint8Array,
   ): Promise<IPendingTransaction | null> {
-    return this.pendingTransactionsRepository.getPendingTransaction(id);
+    return this.pendingTransactionsRepository.getPendingTransaction(hash);
   }
 
   public async getPendingTransactions(): Promise<IPendingTransaction[]> {
     return this.pendingTransactionsRepository.getPendingTransactions();
   }
 
-  public async removePendingTransaction(id: string): Promise<void> {
-    await this.pendingTransactionsRepository.removePendingTransaction(id);
+  public async removePendingTransaction(hash: Uint8Array): Promise<void> {
+    await this.pendingTransactionsRepository.removePendingTransaction(hash);
     await this.eventEmitter.emit(
       PendingTransactionsServiceEvent.PendingTransactionRemoved,
-      id,
+      hash,
     );
   }
 
@@ -263,20 +260,20 @@ class PendingTransactionsService
     status: PendingTransactionStatus,
   ) {
     const pendingTransaction =
-      await this.pendingTransactionsRepository.getPendingTransactionByHash(
+      await this.pendingTransactionsRepository.getPendingTransaction(
         hash,
       );
 
     if (pendingTransaction) {
       await this.pendingTransactionsRepository.setPendingTransactionStatus(
-        pendingTransaction.id,
+        pendingTransaction.hash,
         status,
       );
 
       await this.eventEmitter.emit(
         PendingTransactionsServiceEvent.PendingTransactionUpdated,
         await this.pendingTransactionsRepository.getPendingTransaction(
-          pendingTransaction.id,
+          pendingTransaction.hash,
         ),
       );
     }

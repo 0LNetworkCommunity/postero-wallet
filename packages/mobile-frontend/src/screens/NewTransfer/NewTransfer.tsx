@@ -88,8 +88,8 @@ const NewTransferScreen: FC<
       });
 
       if (res.data) {
-        navigation.replace("PendingTransaction", {
-          id: res.data.newTransfer,
+        navigation.replace("Transaction", {
+          hash: res.data.newTransfer,
         });
       }
     } catch (error) {

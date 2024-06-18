@@ -15,6 +15,7 @@ import ContextMenu, { ContextMenuHandle } from "./ContextMenu";
 import ListItem from "./ListItem";
 import NavBar from "../../ui/NavBar";
 import ChevronLeftIcon from "../../icons/ChevronLeftIcon";
+import PlusIcon from "../../icons/PlusIcon";
 
 const GET_WALLET = gql`
   query GetWallet($address: Bytes!) {
@@ -71,7 +72,6 @@ function WalletPrivateKeys({
           <TouchableOpacity
             style={tw.style("p-2")}
             onPress={() => {
-              console.log('bonjour');
               contextMenu.current?.open();
             }}
           >

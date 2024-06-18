@@ -27,7 +27,6 @@ import KeyRotation from "./screens/KeyRotation";
 import PrivateKeys from "./screens/PrivateKeys";
 import PrivateKey from "./screens/PrivateKey";
 import Transaction from "./screens/Transaction";
-import PendingTransaction from "./screens/PendingTransaction";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -155,14 +154,6 @@ const App: FC = () => {
                   }}
                 />
 
-                <Stack.Screen
-                  name="PendingTransaction"
-                  component={PendingTransaction}
-                  options={{
-                    headerShown: false,
-                    presentation: "modal",
-                  }}
-                />
               </Stack.Navigator>
             </NavigationContainer>
           </GestureHandlerRootView>

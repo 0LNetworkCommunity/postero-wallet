@@ -87,7 +87,7 @@ export class TransactionsWatcherService
   ) {
     if (transaction instanceof UserTransaction) {
       const pendingTransaction =
-        await this.pendingTransactionsRepository.getPendingTransactionByHash(
+        await this.pendingTransactionsRepository.getPendingTransaction(
           transaction.hash,
         );
       if (pendingTransaction) {

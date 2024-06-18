@@ -1,16 +1,24 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable } from '@nestjs/common';
+import { sha3_256 as sha3Hash } from '@noble/hashes/sha3';
 
 import {
   IPendingTransaction,
   IPendingTransactionFactory,
   IPendingTransactionsRepository,
   PendingTransactionStatus,
-  RawPendingTransactionPayloadType,
-} from "./interfaces";
-import { Types } from "../../types";
-import { IDbService } from "../../db/interfaces";
-import { PlatformTypes } from "../../platform/platform-types";
-import { PlatformCryptoService } from "../../platform/interfaces";
+} from './interfaces';
+import { Types } from '../../types';
+import { IDbService } from '../../db/interfaces';
+
+function getTransactionHash(signedTransaction: Uint8Array): Uint8Array {
+  const txHash = sha3Hash
+    .create()
+    .update(sha3Hash.create().update('DIEM::Transaction').digest())
+    .update(new Uint8Array([0]))
+    .update(signedTransaction)
+    .digest();
+  return txHash;
+}
 
 @Injectable()
 class PendingTransactionsRepository implements IPendingTransactionsRepository {
@@ -20,21 +28,18 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
   @Inject(Types.IPendingTransactionFactory)
   private pendingTransactionFactory: IPendingTransactionFactory;
 
-  @Inject(PlatformTypes.CryptoService)
-  private readonly platformCryptoService: PlatformCryptoService;
-
   public async createPendingTransaction(
     sender: Uint8Array,
     transactionPayload: Uint8Array,
     maxGasUnit: bigint,
     gasPrice: bigint,
     expirationTimestamp: bigint,
-  ): Promise<string> {
-    const id = this.platformCryptoService.randomUUID();
+  ): Promise<Uint8Array> {
     const createdAt = new Date();
+    const hash = getTransactionHash(transactionPayload);
 
     await this.dbService.db('pendingTransactions').insert({
-      id,
+      hash: this.dbService.raw(hash),
       sender: this.dbService.raw(sender),
       payload: this.dbService.raw(transactionPayload),
       maxGasUnit: maxGasUnit.toString(10),
@@ -44,48 +49,23 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
       status: PendingTransactionStatus.Unknown,
     });
 
-    return id;
+    return hash;
   }
 
   public async getPendingTransaction(
-    id: string,
-  ): Promise<IPendingTransaction | null> {
-    const row = await this.dbService
-      .db('pendingTransactions')
-      .where('id', id)
-      .first();
-    if (!row) {
-      return null;
-    }
-
-    return this.pendingTransactionFactory.getPendingTransaction({
-      id: row.id,
-      hash: row.hash,
-      status: row.status,
-      type: row.type as RawPendingTransactionPayloadType,
-      payload: row.payload,
-      createdAt: new Date(row.createdAt),
-      expirationTimestamp: row.expirationTimestamp,
-    });
-  }
-
-  public async getPendingTransactionByHash(
     hash: Uint8Array,
   ): Promise<IPendingTransaction | null> {
     const row = await this.dbService
       .db('pendingTransactions')
       .where('hash', this.dbService.raw(hash))
       .first();
-
     if (!row) {
       return null;
     }
 
     return this.pendingTransactionFactory.getPendingTransaction({
-      id: row.id,
       hash: row.hash,
       status: row.status,
-      type: row.type as RawPendingTransactionPayloadType,
       payload: row.payload,
       createdAt: new Date(row.createdAt),
       expirationTimestamp: row.expirationTimestamp,
@@ -103,10 +83,8 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
     return Promise.all(
       rows.map((row) =>
         this.pendingTransactionFactory.getPendingTransaction({
-          id: row.id,
           hash: row.hash,
           status: row.status,
-          type: row.type as RawPendingTransactionPayloadType,
           payload: row.payload,
           createdAt: new Date(row.createdAt),
           expirationTimestamp: row.expirationTimestamp,
@@ -123,10 +101,8 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
     return Promise.all(
       rows.map((row) =>
         this.pendingTransactionFactory.getPendingTransaction({
-          id: row.id,
           hash: row.hash,
           status: row.status,
-          type: row.type as RawPendingTransactionPayloadType,
           payload: row.payload,
           createdAt: new Date(row.createdAt),
           expirationTimestamp: row.expirationTimestamp,
@@ -135,24 +111,15 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
     );
   }
 
-  public async removePendingTransaction(id: string): Promise<void> {
-    await this.dbService.db('pendingTransactions').where('id', id).del();
-  }
-
-  public async setPendingTransactionHash(
-    id: string,
-    hash: Uint8Array,
-  ): Promise<void> {
+  public async removePendingTransaction(hash: Uint8Array): Promise<void> {
     await this.dbService
       .db('pendingTransactions')
-      .update({
-        hash,
-      })
-      .where('id', id);
+      .where('hash', this.dbService.raw(hash))
+      .del();
   }
 
   public async setPendingTransactionStatus(
-    id: string,
+    hash: Uint8Array,
     status: PendingTransactionStatus,
   ): Promise<void> {
     await this.dbService
@@ -160,7 +127,7 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
       .update({
         status,
       })
-      .where('id', id);
+      .where('hash', hash);
   }
 
   public async getTransactionsExpiredAfter(
@@ -176,10 +143,8 @@ class PendingTransactionsRepository implements IPendingTransactionsRepository {
     return Promise.all(
       transactions.map((transaction) =>
         this.pendingTransactionFactory.getPendingTransaction({
-          id: transaction.id,
           hash: transaction.hash,
           status: transaction.status,
-          type: transaction.type as RawPendingTransactionPayloadType,
           payload: transaction.payload,
           createdAt: new Date(transaction.createdAt),
           expirationTimestamp: transaction.expirationTimestamp,

@@ -41,7 +41,6 @@ import { PendingTransaction } from "../../pending-transactions";
 const NEW_PENDING_TRANSACTION_SUBSCRIPTION = gql`
   subscription NewPendingTransaction {
     newPendingTransaction {
-      id
       hash
       status
       createdAt
@@ -52,7 +51,6 @@ const NEW_PENDING_TRANSACTION_SUBSCRIPTION = gql`
 const GET_WALLET_PENDING_TRANSACTIONS = gql`
   query GetWalletPendingTransactions($address: Bytes!) {
     walletPendingTransactions(address: $address) {
-      id
       hash
       status
       createdAt
@@ -236,8 +234,8 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
     const load = async () => {
       const { data } = await apolloClient.query<{
         walletPendingTransactions: {
-          id: string;
           status: string;
+          hash: string;
           createdAt: number;
         }[];
       }>({
@@ -248,7 +246,10 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
       });
 
       setPendingTransactions(
-        data.walletPendingTransactions.map((it) => new PendingTransaction(it))
+        data.walletPendingTransactions.map(
+          (it) =>
+            new PendingTransaction({ ...it, hash: Buffer.from(it.hash, "hex") })
+        )
       );
     };
     load();
@@ -256,8 +257,8 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
 
   useSubscription<{
     newPendingTransaction: {
-      id: string;
       status: string;
+      hash: string;
       createdAt: number;
     };
   }>(NEW_PENDING_TRANSACTION_SUBSCRIPTION, {
@@ -266,8 +267,12 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
         return;
       }
 
+      const { newPendingTransaction } = res.data.data;
       setPendingTransactions([
-        new PendingTransaction(res.data.data.newPendingTransaction),
+        new PendingTransaction({
+          ...newPendingTransaction,
+          hash: Buffer.from(newPendingTransaction.hash, "hex"),
+        }),
         ...pendingTransactions,
       ]);
     },

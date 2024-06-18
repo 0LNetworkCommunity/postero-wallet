@@ -72,16 +72,16 @@ export interface IPendingTransactionsService {
   getWalletPendingTransactions(
     address: Uint8Array,
   ): Promise<IPendingTransaction[]>;
-  getPendingTransaction(id: string): Promise<IPendingTransaction | null>;
+  getPendingTransaction(hash: Uint8Array): Promise<IPendingTransaction | null>;
   getPendingTransactions(): Promise<IPendingTransaction[]>;
-  removePendingTransaction(id: string): Promise<void>;
+  removePendingTransaction(hash: Uint8Array): Promise<void>;
   on(
     event: PendingTransactionsServiceEvent.NewPendingTransaction,
     listener: (pendingTransaction: IPendingTransaction) => void,
   ): UnsubscribeFn;
   on(
     event: PendingTransactionsServiceEvent.PendingTransactionRemoved,
-    listener: (pendingTransactionId: string) => void,
+    listener: (pendingTransactionHash: Uint8Array) => void,
   ): UnsubscribeFn;
   on(
     event: PendingTransactionsServiceEvent.PendingTransactionUpdated,
@@ -94,7 +94,7 @@ export interface IPendingTransactionsService {
     maxGasUnit: bigint,
     gasPrice: bigint,
     expirationTimestamp: bigint,
-  ): Promise<string>;
+  ): Promise<Uint8Array>;
 
   setPendingTransactionStatus(
     hash: Uint8Array,
@@ -103,8 +103,6 @@ export interface IPendingTransactionsService {
 }
 
 export interface PendingTransactionArgs {
-  id: string;
-  type: string;
   payload: Buffer;
   hash: Uint8Array;
   status: PendingTransactionStatus;
@@ -113,11 +111,9 @@ export interface PendingTransactionArgs {
 }
 
 export interface IPendingTransaction {
-  id: string;
-  type: string;
   payload: Buffer;
   createdAt: Date;
-  hash?: Uint8Array;
+  hash: Uint8Array;
   status?: PendingTransactionStatus;
   expirationTimestamp: number;
   init(args: PendingTransactionArgs): void;
@@ -136,19 +132,15 @@ export interface IPendingTransactionsRepository {
     maxGasUnit: bigint,
     gasPrice: bigint,
     expirationTimestamp: bigint,
-  ): Promise<string>;
-  getPendingTransaction(id: string): Promise<IPendingTransaction | null>;
-  getPendingTransactionByHash(
-    hash: Uint8Array,
-  ): Promise<IPendingTransaction | null>;
+  ): Promise<Uint8Array>;
+  getPendingTransaction(hash: Uint8Array): Promise<IPendingTransaction | null>;
   getPendingTransactions(): Promise<IPendingTransaction[]>;
   getWalletPendingTransactions(
     address: Uint8Array,
   ): Promise<IPendingTransaction[]>;
-  removePendingTransaction(id: string): Promise<void>;
-  setPendingTransactionHash(id: string, hash: Uint8Array): Promise<void>;
+  removePendingTransaction(hash: Uint8Array): Promise<void>;
   setPendingTransactionStatus(
-    id: string,
+    hash: Uint8Array,
     status: PendingTransactionStatus,
   ): Promise<void>;
   getTransactionsExpiredAfter(

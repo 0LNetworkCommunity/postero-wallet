@@ -18,7 +18,6 @@ export interface UserTransaction {
 }
 
 export interface PendingTransaction {
-  id: string;
   hash: string | null;
   status: PendingTransactionStatus;
   expirationTimestamp: number;

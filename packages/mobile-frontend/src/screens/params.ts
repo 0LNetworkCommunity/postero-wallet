@@ -19,7 +19,4 @@ export type ModalStackParams = {
   Transaction: {
     hash: string;
   };
-  PendingTransaction: {
-    id: string;
-  };
 };

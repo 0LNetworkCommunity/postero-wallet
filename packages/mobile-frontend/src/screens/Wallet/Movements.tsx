@@ -50,12 +50,12 @@ const Movements: FC<Props> = ({ movements }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate("PendingTransaction", {
-                      id: item.id,
+                    navigation.navigate("Transaction", {
+                      hash: Buffer.from(item.hash).toString("hex"),
                     });
                   }}
                 >
-                  <PendingTransactionItem id={item.id} />
+                  <PendingTransactionItem hash={item.hash} />
                 </TouchableOpacity>
               );
             }
@@ -67,7 +67,7 @@ const Movements: FC<Props> = ({ movements }) => {
               return `movement-${item.version}`;
             }
             if (item instanceof PendingTransaction) {
-              return `pending-transaction-${item.id}`;
+              return `pending-transaction-${Buffer.from(item.hash).toString("hex")}`;
             }
             return "";
           }}

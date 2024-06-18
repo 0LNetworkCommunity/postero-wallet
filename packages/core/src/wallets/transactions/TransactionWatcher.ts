@@ -127,12 +127,12 @@ export class TransactionWatcher implements ITransactionWatcher {
     const hash = parseHexString(rawTransaction.hash);
 
     const pendingTransaction =
-      await this.pendingTransactionsRepository.getPendingTransactionByHash(
+      await this.pendingTransactionsRepository.getPendingTransaction(
         hash,
       );
     if (pendingTransaction) {
       await this.pendingTransactionsRepository.setPendingTransactionStatus(
-        pendingTransaction.id,
+        pendingTransaction.hash,
         rawTransaction.status as PendingTransactionStatus,
       );
     }

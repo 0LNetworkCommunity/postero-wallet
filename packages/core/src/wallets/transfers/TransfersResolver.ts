@@ -40,7 +40,7 @@ class TransfersResolver {
   @Inject(Types.IPendingTransactionsService)
   private readonly pendingTransactionsService: IPendingTransactionsService;
 
-  @Mutation(() => String)
+  @Mutation(() => Buffer)
   public async newTransfer(
     @Args('walletAddress', { type: () => Buffer })
     walletAddress: Uint8Array,
@@ -116,7 +116,7 @@ class TransfersResolver {
     entryFunctionPayload.serialize(serializer);
     const b = serializer.getBytes();
 
-    const id = await this.pendingTransactionsService.newPendingTransaction(
+    const hash = await this.pendingTransactionsService.newPendingTransaction(
       walletAddress,
       b,
       maxGasUnit,
@@ -196,7 +196,7 @@ class TransfersResolver {
     //   console.error(error);
     // }
 
-    return id;
+    return hash;
   }
 }
 

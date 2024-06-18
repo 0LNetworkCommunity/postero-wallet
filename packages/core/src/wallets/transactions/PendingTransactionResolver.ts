@@ -1,6 +1,5 @@
 import {
   Args,
-  ID,
   Mutation,
   Parent,
   Query,
@@ -35,11 +34,11 @@ class PendingTransactionsResolver {
 
   @Query((returns) => PendingTransaction)
   public async pendingTransaction(
-    @Args('id', { type: () => ID })
-    id: string,
+    @Args('hash', { type: () => Buffer })
+    hash: Uint8Array,
   ) {
     const pendingTransaction =
-      await this.pendingTransactionsService.getPendingTransaction(id);
+      await this.pendingTransactionsService.getPendingTransaction(hash);
     return pendingTransaction;
   }
 
@@ -59,70 +58,21 @@ class PendingTransactionsResolver {
   }
 
   @Mutation((returns) => Boolean)
-  public async sendPendingTransaction(
-    @Args('id', { type: () => String })
-    id: string,
-
-    // @Args("walletAddress", { type: () => String })
-    // walletAddress: string,
-
-    // @Args("gasPrice", { type: () => Int })
-    // gasPrice: number,
-
-    // @Args("maxGasUnit", { type: () => Int })
-    // maxGasUnit: number,
-
-    // @Args("timeout", { type: () => Int })
-    // timeout: number,
-  ) {
-    // const transactionHash =
-    //   await this.pendingTransactionsService.sendPendingTransaction(
-    //     pendingTransactionId,
-    //     Buffer.from(walletAddress, 'hex'),
-    //     gasPrice,
-    //     maxGasUnit,
-    //     timeout,
-    //   );
-
-    // if (transactionHash) {
-    //   console.log(
-    //     `https://rpc.0l.fyi/v1/transactions/by_hash/0x${Buffer.from(
-    //       transactionHash,
-    //     ).toString("hex")}`,
-    //   );
-    //   // shell.openExternal(
-    //   //   `https://rpc.0l.fyi/v1/transactions/by_hash/0x${Buffer.from(
-    //   //     transactionHash,
-    //   //   ).toString("hex")}`,
-    //   // );
-    // }
-    // return transactionHash;
-
-    console.log('sendPendingTransaction', id);
-
-    return true;
-  }
-
-  @Mutation((returns) => Boolean)
   public async removePendingTransaction(
-    @Args('pendingTransactionId', { type: () => ID })
-    pendingTransactionId: string,
+    @Args('hash', { type: () => Buffer })
+    hash: Uint8Array,
   ) {
-    await this.pendingTransactionsService.removePendingTransaction(
-      pendingTransactionId,
-    );
+    await this.pendingTransactionsService.removePendingTransaction(hash);
     return true;
   }
 
   @Mutation((returns) => Boolean)
   public async updatePendingTransaction(
-    @Args('id', { type: () => ID })
-    pendingTransactionId: string,
+    @Args('hash', { type: () => Buffer })
+    hash: Uint8Array,
   ) {
     const pendingTransaction =
-      await this.pendingTransactionsService.getPendingTransaction(
-        pendingTransactionId,
-      );
+      await this.pendingTransactionsService.getPendingTransaction(hash);
     if (pendingTransaction) {
       await this.pendingTransactionsUpdaterService.updateTransaction(
         pendingTransaction,
@@ -138,8 +88,6 @@ class PendingTransactionsResolver {
       const release = this.pendingTransactionsService.on(
         PendingTransactionsServiceEvent.NewPendingTransaction,
         async (pendingTrasaction) => {
-          console.log('NewPendingTransaction', pendingTrasaction);
-
           push({
             newPendingTransaction: pendingTrasaction,
           });
@@ -150,14 +98,14 @@ class PendingTransactionsResolver {
     });
   }
 
-  @Subscription((returns) => String)
+  @Subscription((returns) => Buffer)
   public pendingTransactionRemoved() {
     return new Repeater(async (push, stop) => {
       const release = this.pendingTransactionsService.on(
         PendingTransactionsServiceEvent.PendingTransactionRemoved,
-        async (pendingTrasactionId) => {
+        async (hash) => {
           push({
-            pendingTransactionRemoved: pendingTrasactionId,
+            pendingTransactionRemoved: hash,
           });
         },
       );
@@ -168,18 +116,18 @@ class PendingTransactionsResolver {
 
   @Subscription((returns) => PendingTransaction, { name: 'pendingTransaction' })
   public pendingTransactionSubscription(
-    @Args({ name: 'id', type: () => ID })
-    id: string,
+    @Args({ name: 'hash', type: () => Buffer })
+    hash: Uint8Array,
   ) {
     return new Repeater(async (push, stop) => {
       const release = this.pendingTransactionsService.on(
         PendingTransactionsServiceEvent.PendingTransactionUpdated,
         async (pendingTransaction) => {
-          if (pendingTransaction.id === id) {
+          if (Buffer.from(pendingTransaction.hash).equals(Buffer.from(hash))) {
             push({
               pendingTransaction:
                 await this.pendingTransactionsService.getPendingTransaction(
-                  pendingTransaction.id,
+                  pendingTransaction.hash,
                 ),
             });
           }
@@ -193,14 +141,9 @@ class PendingTransactionsResolver {
 
   @ResolveField(() => AbstractTransaction, { nullable: true })
   public async transaction(@Parent() pendingTransaction: PendingTransaction) {
-    const { hash } = pendingTransaction;
-    if (!hash) {
-      return null;
-    }
-
-    const tx = await this.transactionsRepository.getTransactionByHash(hash);
-    console.log('tx', tx);
-    return tx;
+    return this.transactionsRepository.getTransactionByHash(
+      pendingTransaction.hash,
+    );
   }
 
   @ResolveField(() => Boolean)

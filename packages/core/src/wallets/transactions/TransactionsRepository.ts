@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { ITransactionFactory, ITransactionsRepository } from './interfaces';
+import { IPendingTransactionsRepository, ITransactionFactory, ITransactionsRepository } from './interfaces';
 import { IDbService } from '../../db/interfaces';
 import { Types } from '../../types';
 import { AbstractTransaction } from './AbstractTransaction';
@@ -18,6 +18,9 @@ class TransactionsRepository implements ITransactionsRepository {
 
     @Inject(Types.ITransactionFactory)
     private transactionFactory: ITransactionFactory,
+
+    @Inject(Types.IPendingTransactionsRepository)
+    private pendingTransactionsRepository: IPendingTransactionsRepository,
   ) {}
 
   public async getTransactionByVersion(
@@ -29,12 +32,23 @@ class TransactionsRepository implements ITransactionsRepository {
   public async getTransactionByHash(
     hash: Uint8Array,
   ): Promise<AbstractTransaction | null> {
+    const pendingTransaction =
+      await this.pendingTransactionsRepository.getPendingTransaction(
+        hash,
+      );
+    if (pendingTransaction) {
+      return pendingTransaction;
+    }
+
     const userTransaction = await this.getUserTransactionByHash(hash);
     if (userTransaction) {
       return userTransaction;
     }
 
     const genesisTransaction = await this.getGenesisTransactionByHash(hash);
+    if (genesisTransaction) {
+      return genesisTransaction;
+    }
 
     return null;
   }

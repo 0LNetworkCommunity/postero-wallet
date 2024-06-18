@@ -29,7 +29,7 @@ class LocalLink extends ApolloLink {
             }
           })
           .catch((error) => {
-            console.log(error);
+            console.error(error);
           });
       }, 0);
     });

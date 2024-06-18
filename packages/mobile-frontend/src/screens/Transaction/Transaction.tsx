@@ -17,6 +17,7 @@ import { Text } from "@postero/ui";
 import { ModalStackParams } from "../params";
 import NavBar from "../../ui/NavBar";
 import ChevronLeftIcon from "../../icons/ChevronLeftIcon";
+import { PendingTransactionState } from "./PendingTransactionState";
 
 const dateTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
   year: "numeric",
@@ -43,6 +44,17 @@ const GET_TRANSACTION = gql`
         functionName
         arguments
       }
+
+      ... on GenesisTransaction {
+        version
+      }
+
+      ... on PendingTransaction {
+        status
+        payload
+        createdAt
+        expirationTimestamp
+      }
     }
   }
 `;
@@ -63,6 +75,17 @@ function Transaction({
       moduleName: string;
       functionName: string;
       arguments: string;
+    } | {
+      __typename: "GenesisTransaction";
+      hash: string;
+      version: string;
+    } | {
+      __typename: "PendingTransaction";
+      hash: string;
+      status: string;
+      createdAt: number;
+      expirationTimestamp: number;
+      payload: string;
     };
   }>(GET_TRANSACTION, {
     variables: {
@@ -80,85 +103,160 @@ function Transaction({
 
   let transactionView: React.JSX.Element | null = null;
 
-  if (data?.transaction?.__typename === "UserTransaction") {
-    const userTransaction = data.transaction;
+  switch (data?.transaction?.__typename) {
+    case "PendingTransaction": {
+      const pendingTransaction = data.transaction;
 
-    transactionView = (
-      <View style={{ paddingHorizontal: 5 }}>
-        <View style={styles.propertyContainer}>
-          <Text style={styles.label}>Type</Text>
-          <Text>User transaction</Text>
-        </View>
+      transactionView = (
+        <View style={{ paddingHorizontal: 5 }}>
+          <PendingTransactionState
+            hash={Buffer.from(pendingTransaction.hash, "hex")}
+          />
 
-        <View style={styles.separator} />
+          <View style={styles.separator} />
 
-        <View style={styles.propertyContainer}>
-          <Text style={styles.label}>Timestamp</Text>
-          <Text>
-            {dateTimeFormatter.format(
-              new Date(
-                new BN(userTransaction.timestamp).div(new BN(1e3)).toNumber()
-              )
-            )}
-          </Text>
-        </View>
-
-        <View style={styles.separator} />
-
-        <TouchableOpacity
-          onPress={() => {
-            Linking.openURL(
-              `https://0l.fyi/transactions/${userTransaction.version}`
-            );
-          }}
-        >
           <View style={styles.propertyContainer}>
-            <Text style={styles.label}>Version</Text>
+            <Text style={styles.label}>Payload</Text>
+            <Text>{pendingTransaction.payload}</Text>
+          </View>
+        </View>
+      );
+
+    } break;
+
+    case "GenesisTransaction": {
+      const genesisTransaction = data.transaction;
+
+      transactionView = (
+        <View style={{ paddingHorizontal: 5 }}>
+          <View style={styles.propertyContainer}>
+            <Text style={styles.label}>Type</Text>
+            <Text>Genesis transaction</Text>
+          </View>
+
+          <View style={styles.separator} />
+
+          {/* <View style={styles.propertyContainer}>
+            <Text style={styles.label}>Timestamp</Text>
             <Text>
-              {parseInt(userTransaction.version, 10).toLocaleString()}
+              {dateTimeFormatter.format(
+                new Date(
+                  new BN(userTransaction.timestamp)
+                    .div(new BN(1e3))
+                    .toNumber()
+                )
+              )}
             </Text>
           </View>
-        </TouchableOpacity>
 
-        <View style={styles.separator} />
+          <View style={styles.separator} /> */}
 
-        <View style={styles.propertyContainer}>
-          <Text style={styles.label}>Method</Text>
-          <Text>{`${userTransaction.moduleAddress}::${userTransaction.moduleName}::${userTransaction.functionName}`}</Text>
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL(
+                `https://0l.fyi/transactions/${genesisTransaction.version}`
+              );
+            }}
+          >
+            <View style={styles.propertyContainer}>
+              <Text style={styles.label}>Version</Text>
+              <Text>
+                {parseInt(genesisTransaction.version, 10).toLocaleString()}
+              </Text>
+            </View>
+          </TouchableOpacity>
+
         </View>
+      );
 
-        <View style={styles.separator} />
+    } break;
 
-        <TouchableOpacity
-          onPress={() => {
-            Linking.openURL(
-              `https://0l.fyi/accounts/${userTransaction.sender}`
-            );
-          }}
-        >
-          <View style={styles.propertyContainer}>
-            <Text style={styles.label}>Sender</Text>
-            <Text>{userTransaction.sender}</Text>
+    case "UserTransaction":
+      {
+        const userTransaction = data.transaction;
+
+        transactionView = (
+          <View style={{ paddingHorizontal: 5 }}>
+            <View style={styles.propertyContainer}>
+              <Text style={styles.label}>Type</Text>
+              <Text>User transaction</Text>
+            </View>
+
+            <View style={styles.separator} />
+
+            <View style={styles.propertyContainer}>
+              <Text style={styles.label}>Timestamp</Text>
+              <Text>
+                {dateTimeFormatter.format(
+                  new Date(
+                    new BN(userTransaction.timestamp)
+                      .div(new BN(1e3))
+                      .toNumber()
+                  )
+                )}
+              </Text>
+            </View>
+
+            <View style={styles.separator} />
+
+            <TouchableOpacity
+              onPress={() => {
+                Linking.openURL(
+                  `https://0l.fyi/transactions/${userTransaction.version}`
+                );
+              }}
+            >
+              <View style={styles.propertyContainer}>
+                <Text style={styles.label}>Version</Text>
+                <Text>
+                  {parseInt(userTransaction.version, 10).toLocaleString()}
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <View style={styles.separator} />
+
+            <View style={styles.propertyContainer}>
+              <Text style={styles.label}>Method</Text>
+              <Text>{`${userTransaction.moduleAddress}::${userTransaction.moduleName}::${userTransaction.functionName}`}</Text>
+            </View>
+
+            <View style={styles.separator} />
+
+            <TouchableOpacity
+              onPress={() => {
+                Linking.openURL(
+                  `https://0l.fyi/accounts/${userTransaction.sender}`
+                );
+              }}
+            >
+              <View style={styles.propertyContainer}>
+                <Text style={styles.label}>Sender</Text>
+                <Text>{userTransaction.sender}</Text>
+              </View>
+            </TouchableOpacity>
+
+            <View style={styles.separator} />
+
+            <View style={styles.propertyContainer}>
+              <Text style={styles.label}>Success</Text>
+              <Text>{`${userTransaction.success}`}</Text>
+            </View>
           </View>
-        </TouchableOpacity>
+        );
+      }
+      break;
 
-        <View style={styles.separator} />
-
-        <View style={styles.propertyContainer}>
-          <Text style={styles.label}>Success</Text>
-          <Text>{`${userTransaction.success}`}</Text>
+    default: {
+      transactionView = (
+        <View style={{ paddingHorizontal: 5 }}>
+          <View style={styles.propertyContainer}>
+            <Text style={styles.label}>Hash</Text>
+            <Text>{route.params.hash}</Text>
+          </View>
         </View>
-      </View>
-    );
-  } else {
-    transactionView = (
-      <View style={{ paddingHorizontal: 5 }}>
-        <View style={styles.propertyContainer}>
-          <Text style={styles.label}>Hash</Text>
-          <Text>{route.params.hash}</Text>
-        </View>
-      </View>
-    );
+      );
+    }
   }
 
   return (

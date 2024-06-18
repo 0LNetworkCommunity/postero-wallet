@@ -101,8 +101,7 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
 
     await this.db.raw(`
       CREATE TABLE IF NOT EXISTS "pendingTransactions" (
-        "id" TEXT PRIMARY KEY,
-        "hash" BLOB,
+        "hash" BLOB NOT NULL PRIMARY KEY,
         "status" TEXT NOT NULL,
         "sender" BLOB NOT NULL,
         "payload" BLOB NOT NULL,

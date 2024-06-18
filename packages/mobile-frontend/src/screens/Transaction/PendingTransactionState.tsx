@@ -1,14 +1,20 @@
-import { gql, useApolloClient, useQuery, useSubscription } from "@apollo/client";
-import { View, Text, Linking } from "react-native";
-import { PendingTransaction, PendingTransactionStatus } from "./types";
+import {
+  gql,
+  useApolloClient,
+  useQuery,
+  useSubscription,
+} from "@apollo/client";
+import { View, Text, Linking, StyleSheet, TouchableOpacity } from "react-native";
 import { useState } from "react";
+
 import { Button } from "@postero/ui";
+
+import { PendingTransaction, PendingTransactionStatus } from "./types";
 import { Countdown } from "../../ui/Countdown";
 
 const PENDING_TRANSACTION_SUBSCRIPTION = gql`
-  subscription PendingTransaction($id: ID!) {
-    pendingTransaction(id: $id) {
-      id
+  subscription PendingTransaction($hash: Bytes!) {
+    pendingTransaction(hash: $hash) {
       hash
       status
       expirationTimestamp
@@ -17,15 +23,15 @@ const PENDING_TRANSACTION_SUBSCRIPTION = gql`
 
       transaction {
         __typename
-        version
+        hash
 
         ... on UserTransaction {
+          version
           success
           moduleName
           moduleAddress
           functionName
           sender
-          hash
           arguments
           timestamp
         }
@@ -35,9 +41,8 @@ const PENDING_TRANSACTION_SUBSCRIPTION = gql`
 `;
 
 const GET_PENDING_TRANSACTION = gql`
-  query GetPendingTransaction($id: ID!) {
-    pendingTransaction(id: $id) {
-      id
+  query GetPendingTransaction($hash: Bytes!) {
+    pendingTransaction(hash: $hash) {
       hash
       status
       expirationTimestamp
@@ -46,15 +51,15 @@ const GET_PENDING_TRANSACTION = gql`
 
       transaction {
         __typename
-        version
+        hash
 
         ... on UserTransaction {
           success
+          version
           moduleName
           moduleAddress
           functionName
           sender
-          hash
           arguments
           timestamp
         }
@@ -70,10 +75,10 @@ const UPDATE_PENDING_TRANSACTION = gql`
 `;
 
 interface Props {
-  id: string;
+  hash: Uint8Array;
 }
 
-export function PendingTransactionState({ id }: Props) {
+export function PendingTransactionState({ hash }: Props) {
   const apolloClient = useApolloClient();
   const [pendingTransaction, setPendingTransaction] =
     useState<PendingTransaction>();
@@ -92,7 +97,7 @@ export function PendingTransactionState({ id }: Props) {
       console.error(error);
     },
     variables: {
-      id,
+      hash: Buffer.from(hash).toString("hex"),
     },
   });
 
@@ -106,7 +111,7 @@ export function PendingTransactionState({ id }: Props) {
       console.error(error);
     },
     variables: {
-      id,
+      hash: Buffer.from(hash).toString("hex"),
     },
   });
 
@@ -115,22 +120,60 @@ export function PendingTransactionState({ id }: Props) {
   }
 
   return (
-    <View>
-      <Text>
-        {`hash = `}
-        <Text selectable>{pendingTransaction.hash}</Text>
-      </Text>
-      <Text>{`status = ${pendingTransaction.status}`}</Text>
+    <View style={{ paddingHorizontal: 5 }}>
+      <View style={styles.propertyContainer}>
+        <Text style={styles.label}>Type</Text>
+        <Text>Pending transaction</Text>
+      </View>
+
+      <View style={styles.separator} />
+
+      <TouchableOpacity
+        onPress={() => {
+          Linking.openURL(
+            `https://rpc.0l.fyi/v1/transactions/by_hash/0x${pendingTransaction.hash}`
+          );
+        }}
+      >
+        <View style={styles.propertyContainer}>
+          <Text style={styles.label}>Hash</Text>
+          <Text>{pendingTransaction.hash}</Text>
+        </View>
+      </TouchableOpacity>
+
+      <View style={styles.separator} />
+
+      <View style={styles.propertyContainer}>
+        <Text style={styles.label}>Status</Text>
+        <Text>{pendingTransaction.status}</Text>
+      </View>
+
+      <View style={styles.separator} />
+
       {pendingTransaction.status === PendingTransactionStatus.Unknown && (
-        <Text>
-          {`expires in = `}
+        <View style={styles.propertyContainer}>
+          <Text style={styles.label}>Expires in</Text>
           <Countdown
             date={new Date(pendingTransaction.expirationTimestamp * 1e3)}
           />
-        </Text>
+        </View>
       )}
 
-      <Text>{`updating = ${pendingTransaction.updating}`}</Text>
+      <View style={styles.separator} />
+
+      <View style={styles.propertyContainer}>
+        <Text style={styles.label}>Updating</Text>
+        <Text>{`${pendingTransaction.updating}`}</Text>
+      </View>
+
+      <View style={styles.separator} />
+
+      <View style={styles.propertyContainer}>
+        <Text style={styles.label}>Created At</Text>
+        <Text>{new Date(pendingTransaction.createdAt).toISOString()}</Text>
+      </View>
+
+      <View style={styles.separator} />
 
       {pendingTransaction.transaction && (
         <>
@@ -162,7 +205,21 @@ export function PendingTransactionState({ id }: Props) {
           });
         }}
       />
-
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  propertyContainer: {
+    paddingVertical: 10,
+  },
+  label: {
+    color: "rgb(113, 113, 122)",
+    marginBottom: 5,
+  },
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    width: "100%",
+    backgroundColor: "rgba(9, 9, 11, 0.05)",
+  },
+});
