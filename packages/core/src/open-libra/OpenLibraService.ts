@@ -77,7 +77,7 @@ class OpenLibraService implements IOpenLibraService {
       sequence_number: string;
       authentication_key: string;
     }>({
-      url: `${this.rpcHost}/v1/accounts/${Buffer.from(address).toString('hex')}`,
+      url: `${this.rpcHost}/v1/accounts/0x${Buffer.from(address).toString('hex')}`,
     });
     return {
       sequenceNumber: BigInt(res.data.sequence_number),
