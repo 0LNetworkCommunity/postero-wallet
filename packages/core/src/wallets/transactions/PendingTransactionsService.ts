@@ -164,8 +164,8 @@ class PendingTransactionsService
       }[];
     }>({
       method: 'POST',
-      // url: 'https://api.0l.fyi/graphql',
-      url: 'http://localhost:3000/graphql',
+      url: 'https://api.0l.fyi/graphql',
+      // url: 'http://localhost:3000/graphql',
       // validateStatus: () => true,
       data: {
         operationName: 'NewTransaction',
