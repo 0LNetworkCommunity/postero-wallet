@@ -32,14 +32,6 @@ class TransactionsRepository implements ITransactionsRepository {
   public async getTransactionByHash(
     hash: Uint8Array,
   ): Promise<AbstractTransaction | null> {
-    const pendingTransaction =
-      await this.pendingTransactionsRepository.getPendingTransaction(
-        hash,
-      );
-    if (pendingTransaction) {
-      return pendingTransaction;
-    }
-
     const userTransaction = await this.getUserTransactionByHash(hash);
     if (userTransaction) {
       return userTransaction;
@@ -48,6 +40,14 @@ class TransactionsRepository implements ITransactionsRepository {
     const genesisTransaction = await this.getGenesisTransactionByHash(hash);
     if (genesisTransaction) {
       return genesisTransaction;
+    }
+
+    const pendingTransaction =
+      await this.pendingTransactionsRepository.getPendingTransaction(
+        hash,
+      );
+    if (pendingTransaction) {
+      return pendingTransaction;
     }
 
     return null;

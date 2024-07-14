@@ -20,26 +20,22 @@ const SEND_KEY_ROTATION_TRANSACTION = gql`
   }
 `;
 
-function TransactionScreen({
+function KeyRotationTransactionScreen({
   navigation,
   route,
 }: CompositeScreenProps<
-  StackScreenProps<KeyRotationRoutes, "Transaction">,
+  StackScreenProps<KeyRotationRoutes, "KeyRotationTransaction">,
   StackScreenProps<ModalStackParams>
 >) {
   const apolloClient = useApolloClient();
   const [loading, setLoading] = useState(false);
 
   const { publicKey, address } = route.params;
-  console.log('variables', {
-    address,
-    newPublicKey: publicKey,
-  });
   const sendTransaction = async () => {
     setLoading(true);
     try {
       const res = await apolloClient.mutate<{
-        sendKeyRotationTransaction: boolean;
+        sendKeyRotationTransaction: string;
       }>({
         mutation: SEND_KEY_ROTATION_TRANSACTION,
         variables: {
@@ -47,6 +43,12 @@ function TransactionScreen({
           newPublicKey: publicKey,
         },
       });
+
+      if (res.data) {
+        navigation.replace("Transaction", {
+          hash: res.data.sendKeyRotationTransaction,
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -70,4 +72,4 @@ function TransactionScreen({
   );
 }
 
-export default TransactionScreen;
+export default KeyRotationTransactionScreen;

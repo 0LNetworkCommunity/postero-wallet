@@ -69,8 +69,8 @@ const GET_PENDING_TRANSACTION = gql`
 `;
 
 const UPDATE_PENDING_TRANSACTION = gql`
-  mutation UpdatePendingTransaction($id: ID!) {
-    updatePendingTransaction(id: $id)
+  mutation UpdatePendingTransaction($hash: Bytes!) {
+    updatePendingTransaction(hash: $hash)
   }
 `;
 
@@ -200,7 +200,7 @@ export function PendingTransactionState({ hash }: Props) {
           await apolloClient.mutate({
             mutation: UPDATE_PENDING_TRANSACTION,
             variables: {
-              id: pendingTransaction.id,
+              hash: pendingTransaction.hash,
             },
           });
         }}

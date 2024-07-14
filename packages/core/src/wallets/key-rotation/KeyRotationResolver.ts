@@ -9,19 +9,18 @@ class KeyRotationResolver {
   @Inject(Types.IKeyRotationService)
   private readonly keyRotationService!: IKeyRotationService;
 
-  @Mutation(() => Boolean)
+  @Mutation(() => Buffer)
   public async sendKeyRotationTransaction(
     @Args('address', { type: () => Buffer })
     address: Uint8Array,
 
     @Args('newPublicKey', { type: () => Buffer })
     newPublicKey: Uint8Array,
-  ): Promise<boolean> {
-    await this.keyRotationService.sendKeyRotationTransaction(
+  ): Promise<Uint8Array> {
+    return this.keyRotationService.sendKeyRotationTransaction(
       address,
       newPublicKey,
     );
-    return true;
   }
 }
 

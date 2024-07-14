@@ -60,7 +60,7 @@ function MnemonicScreen({
       });
 
       if (res.data) {
-        navigation.navigate("Transaction", {
+        navigation.navigate("KeyRotationTransaction", {
           address: route.params.address,
           publicKey: res.data.createKeyFromMnemonic.publicKey,
         });

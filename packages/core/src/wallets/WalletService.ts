@@ -201,6 +201,8 @@ class WalletService implements IWalletService {
         hash: Knex.Raw<unknown>; // Uint8Array;
       }> = [];
 
+      const transactionHashes: Buffer[] = [];
+
       for (let i = 0; i < movementsLength; ++i) {
         const movement = movements[i];
 
@@ -217,18 +219,21 @@ class WalletService implements IWalletService {
 
         const { transaction } = movement.node;
 
+        const transactionHash = Buffer.from(transaction.hash, 'hex');
+        transactionHashes.push(transactionHash);
+
         switch (transaction.__typename) {
           case 'GenesisTransaction':
             genesisTransactionRows.push({
               version: transaction.version,
-              hash: this.dbService.raw(Buffer.from(transaction.hash, 'hex')),
+              hash: this.dbService.raw(transactionHash),
             });
             break;
 
           case 'UserTransaction':
             userTransactionRows.push({
               version: transaction.version,
-              hash: Buffer.from(transaction.hash, 'hex'),
+              hash: transactionHash,
               success: transaction.success,
               sender: Buffer.from(transaction.sender, 'hex'),
               moduleAddress: Buffer.from(transaction.moduleAddress, 'hex'),
@@ -242,7 +247,7 @@ class WalletService implements IWalletService {
           case 'ScriptUserTransaction':
             scriptUserTransactionRows.push({
               version: transaction.version,
-              hash: this.dbService.raw(Buffer.from(transaction.hash, 'hex')),
+              hash: this.dbService.raw(transactionHash),
               success: transaction.success,
               sender: this.dbService.raw(
                 Buffer.from(transaction.sender, 'hex'),
@@ -254,7 +259,7 @@ class WalletService implements IWalletService {
           case 'BlockMetadataTransaction':
             blockMetadataTransactionRows.push({
               version: transaction.version,
-              hash: this.dbService.raw(Buffer.from(transaction.hash, 'hex')),
+              hash: this.dbService.raw(transactionHash),
               epoch: transaction.epoch,
               timestamp: transaction.timestamp,
             });
@@ -296,6 +301,13 @@ class WalletService implements IWalletService {
             .onConflict('version')
             .ignore();
         }
+      }
+
+      if (transactionHashes.length) {
+        await this.dbService.db('pendingTransactions')
+          .where('sender', this.dbService.raw(address))
+          .whereIn('hash', transactionHashes.map((it) => this.dbService.raw(it)))
+          .del();
       }
     }
 
@@ -340,6 +352,9 @@ class WalletService implements IWalletService {
           .merge(['transferred', 'unlocked']);
       }
     }
+
+
+
   }
 
   public async deleteWallet(walletAddress: Uint8Array) {

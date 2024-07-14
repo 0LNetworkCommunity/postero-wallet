@@ -47,7 +47,6 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
     await this.db.raw(`
       CREATE TABLE IF NOT EXISTS "wallets" (
         "address" BLOB PRIMARY KEY,
-        "authKey" BLOB NOT NULL,
         "label" TEXT
       )
     `);

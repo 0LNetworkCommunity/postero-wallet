@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ApiError, AptosClient, Types } from 'aptos';
 
 import { IOpenLibraService } from './interfaces';
-import { normalizeAddress, normalizeHexString } from '../utils';
+import { normalizeAddress, parseHexString } from '../utils';
 
 @Injectable()
 class OpenLibraService implements IOpenLibraService {
@@ -81,9 +81,7 @@ class OpenLibraService implements IOpenLibraService {
     });
     return {
       sequenceNumber: BigInt(res.data.sequence_number),
-      authKey: new Uint8Array(
-        Buffer.from(normalizeHexString(res.data.authentication_key), 'hex'),
-      ),
+      authKey: parseHexString(res.data.authentication_key),
     };
   }
 }

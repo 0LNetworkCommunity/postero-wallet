@@ -18,15 +18,12 @@ import {
   TransactionsWatcherServiceEvent,
 } from './interfaces';
 import { Types } from "../../types";
-import { IWalletService } from "../interfaces";
 import { IKeychainService } from '../keychain/interfaces';
-import { parseHexString } from "../../utils";
+import { IOpenLibraService } from "../../open-libra/interfaces";
 
 const {
   AccountAddress,
-  EntryFunction,
   TransactionPayload,
-  TransactionPayloadEntryFunction,
   RawTransaction,
   ChainId,
   TransactionAuthenticatorEd25519,
@@ -45,9 +42,6 @@ class PendingTransactionsService
   private eventEmitter = new Emittery();
 
   public constructor(
-    @Inject(Types.IWalletService)
-    private readonly walletService: IWalletService,
-
     @Inject(Types.IPendingTransactionsRepository)
     private readonly pendingTransactionsRepository: IPendingTransactionsRepository,
 
@@ -59,6 +53,9 @@ class PendingTransactionsService
 
     @Inject(Types.IPendingTransactionsUpdaterService)
     private readonly pendingTransactionsUpdaterService: IPendingTransactionsUpdaterService,
+
+    @Inject(Types.IOpenLibraService)
+    private readonly openLibraService: IOpenLibraService,
   ) {}
 
   public onModuleInit() {
@@ -106,16 +103,14 @@ class PendingTransactionsService
       throw new Error('invalid sender length');
     }
 
-    const account = await this.aptosClient.getAccount(
-      Buffer.from(sender32).toString('hex'),
-    );
+    const account = await this.openLibraService.getAccount(sender32);
 
     const deserializer = new BCS.Deserializer(transactionPayload);
     const txPayload = TransactionPayload.deserialize(deserializer);
 
     const rawTxn = new RawTransaction(
       new AccountAddress(sender32),
-      BigInt(account.sequence_number),
+      account.sequenceNumber,
       txPayload,
       maxGasUnit,
       gasPrice,
@@ -123,8 +118,10 @@ class PendingTransactionsService
       new ChainId(await this.aptosClient.getChainId()),
     );
 
-    const privateKey = await this.keychainService.getWalletPrivateKey(sender);
-    const signer = new AptosAccount(privateKey!);
+    const privateKey = await this.keychainService.getWalletKeyFromAuthKey(
+      account.authKey
+    );
+    const signer = new AptosAccount(await privateKey.getPrivateKey());
 
     const hash = sha3Hash.create();
     hash.update('DIEM::RawTransaction');
@@ -155,20 +152,21 @@ class PendingTransactionsService
       expirationTimestamp,
     );
 
-    console.log('txHash', Buffer.from(txHash).toString('hex').toUpperCase());
-
     const res = await axios<{
-      data?: {
+      data: {
         newTransaction: {
           hash: string;
           status: string;
         };
-      };
+      } | null;
+      errors: {
+        message: string;
+      }[];
     }>({
       method: 'POST',
-      url: 'https://api.0l.fyi/graphql',
-      // url: 'http://localhost:3000/graphql',
-      validateStatus: () => true,
+      // url: 'https://api.0l.fyi/graphql',
+      url: 'http://localhost:3000/graphql',
+      // validateStatus: () => true,
       data: {
         operationName: 'NewTransaction',
         variables: {
@@ -185,16 +183,20 @@ class PendingTransactionsService
       },
     });
 
-    console.log('res', res.data.data?.newTransaction.hash);
+    if (res.data.data?.newTransaction.hash) {
+      const pendingTransaction = await this.getPendingTransaction(txHash);
+      this.eventEmitter.emit(
+        PendingTransactionsServiceEvent.NewPendingTransaction,
+        pendingTransaction,
+      );
+      return txHash;
+    }
 
-    const pendingTransaction = await this.getPendingTransaction(txHash);
+    if (res.data.errors && res.data.errors.length) {
+      throw new Error(res.data.errors[0].message);
+    }
 
-    this.eventEmitter.emit(
-      PendingTransactionsServiceEvent.NewPendingTransaction,
-      pendingTransaction,
-    );
-
-    return txHash;
+    throw new Error('unknown error');
   }
 
   public async newTransaction(

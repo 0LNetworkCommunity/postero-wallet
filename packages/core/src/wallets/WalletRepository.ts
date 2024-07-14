@@ -114,7 +114,6 @@ class WalletsFromAuthKeysQueue {
         const el = this.queue.get(authKey);
         if (el) {
           const res = grouped[authKey].map((it) => it.walletAddress);
-          console.log('authKey', authKey, res);
           this.queue.delete(authKey);
           el.resolve(res);
         }
@@ -168,7 +167,6 @@ class WalletRepository implements IWalletRepository {
         .db('wallets')
         .insert({
           address: addressLit,
-          authKey: this.dbService.raw(authKey),
           label: `Wallet #${(total as number) + 1}`,
         })
         .onConflict('address')
@@ -204,10 +202,10 @@ class WalletRepository implements IWalletRepository {
     await this.dbService
       .db('walletsAuthKeys')
       .insert({
-        address: this.dbService.raw(address),
+        walletAddress: this.dbService.raw(address),
         authKey: this.dbService.raw(authKey),
       })
-      .onConflict(['address', 'authKey'])
+      .onConflict(['walletAddress', 'authKey'])
       .ignore();
   }
 

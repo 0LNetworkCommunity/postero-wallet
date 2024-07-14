@@ -12,13 +12,10 @@ export class TransactionsResolver {
     private readonly transactionsRepository: ITransactionsRepository,
   ) {}
   @Query(() => AbstractTransaction, { nullable: true })
-  public async transaction(
+  public transaction(
     @Args('hash', { type: () => Buffer })
     hash: Uint8Array,
   ) {
-    const res = await this.transactionsRepository.getTransactionByHash(hash);
-    console.log('res', res);
-
-    return res;
+    return this.transactionsRepository.getTransactionByHash(hash);
   }
 }

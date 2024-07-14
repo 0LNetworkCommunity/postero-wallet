@@ -94,6 +94,9 @@ const NewTransferScreen: FC<
       }
     } catch (error) {
       console.error(error);
+      if (error instanceof Error && error.message) {
+        alert(error.message);
+      }
     }
   };
 
