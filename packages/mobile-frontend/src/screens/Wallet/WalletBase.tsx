@@ -39,8 +39,8 @@ import AdjustmentsHorizontalIcon from "../../icons/AdjustmentsHorizontalIcon";
 import { PendingTransaction } from "../../pending-transactions";
 
 const NEW_PENDING_TRANSACTION_SUBSCRIPTION = gql`
-  subscription NewPendingTransaction {
-    newPendingTransaction {
+  subscription NewPendingTransaction($address: Bytes!)  {
+    newPendingTransaction(address: $address) {
       hash
       status
       createdAt
@@ -262,6 +262,9 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
       createdAt: number;
     };
   }>(NEW_PENDING_TRANSACTION_SUBSCRIPTION, {
+    variables: {
+      address: walletAddress,
+    },
     onData: (res) => {
       if (!res.data.data) {
         return;

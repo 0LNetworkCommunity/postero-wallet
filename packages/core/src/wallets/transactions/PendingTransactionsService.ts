@@ -1,5 +1,5 @@
 import Emittery, { UnsubscribeFn } from "emittery";
-import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
+import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import axios from "axios";
 import { AptosAccount, AptosClient, BCS, TxnBuilderTypes } from "aptos";
 import { sha3_256 as sha3Hash } from "@noble/hashes/sha3";
@@ -51,7 +51,7 @@ class PendingTransactionsService
     @Inject(Types.ITransactionsWatcherService)
     private readonly walletsWatcherService: ITransactionsWatcherService,
 
-    @Inject(Types.IPendingTransactionsUpdaterService)
+    @Inject(forwardRef(() => Types.IPendingTransactionsUpdaterService))
     private readonly pendingTransactionsUpdaterService: IPendingTransactionsUpdaterService,
 
     @Inject(Types.IOpenLibraService)

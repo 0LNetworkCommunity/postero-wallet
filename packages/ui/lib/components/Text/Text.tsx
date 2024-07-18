@@ -48,24 +48,47 @@ export const Text = forwardRef<RNText, TextProps & Props>(function Text(props, r
 
   const textStyle: TextStyle = {};
 
-  if (xs) {
-    textStyle.fontSize = 24;
-    textStyle.lineHeight = 32;
-  } else if (md) {
-    textStyle.fontSize = 16;
-    textStyle.lineHeight = 24;
-  } else if (lg) {
-    textStyle.fontSize = 18;
-    textStyle.lineHeight = 28;
-  } else if (xl) {
-    textStyle.fontSize = 60;
-    textStyle.lineHeight = 72;
-    textStyle.letterSpacing = -1.2;
-  } else if (xxl) {
-    textStyle.fontSize = 72;
-    textStyle.lineHeight = 90;
-    textStyle.letterSpacing = -1.44;
+  if (text) {
+    if (xs) {
+      textStyle.fontSize = 24;
+      textStyle.lineHeight = 32;
+    } else if (md) {
+      textStyle.fontSize = 16;
+      textStyle.lineHeight = 24;
+    } else if (lg) {
+      textStyle.fontSize = 18;
+      textStyle.lineHeight = 28;
+    } else if (xl) {
+      textStyle.fontSize = 18;
+      textStyle.lineHeight = 28;
+    } else if (xxl) {
+      textStyle.fontSize = 72;
+      textStyle.lineHeight = 90;
+      textStyle.letterSpacing = -1.44;
+    }
   }
+
+  if (display) {
+    if (xs) {
+      textStyle.fontSize = 24;
+      textStyle.lineHeight = 32;
+    } else if (md) {
+      textStyle.fontSize = 36;
+      textStyle.lineHeight = 44;
+      textStyle.letterSpacing = -0.72;
+    } else if (lg) {
+      textStyle.fontSize = 18;
+      textStyle.lineHeight = 28;
+    } else if (xl) {
+      textStyle.fontSize = 20;
+      textStyle.lineHeight = 30;
+    } else if (xxl) {
+      textStyle.fontSize = 72;
+      textStyle.lineHeight = 90;
+      textStyle.letterSpacing = -1.44;
+    }
+  }
+
 
   if (display || text) {
     if (regular) {

@@ -32,7 +32,7 @@ export interface IWalletService {
   setWalletLabel(walletAddress: Uint8Array, label: string): Promise<void>;
   getWalletBalances(walletAddress: Uint8Array): Promise<Balance[]>;
   getSlowWallet(walletAddress: Uint8Array): Promise<ISlowWallet | undefined>;
-  setSlow(address: Uint8Array): Promise<void>;
+  setSlow(address: Uint8Array): Promise<Uint8Array>;
 
   getWalletsFromAuthKey(authKey: Uint8Array): Promise<IGraphQLWallet[]>;
   getWallets(): Promise<IGraphQLWallet[]>;

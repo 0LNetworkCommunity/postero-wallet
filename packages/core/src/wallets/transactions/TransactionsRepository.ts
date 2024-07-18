@@ -84,6 +84,7 @@ class TransactionsRepository implements ITransactionsRepository {
     rawTransactions: {
       version: string;
       timestamp: string;
+      gasUsed: string;
       success: boolean;
       sender: Uint8Array;
       hash: Uint8Array;
@@ -100,6 +101,7 @@ class TransactionsRepository implements ITransactionsRepository {
     const rows = rawTransactions.map((transaction) => ({
       version: transaction.version,
       success: transaction.success,
+      gasUsed: transaction.gasUsed,
       hash: this.dbService.raw(transaction.hash),
       sender: this.dbService.raw(transaction.sender),
       moduleAddress: this.dbService.raw(transaction.moduleAddress),
@@ -117,6 +119,7 @@ class TransactionsRepository implements ITransactionsRepository {
           version: string;
           success: number;
           sender: Uint8Array;
+          gasUsed: string;
           hash: Uint8Array;
           moduleAddress: Uint8Array;
           moduleName: string;
@@ -134,6 +137,7 @@ class TransactionsRepository implements ITransactionsRepository {
           version: new BN(it.version),
           success: !!it.success,
           timestamp: new BN(it.timestamp),
+          gasUsed: new BN(it.gasUsed),
           sender: it.sender,
           hash: it.hash,
           moduleAddress: it.moduleAddress,

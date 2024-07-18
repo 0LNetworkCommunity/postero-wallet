@@ -83,14 +83,21 @@ class PendingTransactionsResolver {
   }
 
   @Subscription((returns) => PendingTransaction)
-  public newPendingTransaction() {
+  public newPendingTransaction(
+    @Args('address', { type: () => Buffer })
+    address: Uint8Array,
+  ) {
     return new Repeater(async (push, stop) => {
       const release = this.pendingTransactionsService.on(
         PendingTransactionsServiceEvent.NewPendingTransaction,
         async (pendingTrasaction) => {
-          push({
-            newPendingTransaction: pendingTrasaction,
-          });
+          // unit this (https://github.com/feross/buffer/pull/346) is released,
+          // we must convert the UInt8Array to a Buffer before passing it to equals()
+          if (Buffer.from(pendingTrasaction.sender).equals(Buffer.from(address))) {
+            push({
+              newPendingTransaction: pendingTrasaction,
+            });
+          }
         },
       );
       await stop;

@@ -38,6 +38,7 @@ export const GET_MOVEMENTS = gql`
               sender
               arguments
               timestamp
+              gasUsed
             }
             ... on ScriptUserTransaction {
               version
@@ -71,6 +72,7 @@ export interface GqlUserTransaction extends GqlAbstractTransaction {
   functionName: string;
   success: boolean;
   sender: string;
+  gasUsed: string;
   arguments: string;
   timestamp: BN;
 }

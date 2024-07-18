@@ -21,6 +21,7 @@ export interface IUserTransaction {
 
 export type UserTransactionInput = AbstractTransactionInput & {
   version: BN;
+  gasUsed: BN;
   sender: Uint8Array;
   hash: Uint8Array;
   success: boolean;
@@ -40,6 +41,9 @@ export class UserTransaction implements IUserTransaction, AbstractTransaction {
 
   @Field(() => BN)
   public timestamp: BN;
+
+  @Field(() => BN)
+  public gasUsed: BN;
 
   @Field()
   public success: boolean;
@@ -72,5 +76,6 @@ export class UserTransaction implements IUserTransaction, AbstractTransaction {
     this.moduleName = input.moduleName;
     this.functionName = input.functionName;
     this.arguments = input.arguments;
+    this.gasUsed = input.gasUsed;
   }
 }

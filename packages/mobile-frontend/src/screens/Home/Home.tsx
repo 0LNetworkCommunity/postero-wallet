@@ -1,22 +1,21 @@
 import { FC, useRef } from "react";
-import { View, Text, SafeAreaView, TouchableOpacity } from "react-native";
-import tw from "twrnc";
 import { StackScreenProps } from "@react-navigation/stack";
+import { Home as HomeScreen } from "@postero/ui";
 
 import { useWallets } from "../Wallets/hook";
 import { ModalStackParams } from "../params";
-import Wallets from "../Wallets";
 import ContextMenu, { ContextMenuHandle } from "./ContextMenu";
-import CogIcon from "../../icons/CogIcon";
+import { NewWalletBottomSheet, NewWalletBottomSheetHandle } from "./NewWalletBottomSheet";
 
 const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
-  route,
   navigation,
 }) => {
   const contextMenu = useRef<ContextMenuHandle>(null);
+  const newWalletBottomSheet = useRef<NewWalletBottomSheetHandle>(null);
+
   const wallets = useWallets();
 
-  let totalLocked = 0;
+  let totalLocked: number | undefined = undefined;
   let totalUnlocked = 0;
 
   if (wallets) {
@@ -35,7 +34,7 @@ const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
         const unlocked = parseInt(slowWallet.unlocked, 10);
         const locked = libraAmount - unlocked;
         totalUnlocked += unlocked;
-        totalLocked += locked;
+        totalLocked = (totalLocked ?? 0) + locked;
       } else {
         totalUnlocked += libraAmount;
       }
@@ -50,49 +49,55 @@ const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={tw.style("p-2")}>
-        <View style={tw.style("pb-2 flex-row justify-between")}>
-          <TouchableOpacity
-            onPress={() => {
-              contextMenu.current?.open();
-            }}
-          >
-            <CogIcon color="#000000" />
-          </TouchableOpacity>
-        </View>
+    <>
+      <HomeScreen
+        totalUnlockedBalance={totalUnlocked}
+        totalLockedBalance={totalLocked}
+        wallets={
+          wallets?.map((wallet) => {
+            let lockedAmount = wallet.slowWallet ? 0 : undefined;
+            let unlockedAmount = 0;
 
-        <View style={tw.style("flex-row mb-2")}>
-          <View style={tw.style("basis-1/2 pr-2")}>
-            <View style={tw.style("p-2 rounded-md bg-white")}>
-              <Text style={tw.style("text-gray-500 text-base leading-6")}>
-                Balance
-              </Text>
-              <Text
-                style={tw.style("text-black text-xl leading-6 font-semibold")}
-              >
-                {`Ƚ ${totalUnlocked.toLocaleString()}`}
-              </Text>
-            </View>
-          </View>
+            const libraBalance = wallet.balances.find(
+              (balance) => balance.coin.symbol === "LIBRA"
+            );
 
-          <View style={tw.style("basis-1/2", "p-2 rounded-md bg-white mb-2")}>
-            <Text style={tw.style("text-gray-500 text-base leading-6")}>
-              Locked
-            </Text>
-            <Text
-              style={tw.style("text-black text-xl leading-6 font-semibold")}
-            >
-              {`Ƚ ${totalLocked.toLocaleString()}`}
-            </Text>
-          </View>
-        </View>
-      </View>
+            if (libraBalance) {
+              let amount = parseInt(libraBalance.amount, 10);
 
-      <Wallets />
+              if (wallet.slowWallet) {
+                unlockedAmount = parseInt(wallet.slowWallet.unlocked, 10);
+                lockedAmount = (amount - unlockedAmount) / 1e6;
+              } else {
+                unlockedAmount = amount;
+              }
+              unlockedAmount /= 1e6;
+            }
+
+            return {
+              label: wallet.label,
+              address: wallet.address,
+              unlockedAmount: unlockedAmount,
+              lockedAmount,
+            };
+          }) ?? []
+        }
+        onPressWallet={(walletAddress) => {
+          navigation.navigate("Wallet", {
+            walletAddress,
+          });
+        }}
+        onPressNewWallet={() => {
+          newWalletBottomSheet.current?.open();
+        }}
+        onPressMore={() => {
+          contextMenu.current?.open();
+        }}
+      />
 
       <ContextMenu ref={contextMenu} />
-    </SafeAreaView>
+      <NewWalletBottomSheet ref={newWalletBottomSheet} />
+    </>
   );
 };
 

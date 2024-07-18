@@ -50,6 +50,7 @@ const App: FC = () => {
     };
     load().catch((error) => {
       console.error(error);
+      throw error;
     });
   }, []);
 

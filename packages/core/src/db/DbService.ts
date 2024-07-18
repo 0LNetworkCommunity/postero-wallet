@@ -135,6 +135,7 @@ class DbService implements IDbService, OnModuleInit, OnModuleDestroy {
         "hash" BLOB NOT NULL,
         "moduleAddress" BLOB NOT NULL,
         "moduleName" TEXT NOT NULL,
+        "gasUsed" TEXT NOT NULL,
         "functionName" TEXT NOT NULL,
         "arguments" TEXT NOT NULL,
         "timestamp" INTEGER NOT NULL

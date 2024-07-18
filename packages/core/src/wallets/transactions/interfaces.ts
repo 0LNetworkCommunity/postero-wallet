@@ -116,6 +116,7 @@ export interface IPendingTransaction {
   hash: Uint8Array;
   status?: PendingTransactionStatus;
   expirationTimestamp: number;
+  sender: Uint8Array;
   init(args: PendingTransactionArgs): void;
 }
 

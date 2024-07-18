@@ -83,6 +83,10 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
+  containerLg: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  },
   containerXl: {
     paddingVertical: 12,
     paddingHorizontal: 18,
@@ -91,20 +95,12 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 22,
   },
-
-  textMd: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  textXl: {
-    fontSize: 16,
-    lineHeight: 24,
-  },
 });
 
 export enum ButtonSize {
   SM = "SM",
   MD = "MD",
+  LG = "LG",
   XL = "XL",
   XXL = "XXL",
 }
@@ -131,6 +127,7 @@ const variationsStyles = new Map([
 
 const containerSizeStyles = new Map<ButtonSize, ViewStyle>([
   [ButtonSize.MD, styles.containerMd],
+  [ButtonSize.LG, styles.containerLg],
   [ButtonSize.XL, styles.containerXl],
   [ButtonSize.XXL, styles.containerXxl],
 ]);
@@ -188,7 +185,7 @@ export function Button({
         medium
         text
         sm={size === ButtonSize.SM}
-        md={size === ButtonSize.MD}
+        md={size === ButtonSize.MD || size === ButtonSize.LG}
         lg={size === ButtonSize.XXL}
         style={[variationStyle.text, disabled && variationStyle.textDisabled]}
       >

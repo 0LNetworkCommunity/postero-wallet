@@ -1,12 +1,11 @@
-// import { Aptos, Deserializer, TransactionPayload } from '@aptos-labs/ts-sdk';
-
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import {
   IPendingTransaction,
   PendingTransactionArgs,
   PendingTransactionStatus,
 } from './interfaces';
 import { AbstractTransaction } from './AbstractTransaction';
+import { Deserializer, SignedTransaction } from '@aptos-labs/ts-sdk';
 
 @ObjectType('PendingTransaction', {
   implements: () => [AbstractTransaction],
@@ -27,6 +26,9 @@ class PendingTransaction implements AbstractTransaction, IPendingTransaction {
   @Field((type) => Number)
   expirationTimestamp: number;
 
+  @Field((type) => Buffer)
+  sender: Uint8Array;
+
   public init(args: PendingTransactionArgs) {
     this.payload = args.payload;
     this.createdAt = args.createdAt;
@@ -34,9 +36,9 @@ class PendingTransaction implements AbstractTransaction, IPendingTransaction {
     this.status = args.status;
     this.expirationTimestamp = args.expirationTimestamp;
 
-    // const deserializer = new Deserializer(args.payload);
-    // const txPayload = TransactionPayload.deserialize(deserializer);
-    // console.log('txPayload', txPayload);
+    const deserializer = new Deserializer(args.payload);
+    const txPayload = SignedTransaction.deserialize(deserializer);
+    this.sender = txPayload.raw_txn.sender.data
   }
 }
 

@@ -17,6 +17,7 @@ export const gqlTransactionMapper = (gqlTransaction: GqlTransaction): Transactio
         version: new BN(gqlTransaction.version),
         hash: Buffer.from(gqlTransaction.hash, 'hex'),
         timestamp: new BN(gqlTransaction.timestamp),
+        gasUsed: new BN(gqlTransaction.gasUsed),
         success: gqlTransaction.success,
         moduleAddress: Buffer.from(gqlTransaction.moduleAddress, "hex"),
         moduleName: gqlTransaction.moduleName,

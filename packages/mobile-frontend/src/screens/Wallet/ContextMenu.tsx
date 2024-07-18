@@ -59,12 +59,17 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({ walletAddress }, ref
         text: "OK",
         onPress: async () => {
           try {
-            const res = await apolloClient.mutate({
+            const res = await apolloClient.mutate<{ setSlow: string }>({
               mutation: SET_SLOW,
               variables: {
                 walletAddress,
               },
             });
+            if (res.data) {
+              navigation.navigate("Transaction", {
+                hash: res.data?.setSlow,
+              });
+            }
           } catch (error) {
             console.error(error);
           }

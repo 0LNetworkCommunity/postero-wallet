@@ -66,6 +66,7 @@ export interface UserTransactionInput extends AbstractTransactionInput {
   sender: Buffer;
   arguments: string;
   timestamp: BN;
+  gasUsed: BN;
 }
 
 export class UserTransaction extends AbstractTransaction {
@@ -76,6 +77,7 @@ export class UserTransaction extends AbstractTransaction {
   public sender: Buffer;
   public arguments: string;
   public timestamp: BN;
+  public gasUsed: BN;
 
   public constructor(input: UserTransactionInput) {
     super({ type: TransactionType.User, ...input });
@@ -86,6 +88,7 @@ export class UserTransaction extends AbstractTransaction {
     this.functionName = input.functionName;
     this.arguments = input.arguments;
     this.timestamp = input.timestamp;
+    this.gasUsed = input.gasUsed;
   }
 
   public get date(): Date {

@@ -10,6 +10,7 @@ import {
   PendingTransactionsUpdaterServiceEvent,
 } from './interfaces';
 import { Types } from '../../types';
+import BN from "bn.js";
 
 @Injectable()
 export class PendingTransactionsUpdaterService
@@ -123,6 +124,18 @@ export class PendingTransactionsUpdaterService
           Buffer.from(hash, 'hex'),
           status,
         );
+      } else {
+        const info = await this.getInfo();
+
+        if (info.latestStableTimestamp) {
+          const expirationTimestamp = new BN(transaction.expirationTimestamp).mul(new BN(1e3));
+          if (info.latestStableTimestamp.gt(expirationTimestamp)) {
+            await this.pendingTransactionsService.setPendingTransactionStatus(
+              transaction.hash,
+              PendingTransactionStatus.Expired,
+            );
+          }
+        }
       }
     } finally {
       await new Promise((resolve) => setTimeout(resolve, 4_000));
@@ -136,5 +149,48 @@ export class PendingTransactionsUpdaterService
         transaction,
       );
     }
+  }
+
+  private async getInfo(): Promise<{
+    latestStableVersion: BN | null;
+    latestStableTimestamp: BN | null;
+  }> {
+    const res = await axios<{
+      data?: {
+        info: {
+          latestStableVersion: string | null;
+          latestStableTimestamp: string | null;
+        };
+      };
+    }>({
+      url: 'https://api.0l.fyi/graphql',
+      method: 'POST',
+      data: {
+        operationName: 'GetInfo',
+        query: `
+          query GetInfo {
+            info {
+              latestStableVersion
+              latestStableTimestamp
+            }
+          }
+        `,
+      },
+    });
+
+    if (res.data.data) {
+      return {
+        latestStableVersion:
+          res.data.data.info.latestStableVersion
+            ? new BN(res.data.data.info.latestStableVersion)
+            : null,
+        latestStableTimestamp:
+          res.data.data.info.latestStableTimestamp
+            ? new BN(res.data.data.info.latestStableTimestamp)
+            : null,
+      };
+    }
+
+    throw new Error('unable to retreive info');
   }
 }

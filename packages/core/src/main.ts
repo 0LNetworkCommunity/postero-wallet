@@ -58,6 +58,8 @@ export class Backend {
       Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
     >,
   ): Promise<Backend> {
+    console.log('CREATE!!!');
+
     @Module({
       imports: [
         PlatformModule.forRoot(platformServices),
@@ -69,14 +71,17 @@ export class Backend {
     })
     class AppModule {}
 
+    console.log('create app');
     const app = await NestFactory.create<NestExpressApplication>(
       AppModule,
       new ExpressAdapter(),
       {
-        abortOnError: false,
+        abortOnError: !false,
       },
     );
+    console.log('init app');
     await app.init();
+    console.log('after init app');
 
     return new Backend(app);
   }
@@ -141,6 +146,7 @@ const bootstrap = async (
     Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
   >,
 ): Promise<Backend> => {
+  console.log('bootstrap');
   return Backend.create(platformServices, imports);
 };
 

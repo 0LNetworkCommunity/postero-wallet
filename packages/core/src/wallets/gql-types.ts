@@ -18,6 +18,7 @@ export interface GqlUserTransaction extends GqlAbstractTransaction {
   sender: string;
   arguments: string;
   timestamp: string;
+  gasUsed: string;
 }
 
 export interface GqlScriptUserTransaction extends GqlAbstractTransaction {

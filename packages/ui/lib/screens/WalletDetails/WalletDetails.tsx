@@ -4,10 +4,10 @@ import styled from "@emotion/native";
 import { useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import { Share } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 import { Text } from "../../components/Text";
 import { Button, ButtonSize, ButtonVariation } from "../../components/Button";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { XCloseIcon } from "../../icons/XCloseIcon";
 
 const Container = styled.SafeAreaView({
