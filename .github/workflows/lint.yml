@@ -1,0 +1,19 @@
+name: lint
+
+on:
+  schedule:
+    - cron: "30 01 * * *"
+  push:
+    branches: ['*']
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  yarn-setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup repository
+        uses: actions/checkout@v4
+
+      - name: Install packages
+        run: yarn install
