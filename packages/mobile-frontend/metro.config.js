@@ -6,6 +6,8 @@ const path = require('path');
 const projectRoot = __dirname;
 const monorepoRoot = path.resolve(projectRoot, '../..');
 const coreNodeModules = path.resolve(monorepoRoot, 'packages/core/node_modules');
+const uiNodeModules = path.resolve(monorepoRoot, 'packages/ui/node_modules');
+
 const rootNodeModules = path.resolve(monorepoRoot, 'node_modules');
 
 const config = getDefaultConfig(projectRoot);
@@ -17,6 +19,7 @@ config.resolver.disableHierarchicalLookup = true;
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
   coreNodeModules,
+  uiNodeModules,
   rootNodeModules,
 ];
 
