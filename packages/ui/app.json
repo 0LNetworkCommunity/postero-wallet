@@ -1,7 +1,9 @@
 {
   "expo": {
+    "slug": "Postero",
     "plugins": [
-      "expo-localization"
+      "expo-localization",
+      "expo-font"
     ]
   }
 }

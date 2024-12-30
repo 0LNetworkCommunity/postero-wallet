@@ -10,8 +10,6 @@
   "workspaces": [
     "packages/mobile-frontend",
     "packages/core",
-    "packages/desktop-backend",
-    "packages/desktop-frontend",
     "packages/ui"
   ],
   "packageManager": "yarn@4.1.1",
