@@ -15,5 +15,29 @@ jobs:
       - name: Setup repository
         uses: actions/checkout@v4
 
+      - name: Corepack
+        run: corepack enable
+
       - name: Install packages
         run: yarn install
+
+  npm-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup repository
+        uses: actions/checkout@v4
+
+      - name: Install packages
+        run: npm install
+
+  bun-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup repository
+        uses: actions/checkout@v4
+
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install packages
+        run: bun install
