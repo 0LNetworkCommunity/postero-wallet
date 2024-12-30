@@ -21,5 +21,5 @@ jobs:
       - name: Install packages
         run: yarn install
 
-      - name: install desktop
-        run: cd packages/desktop-frontend && yarn install
+      - name: install mobile
+        run: cd packages/mobile-frontend && yarn install
