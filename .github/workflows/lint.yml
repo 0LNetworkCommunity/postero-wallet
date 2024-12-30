@@ -15,9 +15,6 @@ jobs:
       - name: Setup repository
         uses: actions/checkout@v4
 
-      - name: nvm
-        run: nvm use
-
       - name: Corepack
         run: corepack enable
 
