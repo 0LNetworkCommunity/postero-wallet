@@ -1,9 +1,15 @@
 {
   "expo": {
-    "slug": "storybook-for-postero",
+    "slug": "carpe-expo-dev",
     "plugins": [
       "expo-localization",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2274a314-1db9-4d87-a737-2945f63923d3"
+      }
+    },
+    "owner": "0o-de-lally"
   }
 }
