@@ -9,17 +9,14 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  yarn-setup:
+  bun-check:
     runs-on: ubuntu-latest
     steps:
       - name: Setup repository
         uses: actions/checkout@v4
 
-      - name: Corepack
-        run: corepack enable
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
 
-      - name: Install packages
-        run: yarn install
-
-      - name: install mobile
-        run: cd packages/mobile-frontend && yarn install
+      - name: Install UI packages
+        run: cd ui && bun install

@@ -1,9 +1,0 @@
-{
-  "expo": {
-    "slug": "Postero",
-    "plugins": [
-      "expo-localization",
-      "expo-font"
-    ]
-  }
-}

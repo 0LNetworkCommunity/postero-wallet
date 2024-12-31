@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "slug": "storybook-for-postero",
+    "plugins": [
+      "expo-localization",
+      "expo-font"
+    ]
+  }
+}
