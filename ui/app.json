@@ -1,15 +1,15 @@
 {
   "expo": {
-    "slug": "carpe-expo-dev",
+    "slug": "carpe-storybook",
     "plugins": [
       "expo-localization",
       "expo-font"
     ],
     "extra": {
       "eas": {
-        "projectId": "2274a314-1db9-4d87-a737-2945f63923d3"
+        "projectId": "99e9d2ff-4212-41a6-a3a9-2ebabab25807"
       }
     },
-    "owner": "0o-de-lally"
+    "owner": "ol-carpe"
   }
 }
