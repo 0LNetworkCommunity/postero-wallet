@@ -5,6 +5,9 @@
       "expo-localization",
       "expo-font"
     ],
+    "android": {
+      "package": "com.example.carpeStorybook"
+    },
     "extra": {
       "eas": {
         "projectId": "99e9d2ff-4212-41a6-a3a9-2ebabab25807"
