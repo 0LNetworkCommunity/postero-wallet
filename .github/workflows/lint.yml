@@ -18,8 +18,11 @@ jobs:
       - name: install bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Install UI packages
+      - name: Installs UI packages
         run: cd ui && bun install
+
+      - name: Installs mobile packages
+        run: cd mobile-frontend && bun install
 
   eslint:
     runs-on: ubuntu-latest
@@ -32,3 +35,15 @@ jobs:
 
       - name: run linter
         run: bun run lint
+
+  doctor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup repository
+        uses: actions/checkout@v4
+
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: expo doctor should pass
+        run: bunx expo-doctor
