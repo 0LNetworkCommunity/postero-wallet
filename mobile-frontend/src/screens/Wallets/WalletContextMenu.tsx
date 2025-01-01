@@ -22,8 +22,6 @@ interface Props {}
 
 const WalletContextMenu = forwardRef<WalletContextMenuHandle, Props>(
   ({}, ref) => {
-    const navigation = useNavigation<any>();
-
     const bottomSheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ["20%"], []);
 
@@ -41,8 +39,6 @@ const WalletContextMenu = forwardRef<WalletContextMenuHandle, Props>(
       ),
       [],
     );
-
-    const handleClosePress = () => bottomSheetRef.current?.close();
 
     useImperativeHandle(ref, () => {
       return {
