@@ -65,14 +65,14 @@ const NewTransferScreen: FC<
     const integer = filterDigits(
       decimalSeparatorIndex === -1
         ? amount
-        : amount.substring(0, decimalSeparatorIndex)
+        : amount.substring(0, decimalSeparatorIndex),
     );
     const decimals =
       decimalSeparatorIndex === -1
         ? "000000"
         : filterDigits(amount.substring(decimalSeparatorIndex + 1)).padEnd(
             6,
-            "0"
+            "0",
           );
 
     try {

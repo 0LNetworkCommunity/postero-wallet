@@ -26,7 +26,11 @@ class ElectronWindow implements IWindow {
 
   private readonly eventEmitter = new Emittery();
 
-  public async init(type: WindowType, params?: any, parent?: IWindow): Promise<void> {
+  public async init(
+    type: WindowType,
+    params?: any,
+    parent?: IWindow,
+  ): Promise<void> {
     this.frame = false;
     this.state = WindowState.Foreground;
   }
@@ -38,11 +42,7 @@ class ElectronWindow implements IWindow {
     return this.eventEmitter.on(eventName, listener);
   }
 
-  public onContextMenu(event: ContextMenuEventData): void {
+  public onContextMenu(event: ContextMenuEventData): void {}
 
-  }
-
-  public close(): void {
-
-  }
+  public close(): void {}
 }

@@ -21,7 +21,10 @@ export interface NewWalletBottomSheetHandle {
 
 interface Props {}
 
-export const NewWalletBottomSheet = forwardRef<NewWalletBottomSheetHandle, Props>(({}, ref) => {
+export const NewWalletBottomSheet = forwardRef<
+  NewWalletBottomSheetHandle,
+  Props
+>(({}, ref) => {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
 
@@ -36,7 +39,7 @@ export const NewWalletBottomSheet = forwardRef<NewWalletBottomSheetHandle, Props
         appearsOnIndex={0}
       />
     ),
-    []
+    [],
   );
 
   useImperativeHandle(ref, () => {

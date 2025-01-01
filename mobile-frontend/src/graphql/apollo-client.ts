@@ -18,7 +18,7 @@ export const getApolloClient = (backend: Backend) => {
       );
     },
     subscriptionLink,
-    localLink
+    localLink,
   );
 
   const apolloClient = new ApolloClient({
@@ -26,14 +26,14 @@ export const getApolloClient = (backend: Backend) => {
     link: splitLink,
     defaultOptions: {
       watchQuery: {
-        fetchPolicy: 'no-cache',
-        errorPolicy: 'ignore',
+        fetchPolicy: "no-cache",
+        errorPolicy: "ignore",
       },
       query: {
-        fetchPolicy: 'no-cache',
-        errorPolicy: 'all',
+        fetchPolicy: "no-cache",
+        errorPolicy: "all",
       },
-    }
+    },
   });
 
   return apolloClient;

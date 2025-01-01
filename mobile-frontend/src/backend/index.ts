@@ -1,11 +1,11 @@
 import bootstrapBackend, { Backend } from "@postero/core";
-import ReactNativePlatformModule from './ReactNativePlatformModule';
+import ReactNativePlatformModule from "./ReactNativePlatformModule";
 
 const bootstrap = async (): Promise<Backend> => {
   const proc = process as any;
 
   if (!global.Buffer) {
-    global.Buffer = require('buffer/').Buffer;
+    global.Buffer = require("buffer/").Buffer;
   }
 
   Object.assign(proc, {

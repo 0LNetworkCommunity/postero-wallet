@@ -15,21 +15,15 @@ export type KeyRotationRoutes = {
     address: string;
     publicKey: string;
   };
-}
+};
 
 const Stack = createNativeStackNavigator<KeyRotationRoutes>();
 
 function KeyRotationRouter() {
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Splash"
-        component={Splash}
-      />
-      <Stack.Screen
-        name="Mnemonic"
-        component={Mnemonic}
-      />
+      <Stack.Screen name="Splash" component={Splash} />
+      <Stack.Screen name="Mnemonic" component={Mnemonic} />
       <Stack.Screen
         name="KeyRotationTransaction"
         component={KeyRotationTransaction}

@@ -2,13 +2,15 @@ import { FC, useRef } from "react";
 import { Alert, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useApolloClient, gql } from "@apollo/client";
-import * as Haptics from 'expo-haptics';
+import * as Haptics from "expo-haptics";
 
-import { Button } from '@postero/ui';
+import { Button } from "@postero/ui";
 
 import { Wallet, useWallets } from "./hook";
 import WalletList from "./WalletList";
-import WalletContextMenu, { WalletContextMenuHandle } from "./WalletContextMenu";
+import WalletContextMenu, {
+  WalletContextMenuHandle,
+} from "./WalletContextMenu";
 
 const DELETE_WALLET = gql`
   mutation DeleteWallet($address: Bytes!) {
@@ -58,7 +60,6 @@ const Wallets: FC = () => {
       </View>
     );
   }
-
 
   return (
     <>

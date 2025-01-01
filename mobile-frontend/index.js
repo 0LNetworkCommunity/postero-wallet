@@ -1,14 +1,14 @@
 import "reflect-metadata";
 
-import 'react-native-gesture-handler';
-
-global.Buffer = require('buffer').Buffer;
+import "react-native-gesture-handler";
 
 import "@azure/core-asynciterator-polyfill";
 
 import { registerRootComponent } from "expo";
 
 import App from "./src/App";
+
+global.Buffer = require("buffer").Buffer;
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);
 // It also ensures that whether you load the app in Expo Go or in a native build,

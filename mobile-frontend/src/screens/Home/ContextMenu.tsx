@@ -36,7 +36,7 @@ const ContextMenu = forwardRef<ContextMenuHandle, Props>(({}, ref) => {
         appearsOnIndex={0}
       />
     ),
-    []
+    [],
   );
 
   useImperativeHandle(ref, () => {

@@ -1,1 +1,1 @@
-export { default } from './MnemonicImport';
+export { default } from "./MnemonicImport";

@@ -9,4 +9,3 @@ function CreateWallet() {
 }
 
 export default CreateWallet;
-

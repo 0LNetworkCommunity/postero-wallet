@@ -4,7 +4,13 @@ import {
   useQuery,
   useSubscription,
 } from "@apollo/client";
-import { View, Text, Linking, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Linking,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { useState } from "react";
 
 import { Button } from "@postero/ui";
@@ -131,7 +137,7 @@ export function PendingTransactionState({ hash }: Props) {
       <TouchableOpacity
         onPress={() => {
           Linking.openURL(
-            `https://rpc.0l.fyi/v1/transactions/by_hash/0x${pendingTransaction.hash}`
+            `https://rpc.0l.fyi/v1/transactions/by_hash/0x${pendingTransaction.hash}`,
           );
         }}
       >
@@ -185,7 +191,7 @@ export function PendingTransactionState({ hash }: Props) {
                 title="View in explorer"
                 onPress={() => {
                   Linking.openURL(
-                    `https://0l.fyi/transactions/${pendingTransaction.transaction!.version}`
+                    `https://0l.fyi/transactions/${pendingTransaction.transaction!.version}`,
                   );
                 }}
               />

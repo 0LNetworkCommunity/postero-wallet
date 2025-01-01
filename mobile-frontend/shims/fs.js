@@ -1,5 +1,5 @@
 module.exports = {
   readFile: () => {
-    throw new Error('fs.readFile unsupported');
+    throw new Error("fs.readFile unsupported");
   },
 };

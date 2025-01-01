@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 
 @Injectable()
-class ReactNativeBrowserLinkService {
-}
+class ReactNativeBrowserLinkService {}
 
 export default ReactNativeBrowserLinkService;

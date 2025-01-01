@@ -19,8 +19,8 @@ function Splash({
         <Text>
           Key rotation allows you to replace your current private key with a new
           one. This update is made without altering your wallet address. The
-          current private key will not be automatically removed and will remain on
-          your device.
+          current private key will not be automatically removed and will remain
+          on your device.
         </Text>
       </View>
 

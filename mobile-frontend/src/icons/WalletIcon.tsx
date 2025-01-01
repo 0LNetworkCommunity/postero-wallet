@@ -15,7 +15,6 @@ const WalletIcon: FC<Props> = ({ color }) => {
       />
     </Svg>
   );
-}
+};
 
 export default WalletIcon;
-

@@ -1,13 +1,9 @@
-import { gql } from '@apollo/client';
-import BN from 'bn.js';
+import { gql } from "@apollo/client";
+import BN from "bn.js";
 
 export const GET_MOVEMENTS = gql`
-  query GetMovements(
-    $walletAddress: Bytes!,
-  ) {
-    movements(
-      walletAddress: $walletAddress
-    ) {
+  query GetMovements($walletAddress: Bytes!) {
+    movements(walletAddress: $walletAddress) {
       totalCount
       pageInfo {
         prevCursor
@@ -53,20 +49,19 @@ export const GET_MOVEMENTS = gql`
   }
 `;
 
-
 export interface GqlAbstractTransaction {
   version: string;
   hash: string;
 }
 
 export interface GqlBlockMetadataTransaction extends GqlAbstractTransaction {
-  __typename: 'BlockMetadataTransaction';
+  __typename: "BlockMetadataTransaction";
   epoch: string;
   timestamp: string;
 }
 
 export interface GqlUserTransaction extends GqlAbstractTransaction {
-  __typename: 'UserTransaction';
+  __typename: "UserTransaction";
   moduleAddress: string;
   moduleName: string;
   functionName: string;
@@ -78,14 +73,14 @@ export interface GqlUserTransaction extends GqlAbstractTransaction {
 }
 
 export interface GqlScriptUserTransaction extends GqlAbstractTransaction {
-  __typename: 'ScriptUserTransaction';
+  __typename: "ScriptUserTransaction";
   success: boolean;
   sender: string;
   timestamp: string;
 }
 
 export interface GqlGenesisTransaction extends GqlAbstractTransaction {
-  __typename: 'GenesisTransaction';
+  __typename: "GenesisTransaction";
 }
 
 export type GqlTransaction =

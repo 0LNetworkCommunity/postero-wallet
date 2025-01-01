@@ -1,4 +1,3 @@
-
 export interface PendingTransactionInput {
   status: string;
   hash: Uint8Array;

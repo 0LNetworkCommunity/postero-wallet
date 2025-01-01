@@ -5,7 +5,7 @@ import { gqlMovementMapper } from "./mappers";
 import { Movement } from "./types";
 
 export const useMovements = (
-  walletAddress: string
+  walletAddress: string,
 ): {
   loading: boolean;
   total?: number;
@@ -31,7 +31,7 @@ export const useMovements = (
         if (res.data) {
           const { movements } = res.data;
           setMovements(
-            movements.edges.map((edge) => gqlMovementMapper(edge.node))
+            movements.edges.map((edge) => gqlMovementMapper(edge.node)),
           );
         }
       } finally {

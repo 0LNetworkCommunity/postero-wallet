@@ -5,7 +5,9 @@ import {
 
 import * as SecureStore from "expo-secure-store";
 
-class ReactNativeEncryptedStoreService implements PlatformEncryptedStoreService {
+class ReactNativeEncryptedStoreService
+  implements PlatformEncryptedStoreService
+{
   private static RULES = new Map<EncryptedStoreRule, number>([
     [EncryptedStoreRule.AfterFirstUnlock, SecureStore.AFTER_FIRST_UNLOCK],
     [
@@ -31,7 +33,7 @@ class ReactNativeEncryptedStoreService implements PlatformEncryptedStoreService 
   public async setItem(
     key: string,
     value: string,
-    rule: EncryptedStoreRule
+    rule: EncryptedStoreRule,
   ): Promise<void> {
     return SecureStore.setItem(key, value, {
       keychainAccessible: ReactNativeEncryptedStoreService.RULES.get(rule)!,

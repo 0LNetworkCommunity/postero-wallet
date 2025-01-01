@@ -1,18 +1,9 @@
 import { ReactNode, useEffect, useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import {
-  gql,
-  useApolloClient,
-  useSubscription,
-} from "@apollo/client";
+import { gql, useApolloClient, useSubscription } from "@apollo/client";
 import tw from "twrnc";
-import BN from "bn.js"
+import BN from "bn.js";
 import {
   ArrowUpRightIcon,
   Button,
@@ -39,7 +30,7 @@ import AdjustmentsHorizontalIcon from "../../icons/AdjustmentsHorizontalIcon";
 import { PendingTransaction } from "../../pending-transactions";
 
 const NEW_PENDING_TRANSACTION_SUBSCRIPTION = gql`
-  subscription NewPendingTransaction($address: Bytes!)  {
+  subscription NewPendingTransaction($address: Bytes!) {
     newPendingTransaction(address: $address) {
       hash
       status
@@ -105,10 +96,7 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
   >([]);
 
   const movementsAndPendingTransactions = useMemo(() => {
-    return [
-      ...(movements ?? []),
-      ...pendingTransactions
-    ].sort((a, b) => {
+    return [...(movements ?? []), ...pendingTransactions].sort((a, b) => {
       let aTimestamp: BN;
       let bTimestamp: BN;
 
@@ -145,7 +133,6 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
     });
   }, [movements, pendingTransactions]);
 
-
   const [loading, setLoading] = useState(false);
 
   const [wallet, setWallet] = useState<{
@@ -180,7 +167,7 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
                 | BlockMetadataTransaction
             ).timestamp
               .div(new BN(1e3))
-              .toNumber()
+              .toNumber(),
           );
 
           histBalance.push({
@@ -248,8 +235,11 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
       setPendingTransactions(
         data.walletPendingTransactions.map(
           (it) =>
-            new PendingTransaction({ ...it, hash: Buffer.from(it.hash, "hex") })
-        )
+            new PendingTransaction({
+              ...it,
+              hash: Buffer.from(it.hash, "hex"),
+            }),
+        ),
       );
     };
     load();
@@ -302,7 +292,7 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
   if (wallet) {
     if (wallet.balances.length) {
       const libraBalance = wallet.balances.find(
-        (it) => it.coin.symbol === "LIBRA"
+        (it) => it.coin.symbol === "LIBRA",
       );
       if (libraBalance) {
         let amount = parseInt(libraBalance.amount, 10);
@@ -346,10 +336,7 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
         <View style={tw.style("px-3 pt-2")}>
           <NavBar
             title={
-              <WalletLabel
-                value={wallet.label}
-                onChange={setWalletLabel}
-              />
+              <WalletLabel value={wallet.label} onChange={setWalletLabel} />
             }
             leftActions={
               <TouchableOpacity
@@ -377,7 +364,7 @@ function WalletBase({ walletAddress, onPressSettings }: Props): ReactNode {
           <View
             style={tw.style(
               { height: 250 },
-              "bg-white rounded-md my-2 overflow-hidden"
+              "bg-white rounded-md my-2 overflow-hidden",
             )}
           >
             {histData.length > 0 && <Chart data={histData} />}

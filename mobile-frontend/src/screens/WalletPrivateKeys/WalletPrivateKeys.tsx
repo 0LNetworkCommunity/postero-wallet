@@ -81,32 +81,32 @@ function WalletPrivateKeys({
       />
 
       <View style={{ flex: 1 }}>
-    <FlatList
-      data={data?.wallet.keys ?? []}
-      keyExtractor={(key) => key.publicKey}
-      ItemSeparatorComponent={() => <View style={styles.separator} />}
-      renderItem={({ item }) => {
-        // const tap = Gesture.Tap()
-        //   .maxDuration(500)
-        //   .onEnd(() => {
-        //     runOnJS(onWalletPress)(item);
-        //   });
+        <FlatList
+          data={data?.wallet.keys ?? []}
+          keyExtractor={(key) => key.publicKey}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          renderItem={({ item }) => {
+            // const tap = Gesture.Tap()
+            //   .maxDuration(500)
+            //   .onEnd(() => {
+            //     runOnJS(onWalletPress)(item);
+            //   });
 
-        // const longPress = Gesture.LongPress()
-        //   .minDuration(800)
-        //   .onStart(() => {
-        //     runOnJS(onWalletContext)(item);
-        //   });
+            // const longPress = Gesture.LongPress()
+            //   .minDuration(800)
+            //   .onStart(() => {
+            //     runOnJS(onWalletContext)(item);
+            //   });
 
-        return (
-          // <SwipeableRow onDelete={() => onWalletDelete(item)}>
-            // <GestureDetector gesture={Gesture.Exclusive(tap, longPress)}>
+            return (
+              // <SwipeableRow onDelete={() => onWalletDelete(item)}>
+              // <GestureDetector gesture={Gesture.Exclusive(tap, longPress)}>
               <ListItem publicKey={item.publicKey} authKey={item.authKey} />
-            // </GestureDetector>
-          // </SwipeableRow>
-        );
-      }}
-    />
+              // </GestureDetector>
+              // </SwipeableRow>
+            );
+          }}
+        />
       </View>
 
       <ContextMenu ref={contextMenu} walletAddress={walletAddress} />
@@ -116,7 +116,7 @@ function WalletPrivateKeys({
 
 const styles = StyleSheet.create({
   separator: {
-    backgroundColor: 'rgb(200, 199, 204)',
+    backgroundColor: "rgb(200, 199, 204)",
     height: StyleSheet.hairlineWidth,
   },
 });

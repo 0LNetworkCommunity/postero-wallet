@@ -1,4 +1,3 @@
-
 export type NewWalletStackParams = {
   Root: undefined;
   CreateWallet: undefined;

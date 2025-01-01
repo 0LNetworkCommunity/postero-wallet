@@ -1,6 +1,6 @@
-import { Buffer } from 'buffer';
-import BN from 'bn.js';
-import { Decimal } from 'decimal.js';
+import { Buffer } from "buffer";
+import BN from "bn.js";
+import { Decimal } from "decimal.js";
 
 export enum TransactionType {
   Genesis,
@@ -21,7 +21,9 @@ export class AbstractTransaction {
 
   public readonly hash: Uint8Array;
 
-  public constructor(input: { type: TransactionType } & AbstractTransactionInput) {
+  public constructor(
+    input: { type: TransactionType } & AbstractTransactionInput,
+  ) {
     this.type = input.type;
     this.version = input.version;
     this.hash = input.hash;
@@ -38,7 +40,8 @@ export class GenesisTransaction extends AbstractTransaction {
   }
 }
 
-export interface BlockMetadataTransactionInput extends AbstractTransactionInput {
+export interface BlockMetadataTransactionInput
+  extends AbstractTransactionInput {
   epoch: BN;
   timestamp: BN;
 }
@@ -119,7 +122,10 @@ export class ScriptUserTransaction extends AbstractTransaction {
   }
 }
 
-export type Transaction = GenesisTransaction | BlockMetadataTransaction | UserTransaction;
+export type Transaction =
+  | GenesisTransaction
+  | BlockMetadataTransaction
+  | UserTransaction;
 
 export interface MovementInput {
   balance: Decimal;

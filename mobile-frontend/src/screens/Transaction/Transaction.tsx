@@ -19,7 +19,7 @@ import NavBar from "../../ui/NavBar";
 import ChevronLeftIcon from "../../icons/ChevronLeftIcon";
 import { PendingTransactionState } from "./PendingTransactionState";
 
-const dateTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
+const dateTimeFormatter = new Intl.DateTimeFormat("fr-FR", {
   year: "numeric",
   month: "numeric",
   day: "numeric",
@@ -64,29 +64,33 @@ function Transaction({
   navigation,
 }: StackScreenProps<ModalStackParams, "Transaction">) {
   const { data, loading, error } = useQuery<{
-    transaction: null | {
-      __typename: "UserTransaction";
-      hash: string;
-      version: string;
-      timestamp: string;
-      success: boolean;
-      sender: string;
-      moduleAddress: string;
-      moduleName: string;
-      functionName: string;
-      arguments: string;
-    } | {
-      __typename: "GenesisTransaction";
-      hash: string;
-      version: string;
-    } | {
-      __typename: "PendingTransaction";
-      hash: string;
-      status: string;
-      createdAt: number;
-      expirationTimestamp: number;
-      payload: string;
-    };
+    transaction:
+      | null
+      | {
+          __typename: "UserTransaction";
+          hash: string;
+          version: string;
+          timestamp: string;
+          success: boolean;
+          sender: string;
+          moduleAddress: string;
+          moduleName: string;
+          functionName: string;
+          arguments: string;
+        }
+      | {
+          __typename: "GenesisTransaction";
+          hash: string;
+          version: string;
+        }
+      | {
+          __typename: "PendingTransaction";
+          hash: string;
+          status: string;
+          createdAt: number;
+          expirationTimestamp: number;
+          payload: string;
+        };
   }>(GET_TRANSACTION, {
     variables: {
       hash: route.params.hash,
@@ -104,39 +108,41 @@ function Transaction({
   let transactionView: React.JSX.Element | null = null;
 
   switch (data?.transaction?.__typename) {
-    case "PendingTransaction": {
-      const pendingTransaction = data.transaction;
+    case "PendingTransaction":
+      {
+        const pendingTransaction = data.transaction;
 
-      transactionView = (
-        <View style={{ paddingHorizontal: 5 }}>
-          <PendingTransactionState
-            hash={Buffer.from(pendingTransaction.hash, "hex")}
-          />
+        transactionView = (
+          <View style={{ paddingHorizontal: 5 }}>
+            <PendingTransactionState
+              hash={Buffer.from(pendingTransaction.hash, "hex")}
+            />
 
-          <View style={styles.separator} />
+            <View style={styles.separator} />
 
-          <View style={styles.propertyContainer}>
-            <Text style={styles.label}>Payload</Text>
-            <Text>{pendingTransaction.payload}</Text>
+            <View style={styles.propertyContainer}>
+              <Text style={styles.label}>Payload</Text>
+              <Text>{pendingTransaction.payload}</Text>
+            </View>
           </View>
-        </View>
-      );
+        );
+      }
+      break;
 
-    } break;
+    case "GenesisTransaction":
+      {
+        const genesisTransaction = data.transaction;
 
-    case "GenesisTransaction": {
-      const genesisTransaction = data.transaction;
+        transactionView = (
+          <View style={{ paddingHorizontal: 5 }}>
+            <View style={styles.propertyContainer}>
+              <Text style={styles.label}>Type</Text>
+              <Text>Genesis transaction</Text>
+            </View>
 
-      transactionView = (
-        <View style={{ paddingHorizontal: 5 }}>
-          <View style={styles.propertyContainer}>
-            <Text style={styles.label}>Type</Text>
-            <Text>Genesis transaction</Text>
-          </View>
+            <View style={styles.separator} />
 
-          <View style={styles.separator} />
-
-          {/* <View style={styles.propertyContainer}>
+            {/* <View style={styles.propertyContainer}>
             <Text style={styles.label}>Timestamp</Text>
             <Text>
               {dateTimeFormatter.format(
@@ -151,25 +157,24 @@ function Transaction({
 
           <View style={styles.separator} /> */}
 
-          <TouchableOpacity
-            onPress={() => {
-              Linking.openURL(
-                `https://0l.fyi/transactions/${genesisTransaction.version}`
-              );
-            }}
-          >
-            <View style={styles.propertyContainer}>
-              <Text style={styles.label}>Version</Text>
-              <Text>
-                {parseInt(genesisTransaction.version, 10).toLocaleString()}
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-        </View>
-      );
-
-    } break;
+            <TouchableOpacity
+              onPress={() => {
+                Linking.openURL(
+                  `https://0l.fyi/transactions/${genesisTransaction.version}`,
+                );
+              }}
+            >
+              <View style={styles.propertyContainer}>
+                <Text style={styles.label}>Version</Text>
+                <Text>
+                  {parseInt(genesisTransaction.version, 10).toLocaleString()}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        );
+      }
+      break;
 
     case "UserTransaction":
       {
@@ -191,8 +196,8 @@ function Transaction({
                   new Date(
                     new BN(userTransaction.timestamp)
                       .div(new BN(1e3))
-                      .toNumber()
-                  )
+                      .toNumber(),
+                  ),
                 )}
               </Text>
             </View>
@@ -202,7 +207,7 @@ function Transaction({
             <TouchableOpacity
               onPress={() => {
                 Linking.openURL(
-                  `https://0l.fyi/transactions/${userTransaction.version}`
+                  `https://0l.fyi/transactions/${userTransaction.version}`,
                 );
               }}
             >
@@ -226,7 +231,7 @@ function Transaction({
             <TouchableOpacity
               onPress={() => {
                 Linking.openURL(
-                  `https://0l.fyi/accounts/${userTransaction.sender}`
+                  `https://0l.fyi/accounts/${userTransaction.sender}`,
                 );
               }}
             >

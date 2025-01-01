@@ -9,14 +9,8 @@ import { KeyRotationRoutes } from "../../Router";
 import { ModalStackParams } from "../../../params";
 
 const SEND_KEY_ROTATION_TRANSACTION = gql`
-  mutation SendKeyRotationTransaction(
-    $address: Bytes!,
-    $newPublicKey: Bytes!
-  ) {
-    sendKeyRotationTransaction(
-      address: $address,
-      newPublicKey: $newPublicKey
-    )
+  mutation SendKeyRotationTransaction($address: Bytes!, $newPublicKey: Bytes!) {
+    sendKeyRotationTransaction(address: $address, newPublicKey: $newPublicKey)
   }
 `;
 

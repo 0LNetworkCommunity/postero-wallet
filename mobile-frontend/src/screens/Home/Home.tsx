@@ -5,7 +5,10 @@ import { Home as HomeScreen } from "@postero/ui";
 import { useWallets } from "../Wallets/hook";
 import { ModalStackParams } from "../params";
 import ContextMenu, { ContextMenuHandle } from "./ContextMenu";
-import { NewWalletBottomSheet, NewWalletBottomSheetHandle } from "./NewWalletBottomSheet";
+import {
+  NewWalletBottomSheet,
+  NewWalletBottomSheetHandle,
+} from "./NewWalletBottomSheet";
 
 const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
   navigation,
@@ -21,7 +24,7 @@ const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
   if (wallets) {
     for (const wallet of wallets) {
       const libraBalance = wallet.balances.find(
-        (it) => it.coin.symbol === "LIBRA"
+        (it) => it.coin.symbol === "LIBRA",
       );
       if (libraBalance === undefined) {
         continue;
@@ -59,7 +62,7 @@ const Home: FC<StackScreenProps<ModalStackParams, "Main">> = ({
             let unlockedAmount = 0;
 
             const libraBalance = wallet.balances.find(
-              (balance) => balance.coin.symbol === "LIBRA"
+              (balance) => balance.coin.symbol === "LIBRA",
             );
 
             if (libraBalance) {

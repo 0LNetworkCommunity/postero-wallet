@@ -1,8 +1,14 @@
 import { useState } from "react";
-import { View, TextInput, ActivityIndicator, SafeAreaView, TouchableOpacity } from "react-native";
+import {
+  View,
+  TextInput,
+  ActivityIndicator,
+  SafeAreaView,
+  TouchableOpacity,
+} from "react-native";
 import tw from "twrnc";
 import { gql, useApolloClient } from "@apollo/client";
-import * as Clipboard from 'expo-clipboard';
+import * as Clipboard from "expo-clipboard";
 import { CompositeScreenProps } from "@react-navigation/native";
 
 import { Button } from "@postero/ui";

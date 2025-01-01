@@ -12,9 +12,13 @@ import {
   UserTransaction,
 } from "../../movements";
 import LibraAmount from "../../ui/LibraAmount";
-import { ArrowUpRightIcon, Download01Icon, TransactionListItem } from "@postero/ui";
+import {
+  ArrowUpRightIcon,
+  Download01Icon,
+  TransactionListItem,
+} from "@postero/ui";
 
-const dateTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
+const dateTimeFormatter = new Intl.DateTimeFormat("fr-FR", {
   year: "numeric",
   month: "numeric",
   day: "numeric",
@@ -47,17 +51,16 @@ const MovementItem: FC<Props> = ({ movement }) => {
     }
 
     return dateTimeFormatter.format(
-      new Date(timestamp.div(new BN(1e3)).toNumber())
+      new Date(timestamp.div(new BN(1e3)).toNumber()),
     );
   }, [timestamp]);
 
   if (transaction.type === TransactionType.User) {
     const userTransaction = transaction as UserTransaction;
 
-    if (Buffer.from('01', 'hex').equals(userTransaction.moduleAddress)) {
-      if (userTransaction.moduleName === 'ol_account') {
-        if (userTransaction.functionName === 'transfer') {
-
+    if (Buffer.from("01", "hex").equals(userTransaction.moduleAddress)) {
+      if (userTransaction.moduleName === "ol_account") {
+        if (userTransaction.functionName === "transfer") {
           const args: string[] = JSON.parse(userTransaction.arguments);
 
           return (
@@ -74,7 +77,7 @@ const MovementItem: FC<Props> = ({ movement }) => {
                   movement.unlockedAmount.isNeg()
                     ? ArrowUpRightIcon
                     : Download01Icon
-                  }
+                }
                 amountLabel={`${new Decimal(args[1]).div(1e6)} Ƚ`}
                 feeLabel={`Fee: ${userTransaction.gasUsed.toString(10)} Ƚ`}
               />
@@ -111,13 +114,13 @@ const MovementItem: FC<Props> = ({ movement }) => {
         return null;
       })()}
 
-      <View style={{ flexDirection: 'row' }}>
+      <View style={{ flexDirection: "row" }}>
         <LibraAmount
           style={tw.style(
             "font-mono",
             movement.unlockedAmount.isPos() && "text-green-600",
             movement.unlockedAmount.isNeg() && "text-red-600",
-            movement.unlockedAmount.isZero() && "text-slate-800"
+            movement.unlockedAmount.isZero() && "text-slate-800",
           )}
         >
           {movement.unlockedAmount}
@@ -130,7 +133,7 @@ const MovementItem: FC<Props> = ({ movement }) => {
                 "font-mono",
                 movement.lockedAmount.isPos() && "text-green-600",
                 movement.lockedAmount.isNeg() && "text-red-600",
-                movement.lockedAmount.isZero() && "text-slate-800"
+                movement.lockedAmount.isZero() && "text-slate-800",
               )}
             >
               {movement.lockedAmount}

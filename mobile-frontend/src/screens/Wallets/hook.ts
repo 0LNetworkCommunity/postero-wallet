@@ -104,7 +104,7 @@ export const useWallets = () => {
       const walletAddress = res.data.data.walletRemoved;
       if (walletAddress !== undefined) {
         setWallets((wallets) =>
-          wallets?.filter((wallet) => wallet.address !== walletAddress)
+          wallets?.filter((wallet) => wallet.address !== walletAddress),
         );
       }
     },
@@ -117,7 +117,8 @@ export const useWallets = () => {
       }
       const wallet = res.data.data.walletUpdated;
       setWallets((wallets) => {
-        const index = wallets?.findIndex((it) => it.address === wallet.address) ?? -1;
+        const index =
+          wallets?.findIndex((it) => it.address === wallet.address) ?? -1;
         if (index === -1) {
           return [...(wallets ?? []), wallet];
         }

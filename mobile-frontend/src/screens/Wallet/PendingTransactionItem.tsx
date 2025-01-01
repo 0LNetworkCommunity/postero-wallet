@@ -2,8 +2,16 @@ import { useMemo, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { Text } from "@postero/ui";
 import tw from "twrnc";
-import { gql, useApolloClient, useQuery, useSubscription } from "@apollo/client";
-import { PendingTransaction, PendingTransactionStatus } from "../Transaction/types";
+import {
+  gql,
+  useApolloClient,
+  useQuery,
+  useSubscription,
+} from "@apollo/client";
+import {
+  PendingTransaction,
+  PendingTransactionStatus,
+} from "../Transaction/types";
 import { Countdown } from "../../ui/Countdown";
 
 const GET_PENDING_TRANSACTION = gql`
@@ -118,9 +126,7 @@ export function PendingTransactionItem({ hash }: Props) {
     if (!pendingTransaction) {
       return "";
     }
-    return dateTimeFormatter.format(
-      new Date(pendingTransaction.createdAt)
-    );
+    return dateTimeFormatter.format(new Date(pendingTransaction.createdAt));
   }, [pendingTransaction?.createdAt]);
 
   if (pendingTransaction) {

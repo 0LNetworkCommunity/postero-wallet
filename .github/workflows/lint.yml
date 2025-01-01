@@ -20,3 +20,15 @@ jobs:
 
       - name: Install UI packages
         run: cd ui && bun install
+
+  eslint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup repository
+        uses: actions/checkout@v4
+
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: run linter
+        run: bun run lint

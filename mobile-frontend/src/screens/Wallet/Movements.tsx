@@ -35,7 +35,7 @@ const Movements: FC<Props> = ({ movements }) => {
                       name: "Transaction",
                       params: {
                         hash: Buffer.from(item.transaction.hash).toString(
-                          "hex"
+                          "hex",
                         ),
                       },
                     });

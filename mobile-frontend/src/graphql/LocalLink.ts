@@ -14,7 +14,7 @@ class LocalLink extends ApolloLink {
 
   public request(
     operation: Operation,
-    forward?: NextLink
+    forward?: NextLink,
   ): Observable<FetchResult> | null {
     return new Observable((observer) => {
       setTimeout(() => {

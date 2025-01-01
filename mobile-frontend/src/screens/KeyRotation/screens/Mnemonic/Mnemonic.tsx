@@ -5,7 +5,7 @@ import { LangEn, Mnemonic } from "ethers";
 import { gql, useApolloClient } from "@apollo/client";
 import { CompositeScreenProps } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
-import * as Clipboard from 'expo-clipboard';
+import * as Clipboard from "expo-clipboard";
 
 import { Button } from "@postero/ui";
 

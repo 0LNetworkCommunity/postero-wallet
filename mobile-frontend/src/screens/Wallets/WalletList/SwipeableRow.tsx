@@ -47,7 +47,7 @@ class SwipeableRow extends Component<Props> {
     text: string,
     color: string,
     x: number,
-    progress: Animated.AnimatedInterpolation<number>
+    progress: Animated.AnimatedInterpolation<number>,
   ) {
     const trans = progress.interpolate({
       inputRange: [0, 1],
