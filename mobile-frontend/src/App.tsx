@@ -16,8 +16,8 @@ import HomeScreen from "./screens/Home";
 import NewWalletScreen from "./screens/NewWallet";
 import WalletScreen from "./screens/Wallet";
 
-import bootstrap from "./backend";
-import { getApolloClient } from "./graphql/apollo-client";
+// import bootstrap from "./backend";
+// import { getApolloClient } from "./graphql/apollo-client";
 import { ModalStackParams } from "./screens/params";
 import NewTransfer from "./screens/NewTransfer";
 import WalletDetails from "./screens/WalletDetails";
@@ -43,16 +43,16 @@ const App: FC = () => {
   const [apolloClient, setApolloClient] =
     useState<ApolloClient<NormalizedCacheObject>>();
 
-  useEffect(() => {
-    const load = async () => {
-      const backend = await bootstrap();
-      setApolloClient(getApolloClient(backend));
-    };
-    load().catch((error) => {
-      console.error(error);
-      throw error;
-    });
-  }, []);
+  // useEffect(() => {
+  //   const load = async () => {
+  //     const backend = await bootstrap();
+  //     setApolloClient(getApolloClient(backend));
+  //   };
+  //   load().catch((error) => {
+  //     console.error(error);
+  //     throw error;
+  //   });
+  // }, []);
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded || fontError) {
