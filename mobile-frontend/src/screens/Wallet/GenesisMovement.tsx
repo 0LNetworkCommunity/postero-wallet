@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Movement } from "../../../movements";
+import { Movement } from "../../movements";
 
 interface Props {
   movement: Movement;
