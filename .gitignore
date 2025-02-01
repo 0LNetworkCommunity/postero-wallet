@@ -73,3 +73,7 @@ tsconfig.json
 .cache/
 
 *storybook.log
+
+# don't store lock files
+bun.lockb
+bun.lock
