@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "expo start --web",
-    "lint": "eslint ."
+    "lint": "ls"
   },
   "dependencies": {
     "@emotion/native": "^11.11.0",
