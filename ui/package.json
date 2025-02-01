@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "expo start --web"
+    "dev": "expo start --web",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@emotion/native": "^11.11.0",
@@ -42,6 +43,8 @@
     "@storybook/test": "^7.6.20",
     "@types/d3": "^7.4.3",
     "@types/react": "~18.2.79",
+    "eslint": "^8.57.0",
+    "eslint-config-expo": "~7.1.2",
     "expo-clipboard": "~6.0.3",
     "expo-device": "~6.0.2",
     "react-native-web": "~0.19.13",
