@@ -60,4 +60,5 @@ Unable to resolve "@postero/ui" from "src/screens/WalletDetails/WalletDetails.ts
 - [] Fix local module deps
 - [] make mobile frontend build
 - [] remove Apollo for client side state
+- [] remove shims
 - [] minimalist android demo
